@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity{
+public class User extends BaseEntity {
     private String name; // 이름
 
     public User(String name) {
@@ -18,12 +18,12 @@ public class User extends BaseEntity{
 
     @Override
     public String toString(){
-        return String.format("USER ( \n" +
-                " id=%s, createdAt=%s, updateAt=%s \n" +
-                " name=%s \n" + ")",
+        return String.format("Channel ( \n" +
+                        " id=%s, createdAt=%s, updateAt=%s \n" +
+                        " name=%s \n" +
+                        ")",
                 super.getId(), super.getCreatedAt(),super.getUpdatedAt(),
                 this.name
         );
     }
-
 }
