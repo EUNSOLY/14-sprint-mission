@@ -1,8 +1,12 @@
 package com.sprint.mission;
 
 
+import com.sprint.mission.discodeit.entity.User;
+
 public class Application {
     public static void main(String[] args) {
-        System.out.printf("하이로");
+        User aaron = new User("Aaron");
+        System.out.println(aaron);
+        System.out.println(aaron.getCreatedAt());
     }
 }
