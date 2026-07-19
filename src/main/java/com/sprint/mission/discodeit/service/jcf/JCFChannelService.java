@@ -15,7 +15,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel find(UUID id) {
         if(!data.containsKey(id)){
-            throw new RuntimeException("요청한 데이터가 존재하지 않습니다.");
+            return null;
         }
         return data.get(id);
     }

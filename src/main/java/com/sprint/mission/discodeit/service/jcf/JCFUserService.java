@@ -15,7 +15,7 @@ public class JCFUserService implements UserService {
     @Override
     public User find(UUID id) {
         if(!data.containsKey(id)){
-            throw new RuntimeException("요청한 사용자의 데이터가 존재하지 않습니다.");
+            return null;
         }
         return data.get(id);
     }

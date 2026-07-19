@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.UUID;
+
 public class JavaApplication {
     public static void main(String[] args) {
 
@@ -65,11 +67,14 @@ public class JavaApplication {
         Message message1 = new Message("첫번째 메세지 입니다.", baron.getId(), channel2.getId());
         Message message2 = new Message("두번째 메세지 입니다.", aaron.getId(), channel1.getId());
         Message message3 = new Message("세번째 메세지 입니다.", baron.getId(), channel1.getId());
+        Message message4 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
 
-        MessageService messageService = new JCFMessageService();
+        MessageService messageService = new JCFMessageService(userService,channelService);
         messageService.save(message1);
         messageService.save(message2);
         messageService.save(message3);
+        messageService.save(message4);
+
         System.out.println("단건 조회");
         System.out.println(messageService.find(message1.getId()));
         System.out.println("다건 조회");
