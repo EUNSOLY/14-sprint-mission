@@ -17,9 +17,9 @@ public class JavaApplication {
 
         // User
         System.out.println("=============== 사용자 ===============");
-        User aaron = new User("Aaron");
-        User baron = new User("Baron");
-        User caron = new User("Caron");
+        User aaron = new User("Aaron","010-1111-1111");
+        User baron = new User("Baron","010-2222-2222");
+        User caron = new User("Caron","010-3333-3333");
 
         UserService userService = new JCFUserService();
         userService.save(aaron);
