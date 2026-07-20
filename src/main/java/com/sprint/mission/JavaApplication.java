@@ -32,6 +32,7 @@ public class JavaApplication {
         System.out.println(userService.findAll());
         User newAaron = userService.find(aaron.getId());
         newAaron.changeName("Aaron_2");
+        userService.update(newAaron.getId(), newAaron);
         System.out.println(userService.find(newAaron.getId()));
         User deleteUser = userService.find(caron.getId());
         userService.delete(deleteUser.getId());
@@ -56,6 +57,7 @@ public class JavaApplication {
         System.out.println(channelService.findAll());
         Channel newChannel1 = channelService.find(channel1.getId());
         newChannel1.changeName("new_Channel1");
+        channelService.update(newChannel1.getId(), newChannel1);
         System.out.println(channelService.find(newChannel1.getId()));
         Channel deleteChannel = channelService.find(channel3.getId());
         channelService.delete(deleteChannel.getId());
@@ -81,6 +83,8 @@ public class JavaApplication {
         System.out.println(messageService.findAll());
         Message newMessage1 = messageService.find(message1.getId());
         newMessage1.changeMessage("변경 된 메세지 입니다.");
+        messageService.update(newMessage1.getId(), newMessage1);
+
         System.out.println(messageService.find(newMessage1.getId()));
         Message deleteMessage = messageService.find(message3.getId());
         messageService.delete(deleteMessage.getId());
