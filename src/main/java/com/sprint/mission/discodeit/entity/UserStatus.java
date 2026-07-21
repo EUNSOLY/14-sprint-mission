@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 
 @Getter
+@ToString
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public enum UserStatus {

@@ -55,12 +55,12 @@ public class User extends BaseEntity {
 
     @Override
     public String toString() {
-        return String.format("Channel ( \n" +
+        return String.format("User ( \n" +
                         " id=%s, createdAt=%s, updateAt=%s \n" +
-                        " name=%s \n" +
+                        " name=%s, nickname=%s, phone=%s, status=%s \n" +
                         ")",
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
-                this.name
+                this.name, this.nickname, this.phone, this.status
         );
     }
 }
