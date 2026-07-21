@@ -3,31 +3,63 @@ package com.sprint.mission.discodeit.entity;
 public class User extends BaseEntity {
     private String name; // 이름
     private String phone;
+    private String nickname;
+    private UserStatus status;
 
-    public User(String name, String phone) {
+
+    public User(String name, String phone, String nickname, UserStatus status) {
         super();
         this.name = name;
         this.phone = phone;
+        this.nickname = nickname;
+        this.status = status;
     }
 
-    public void changeName(String name){
+    public void changeName(String name) {
         this.name = name;
+        super.changeUpdatedAt();
     }
-    public void changePhone(String phone){this.phone = phone;}
 
-    public String getName(){
+    public void changePhone(String phone) {
+        this.phone = phone;
+        super.changeUpdatedAt();
+    }
+
+    public void changeStatus(UserStatus status) {
+        this.status = status;
+        super.changeUpdatedAt();
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+        super.changeUpdatedAt();
+    }
+
+    ;
+
+    public String getName() {
         return this.name;
     }
 
-    public String getPhone(){return this.phone;}
+    public String getPhone() {
+        return this.phone;
+    }
+
+    public UserStatus getStatus() {
+        return this.status;
+    }
+
+    public String getNickname() {
+        return this.nickname;
+    }
 
     @Override
-    public String toString(){
+    public String toString() {
         return String.format("Channel ( \n" +
                         " id=%s, createdAt=%s, updateAt=%s \n" +
                         " name=%s \n" +
                         ")",
-                super.getId(), super.getCreatedAt(),super.getUpdatedAt(),
+                super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
                 this.name
         );
     }

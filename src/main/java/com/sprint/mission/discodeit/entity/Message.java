@@ -17,6 +17,7 @@ public class Message extends BaseEntity  {
 
     public void changeMessage(String message){
         this.message = message;
+        super.changeUpdatedAt();
     }
 
     public String getMessage(){
