@@ -2,7 +2,11 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data = new HashMap<>();
@@ -14,7 +18,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID id) {
-        if(!data.containsKey(id)){
+        if (!data.containsKey(id)) {
             return null;
         }
         return data.get(id);
@@ -27,7 +31,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(UUID id, Channel channel) {
-        if(!data.containsKey(id)){
+        if (!data.containsKey(id)) {
             throw new RuntimeException("요청한 데이터가 존재하지 않습니다.");
         }
         data.replace(id, channel);
@@ -36,7 +40,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void delete(UUID id) {
-        if(!data.containsKey(id)){
+        if (!data.containsKey(id)) {
             throw new RuntimeException("요청한 데이터가 존재하지 않습니다.");
         }
         data.remove(id);

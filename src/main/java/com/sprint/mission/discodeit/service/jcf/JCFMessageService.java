@@ -16,18 +16,18 @@ public class JCFMessageService implements MessageService {
     public JCFMessageService(
             UserService userService,
             ChannelService channelService
-    ){
+    ) {
         this.channelService = channelService;
         this.userService = userService;
     }
 
     @Override
     public void save(Message message) {
-        if(Objects.isNull(this.userService.find(message.getUserId()))){
+        if (Objects.isNull(this.userService.find(message.getUserId()))) {
             throw new RuntimeException("잘못된 사용자 ID 입니다. 확인 해주세요. 메세지 내용 : " + message.getMessage());
         }
 
-        if(Objects.isNull(this.channelService.find(message.getChannelId()))){
+        if (Objects.isNull(this.channelService.find(message.getChannelId()))) {
             throw new RuntimeException("잘못된 사용자 ID 입니다. 확인 해주세요. 메세지 내용 : " + message.getMessage());
         }
 
@@ -36,11 +36,34 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message find(UUID id) {
-        if(!data.containsKey(id)){
+        if (!data.containsKey(id)) {
             return null;
         }
         return data.get(id);
     }
+
+    @Override
+    public List<Message> findByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(message -> message.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.getUserId().equals(userId))
+                .toList();
+    }
+
 
     @Override
     public List<Message> findAll() {
@@ -49,7 +72,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void update(UUID id, Message message) {
-        if(!data.containsKey(id)){
+        if (!data.containsKey(id)) {
             throw new RuntimeException("요청한 데이터가 존재하지 않습니다.");
         }
         data.replace(id, message);
@@ -58,7 +81,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void delete(UUID id) {
-        if(!data.containsKey(id)){
+        if (!data.containsKey(id)) {
             throw new RuntimeException("요청한 데이터가 존재하지 않습니다.");
         }
         data.remove(id);

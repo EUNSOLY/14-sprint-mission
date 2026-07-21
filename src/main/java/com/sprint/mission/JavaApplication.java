@@ -11,6 +11,8 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.List;
+
 public class JavaApplication {
     public static void main(String[] args) {
 
@@ -73,9 +75,11 @@ public class JavaApplication {
         System.out.println(channelService.findAll());
 
         System.out.println("=============== 메세지 ===============");
-        Message message1 = new Message("첫번째 메세지 입니다.", baron.getId(), channel2.getId());
-        Message message2 = new Message("두번째 메세지 입니다.", aaron.getId(), channel1.getId());
+        Message message1 = new Message("첫번째 메세지 입니다.", aaron.getId(), channel2.getId());
+        Message message2 = new Message("두번째 메세지 입니다.", baron.getId(), channel1.getId());
         Message message3 = new Message("세번째 메세지 입니다.", baron.getId(), channel1.getId());
+        Message message4 = new Message("아론의 두번째 메세지 입니다.", aaron.getId(), channel1.getId());
+        Message message5 = new Message("아론의 세번째 메세지 입니다.", aaron.getId(), channel1.getId());
 
 
         MessageService messageService = new JCFMessageService(userService, channelService);
@@ -83,6 +87,8 @@ public class JavaApplication {
         messageService.save(message1);
         messageService.save(message2);
         messageService.save(message3);
+        messageService.save(message4);
+        messageService.save(message5);
 
         System.out.println("단건 조회");
         System.out.println(messageService.find(message1.getId()));
@@ -100,9 +106,27 @@ public class JavaApplication {
         System.out.println("최종 조회");
         System.out.println(messageService.findAll());
 
+        // 특정 유저 메세지
+        System.out.println("-------" + aaron.getName() + "님의 메세지만 조회합니다. -------");
+
+        List<Message> userMessage = messageService.findByUserId(aaron.getId());
+        userMessage.forEach(System.out::println);
+
+        // 특정 채널 메세지
+        System.out.println("------- 채널명 : [" + channel2.getName() + "] 메세지만 조회합니다. -------");
+
+        List<Message> channelMessage = messageService.findByChannelId(channel2.getId());
+        channelMessage.forEach(System.out::println);
+
+        // 특정 채널 + 회원 메세지
+        System.out.println("------- 채널명 : [" + channel1.getName() + "] - " + aaron.getName() + "님 메세지만 조회합니다. -------");
+
+        List<Message> channelByUserMessage = messageService.findByChannelIdAndUserId(aaron.getId(), channel1.getId());
+        channelByUserMessage.forEach(System.out::println);
+
         //심화 검증 테스트
-//        Message message4 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
-//        messageService.save(message4);
+//        Message message6 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
+//        messageService.save(message6);
 
     }
 }
