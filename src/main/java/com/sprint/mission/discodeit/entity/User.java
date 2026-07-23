@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-
-public class User extends BaseEntity implements Serializable {
+public class User extends BaseEntity {
     private String name; // 이름
     private String phone;
     private String nickname;
