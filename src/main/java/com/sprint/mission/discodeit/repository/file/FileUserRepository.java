@@ -43,6 +43,8 @@ public class FileUserRepository implements UserRepository {
         Map<UUID, User> fileDatabase = this.load(); // 파일 로드해서
         fileDatabase.put(user.getId(), user); // 신규 데이터 저장
         this.fileSave(fileDatabase);
+        Map<UUID, User> test = this.load(); // 파일 로드해서
+        System.out.println("테스트중입니다 --->" + test);
     }
 
 
