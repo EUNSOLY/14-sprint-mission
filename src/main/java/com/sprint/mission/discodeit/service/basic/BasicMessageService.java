@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.Objects;
@@ -10,13 +12,13 @@ import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    private final BasicUserService userService;
-    private final BasicChannelService channelService;
+    private final UserService userService;
+    private final ChannelService channelService;
 
     public BasicMessageService(
             MessageRepository messageRepository,
-            BasicUserService basicUserService,
-            BasicChannelService basicChannelService
+            UserService basicUserService,
+            ChannelService basicChannelService
     ) {
         this.messageRepository = messageRepository;
         this.userService = basicUserService;
@@ -59,7 +61,7 @@ public class BasicMessageService implements MessageService {
         if (Objects.isNull(userService.find(userId)) || Objects.isNull(channelService.find(channelId))) {
             throw new RuntimeException("회원정보 또는 채널 정보가 잘못 됬습니다.");
         }
-        
+
         return messageRepository.findByChannelIdAndUserId(userId, channelId);
 
     }
