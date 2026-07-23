@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface UserRepository {
     void save(User user);
 
-    User find(UUID id);
+    User findById(UUID id);
 
     List<User> findAll();
 

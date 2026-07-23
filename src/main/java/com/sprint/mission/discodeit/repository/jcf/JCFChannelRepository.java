@@ -17,10 +17,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel find(UUID id) {
-        if (!data.containsKey(id)) {
-            return null;
-        }
+    public Channel findById(UUID id) {
         return data.get(id);
     }
 
@@ -37,6 +34,5 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public void delete(UUID id) {
         data.remove(id);
-
     }
 }

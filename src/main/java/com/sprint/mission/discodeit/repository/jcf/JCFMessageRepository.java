@@ -11,14 +11,14 @@ import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data = new HashMap<>();
-    
+
     @Override
     public void save(Message message) {
         data.put(message.getId(), message);
     }
 
     @Override
-    public Message find(UUID id) {
+    public Message findById(UUID id) {
         return data.get(id);
     }
 

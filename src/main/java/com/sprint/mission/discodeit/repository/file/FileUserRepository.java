@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class FileUserRepository implements UserService {
+public class FileUserRepository implements UserRepository {
     private static final String FILE_NAME = "user.dir";
 
     private void fileSave(Map<UUID, User> data) {
@@ -45,8 +45,9 @@ public class FileUserRepository implements UserService {
         this.fileSave(fileDatabase);
     }
 
+
     @Override
-    public User find(UUID id) {
+    public User findById(UUID id) {
         Map<UUID, User> users = this.load();
         return users.get(id);
     }

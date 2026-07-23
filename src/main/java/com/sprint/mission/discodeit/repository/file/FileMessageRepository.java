@@ -46,8 +46,9 @@ public class FileMessageRepository implements MessageRepository {
         this.fileSave(fileDatabase);
     }
 
+
     @Override
-    public Message find(UUID id) {
+    public Message findById(UUID id) {
         Map<UUID, Message> messages = this.load();
         return messages.get(id);
     }

@@ -47,7 +47,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel find(UUID id) {
+    public Channel findById(UUID id) {
         Map<UUID, Channel> Channels = this.load();
         if (!Channels.containsKey(id)) {
             return null;

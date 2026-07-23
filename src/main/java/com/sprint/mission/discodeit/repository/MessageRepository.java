@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface MessageRepository {
     void save(Message message);
 
-    Message find(UUID id);
+    Message findById(UUID id);
 
     List<Message> findByUserId(UUID userId);
 

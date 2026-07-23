@@ -16,7 +16,6 @@ public interface MessageService {
 
     List<Message> findByChannelIdAndUserId(UUID channelId, UUID userId);
 
-
     List<Message> findAll();
 
     void update(UUID id, Message message);
