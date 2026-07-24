@@ -34,9 +34,7 @@ public class JavaApplication {
         System.out.println(userService.findAll());
         // 사용자 수정
         User newAaron = userService.find(aaron.getId());
-        newAaron.changeName("Aaron_2");
-        newAaron.changeNickname("aarorong");
-        newAaron.changeStatus(UserStatus.toUserStatus("자리비움"));
+        newAaron.update("Aaron_2", null, UserStatus.toUserStatus("자리비움"), "aarorong");
         userService.update(newAaron.getId(), newAaron);
         System.out.println(userService.find(newAaron.getId()));
         // 사용자 삭제

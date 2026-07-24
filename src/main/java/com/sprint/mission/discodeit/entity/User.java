@@ -14,28 +14,14 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.status = status;
     }
-
-    public void changeName(String name) {
-        this.name = name;
+    
+    public void update(String name, String phone, UserStatus status, String nickname) {
+        if (name != null) this.name = name;
+        if (phone != null) this.phone = phone;
+        if (status != null) this.status = status;
+        if (nickname != null) this.nickname = nickname;
         super.changeUpdatedAt();
     }
-
-    public void changePhone(String phone) {
-        this.phone = phone;
-        super.changeUpdatedAt();
-    }
-
-    public void changeStatus(UserStatus status) {
-        this.status = status;
-        super.changeUpdatedAt();
-    }
-
-    public void changeNickname(String nickname) {
-        this.nickname = nickname;
-        super.changeUpdatedAt();
-    }
-
-    ;
 
     public String getName() {
         return this.name;

@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -35,12 +35,14 @@ public class JavaFileIOApplication {
     public static void main(String[] args) {
         // 서비스 초기화
         // TODO Basic*Service 구현체를 초기화하세요.
-//        UserService userService = new BasicUserService(new JCFUserRepository());
-//        ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
-//        MessageService messageService = new BasicMessageService(new JCFMessageRepository(), userService, channelService);
-        UserService userService = new BasicUserService(new FileUserRepository());
-        ChannelService channelService = new BasicChannelService(new FileChannelRepository());
-        MessageService messageService = new BasicMessageService(new FileMessageRepository(), userService, channelService);
+        UserService userService = new BasicUserService(new JCFUserRepository());
+        ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
+        MessageService messageService = new BasicMessageService(new JCFMessageRepository(), userService, channelService);
+
+//        UserService userService = new BasicUserService(new FileUserRepository());
+//        ChannelService channelService = new BasicChannelService(new FileChannelRepository());
+//        MessageService messageService = new BasicMessageService(new FileMessageRepository(), userService, channelService);
+        
 //        UserService userService = new JCFUserService();
 //        ChannelService channelService = new JCFChannelService();
 //        MessageService messageService = new JCFMessageService(userService, channelService);

@@ -27,7 +27,7 @@
 
 ### 도메인 모델링
 
-- [ ] 디스코드 서비스를 활용해보면서 각 도메인 모델에 필요한 정보를 도출하고, Java Class로 구현하세요.
+- [x] 디스코드 서비스를 활용해보면서 각 도메인 모델에 필요한 정보를 도출하고, Java Class로 구현하세요.
     - [x] 패키지명: `com.sprint.mission.discodeit.entity`
     - [x] 도메인 모델 정의
         - [x] 공통
@@ -41,7 +41,8 @@
         - [x] `createdAt`는 생성자에서 초기화하세요.
         - [x] `id`, `createdAt`, `updatedAt`을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
     - [x] 메소드
-        - [x] 각 필드를 반환하는 `Getter` 함수를 정의하세요.
+        - [x] 각 필드를 반환하는 `Getter` 함수를
+          정의하세요.[JavaApplication.java](src/main/java/com/sprint/mission/JavaApplication.java)
         - [x] 필드를 수정하는 `update` 함수를 정의하세요.
 
 ### 서비스 설계 및 구현
@@ -102,10 +103,10 @@
     - [x] 클래스 패키지명: `com.sprint.mission.discodeit.repository.jcf`
     - [x] 클래스 네이밍 규칙: `JCF[인터페이스 이름]`
     - [x] 기존에 구현한 `JCF*Service` 구현체의 "저장 로직"과 관련된 코드를 참고하여 구현하세요.
-- [ ] 다음의 조건을 만족하는 레포지토리 인터페이스의 구현체를 작성하세요. (File 버전)
-    - [ ] 클래스 패키지명: `com.sprint.mission.discodeit.repository.file`
-    - [ ] 클래스 네이밍 규칙: `File[인터페이스 이름]`
-    - [ ] 기존에 구현한 `File*Service` 구현체의 "저장 로직"과 관련된 코드를 참고하여 구현하세요.
+- [x] 다음의 조건을 만족하는 레포지토리 인터페이스의 구현체를 작성하세요. (File 버전)
+    - [x] 클래스 패키지명: `com.sprint.mission.discodeit.repository.file`
+    - [x] 클래스 네이밍 규칙: `File[인터페이스 이름]`
+    - [x] 기존에 구현한 `File*Service` 구현체의 "저장 로직"과 관련된 코드를 참고하여 구현하세요.
 
 ---
 
@@ -113,10 +114,10 @@
 
 ### 4. 관심사 분리를 통한 레이어 간 의존성 주입
 
-- [ ] 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
-    - [ ] 클래스 패키지명: `com.sprint.mission.discodeit.service.basic`
-    - [ ] 클래스 네이밍 규칙: `Basic[인터페이스 이름]`
-    - [ ] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
-    - [ ] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
-    - [ ] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
-- [ ] `Basic*Service` 구현체를 활용하여 테스트해보세요.
+- [x] 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
+    - [x] 클래스 패키지명: `com.sprint.mission.discodeit.service.basic`
+    - [x] 클래스 네이밍 규칙: `Basic[인터페이스 이름]`
+    - [x] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
+    - [x] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
+    - [x] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
+- [x] `Basic*Service` 구현체를 활용하여 테스트해보세요.
