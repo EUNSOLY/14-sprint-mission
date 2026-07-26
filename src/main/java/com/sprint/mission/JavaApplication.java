@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -25,25 +26,30 @@ public class JavaApplication {
         // 사용자 저장
 //        UserService userService = new JCFUserService();
         UserService userService = JCFUserService.getInstance();
-        userService.save(aaron);
-        userService.save(baron);
-        userService.save(caron);
 
-        System.out.println("단건 조회");
-        System.out.println(userService.find(aaron.getId()));
-        System.out.println("다건 조회");
-        System.out.println(userService.findAll());
-        // 사용자 수정
-        User newAaron = userService.find(aaron.getId());
-        newAaron.update("Aaron_2", null, UserStatus.toUserStatus("자리비움"), "aarorong");
-        userService.update(newAaron.getId(), newAaron);
-        System.out.println(userService.find(newAaron.getId()));
-        // 사용자 삭제
-        User deleteUser = userService.find(caron.getId());
-        userService.delete(deleteUser.getId());
+        try {
+            userService.save(aaron);
+            userService.save(baron);
+            userService.save(caron);
 
-        System.out.println("최종 조회");
-        System.out.println(userService.findAll());
+            System.out.println("단건 조회");
+            System.out.println(userService.find(aaron.getId()));
+            System.out.println("다건 조회");
+            System.out.println(userService.findAll());
+            // 사용자 수정
+            User newAaron = userService.find(aaron.getId());
+            newAaron.update("Aaron_2", null, UserStatus.toUserStatus("자리비움"), "aarorong");
+            userService.update(newAaron.getId(), newAaron);
+            System.out.println(userService.find(newAaron.getId()));
+            // 사용자 삭제
+            User deleteUser = userService.find(caron.getId());
+            userService.delete(deleteUser.getId());
+
+            System.out.println("최종 조회");
+            System.out.println(userService.findAll());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
 
         // Channel
@@ -54,25 +60,31 @@ public class JavaApplication {
 
 //        ChannelService channelService = new JCFChannelService();
         ChannelService channelService = JCFChannelService.getInstance();
-        // 채널 저장
-        channelService.save(channel1);
-        channelService.save(channel2);
-        channelService.save(channel3);
-        System.out.println("단건 조회");
-        System.out.println(channelService.find(channel1.getId()));
-        System.out.println("다건 조회");
-        System.out.println(channelService.findAll());
-        // 채널 수정
-        Channel newChannel1 = channelService.find(channel1.getId());
-        newChannel1.changeName("new_Channel1");
-        channelService.update(newChannel1.getId(), newChannel1);
-        System.out.println(channelService.find(newChannel1.getId()));
-        // 채널 삭제
-        Channel deleteChannel = channelService.find(channel3.getId());
-        channelService.delete(deleteChannel.getId());
 
-        System.out.println("최종 조회");
-        System.out.println(channelService.findAll());
+        try {
+            // 채널 저장
+            channelService.save(channel1);
+            channelService.save(channel2);
+            channelService.save(channel3);
+            System.out.println("단건 조회");
+            System.out.println(channelService.find(channel1.getId()));
+            System.out.println("다건 조회");
+            System.out.println(channelService.findAll());
+            // 채널 수정
+            Channel newChannel1 = channelService.find(channel1.getId());
+            newChannel1.changeName("new_Channel1");
+            channelService.update(newChannel1.getId(), newChannel1);
+            System.out.println(channelService.find(newChannel1.getId()));
+            // 채널 삭제
+            Channel deleteChannel = channelService.find(channel3.getId());
+            channelService.delete(deleteChannel.getId());
+
+            System.out.println("최종 조회");
+            System.out.println(channelService.findAll());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
 
         System.out.println("=============== 메세지 ===============");
         Message message1 = new Message("첫번째 메세지 입니다.", aaron.getId(), channel2.getId());
@@ -83,50 +95,56 @@ public class JavaApplication {
 
 
         MessageService messageService = new JCFMessageService(userService, channelService);
-        // 메세지 저장
-        messageService.save(message1);
-        messageService.save(message2);
-        messageService.save(message3);
-        messageService.save(message4);
-        messageService.save(message5);
+        try {
+            // 메세지 저장
+            messageService.save(message1);
+            messageService.save(message2);
+            messageService.save(message3);
+            messageService.save(message4);
+            messageService.save(message5);
 
-        System.out.println("단건 조회");
-        System.out.println(messageService.find(message1.getId()));
-        System.out.println("다건 조회");
-        System.out.println(messageService.findAll());
-        // 메세지 수정
-        Message newMessage1 = messageService.find(message1.getId());
-        newMessage1.changeMessage("변경 된 메세지 입니다.");
-        messageService.update(newMessage1.getId(), newMessage1);
-        System.out.println(messageService.find(newMessage1.getId()));
-        // 메세지 삭제
-        Message deleteMessage = messageService.find(message3.getId());
-        messageService.delete(deleteMessage.getId());
+            System.out.println("단건 조회");
+            System.out.println(messageService.find(message1.getId()));
+            System.out.println("다건 조회");
+            System.out.println(messageService.findAll());
+            // 메세지 수정
+            Message newMessage1 = messageService.find(message1.getId());
+            newMessage1.changeMessage("변경 된 메세지 입니다.");
+            messageService.update(newMessage1.getId(), newMessage1);
+            System.out.println(messageService.find(newMessage1.getId()));
+            // 메세지 삭제
+            Message deleteMessage = messageService.find(message3.getId());
+            messageService.delete(deleteMessage.getId());
 
-        System.out.println("최종 조회");
-        System.out.println(messageService.findAll());
+            System.out.println("최종 조회");
+            System.out.println(messageService.findAll());
 
-        // 특정 유저 메세지
-        System.out.println("-------" + aaron.getName() + "님의 메세지만 조회합니다. -------");
+            // 특정 유저 메세지
+            System.out.println("-------" + aaron.getName() + "님의 메세지만 조회합니다. -------");
 
-        List<Message> userMessage = messageService.findByUserId(aaron.getId());
-        userMessage.forEach(System.out::println);
+            List<Message> userMessage = messageService.findByUserId(aaron.getId());
+            userMessage.forEach(System.out::println);
 
-        // 특정 채널 메세지
-        System.out.println("------- 채널명 : [" + channel2.getName() + "] 메세지만 조회합니다. -------");
+            // 특정 채널 메세지
+            System.out.println("------- 채널명 : [" + channel2.getName() + "] 메세지만 조회합니다. -------");
 
-        List<Message> channelMessage = messageService.findByChannelId(channel2.getId());
-        channelMessage.forEach(System.out::println);
+            List<Message> channelMessage = messageService.findByChannelId(channel2.getId());
+            channelMessage.forEach(System.out::println);
 
-        // 특정 채널 + 회원 메세지
-        System.out.println("------- 채널명 : [" + channel1.getName() + "] - " + aaron.getName() + "님 메세지만 조회합니다. -------");
+            // 특정 채널 + 회원 메세지
+            System.out.println("------- 채널명 : [" + channel1.getName() + "] - " + aaron.getName() + "님 메세지만 조회합니다. -------");
 
-        List<Message> channelByUserMessage = messageService.findByChannelIdAndUserId(aaron.getId(), channel1.getId());
-        channelByUserMessage.forEach(System.out::println);
+            List<Message> channelByUserMessage = messageService.findByChannelIdAndUserId(aaron.getId(), channel1.getId());
+            channelByUserMessage.forEach(System.out::println);
 
-        //심화 검증 테스트
-//        Message message6 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
-//        messageService.save(message6);
+            //심화 검증 테스트
+            Message message6 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
+            messageService.save(message6);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 }
