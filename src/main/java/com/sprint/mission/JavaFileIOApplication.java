@@ -4,6 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -39,19 +42,20 @@ public class JavaFileIOApplication {
         ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
         MessageService messageService = new BasicMessageService(new JCFMessageRepository(), userService, channelService);
 
-//        UserService userService = new BasicUserService(new FileUserRepository());
-//        ChannelService channelService = new BasicChannelService(new FileChannelRepository());
-//        MessageService messageService = new BasicMessageService(new FileMessageRepository(), userService, channelService);
-        
+        UserService userFileService = new BasicUserService(new FileUserRepository());
+        ChannelService channelFileService = new BasicChannelService(new FileChannelRepository());
+        MessageService messageFileService = new BasicMessageService(new FileMessageRepository(), userService, channelService);
+
 //        UserService userService = new JCFUserService();
 //        ChannelService channelService = new JCFChannelService();
 //        MessageService messageService = new JCFMessageService(userService, channelService);
 
         // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        User user = setupUser(userFileService);
+        Channel channel = setupChannel(channelFileService);
+
         //x테스트
-        messageCreateTest(messageService, channel, user);
+        messageCreateTest(messageFileService, channel, user);
 
     }
 }

@@ -35,7 +35,7 @@ public class FileMessageRepository implements MessageRepository {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("역직렬화 할 클래스파일이 존재하지않습니다.");
         } catch (IOException e) {
-            throw new RuntimeException("데이터 파싱에 실패");
+            throw new RuntimeException("데이터 파싱에 실패", e);
         }
     }
 

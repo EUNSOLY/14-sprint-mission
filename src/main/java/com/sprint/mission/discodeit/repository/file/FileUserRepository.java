@@ -34,7 +34,7 @@ public class FileUserRepository implements UserRepository {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("역직렬화 할 클래스파일이 존재하지않습니다.");
         } catch (IOException e) {
-            throw new RuntimeException("데이터 파싱에 실패");
+            throw new RuntimeException("데이터 파싱에 실패", e);
         }
     }
 
@@ -43,8 +43,6 @@ public class FileUserRepository implements UserRepository {
         Map<UUID, User> fileDatabase = this.load(); // 파일 로드해서
         fileDatabase.put(user.getId(), user); // 신규 데이터 저장
         this.fileSave(fileDatabase);
-        Map<UUID, User> test = this.load(); // 파일 로드해서
-        System.out.println("테스트중입니다 --->" + test);
     }
 
 

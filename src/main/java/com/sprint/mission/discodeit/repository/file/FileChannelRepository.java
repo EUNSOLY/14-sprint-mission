@@ -35,7 +35,7 @@ public class FileChannelRepository implements ChannelRepository {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("역직렬화 할 클래스파일이 존재하지않습니다.");
         } catch (IOException e) {
-            throw new RuntimeException("데이터 파싱에 실패");
+            throw new RuntimeException("데이터 파싱에 실패", e);
         }
     }
 
@@ -49,9 +49,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Channel findById(UUID id) {
         Map<UUID, Channel> Channels = this.load();
-        if (!Channels.containsKey(id)) {
-            return null;
-        }
         return Channels.get(id);
     }
 
@@ -63,10 +60,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void update(UUID id, Channel channel) {
         Map<UUID, Channel> Channels = this.load(); // 파일 로드해서
-        if (!Channels.containsKey(id)) {
-            throw new RuntimeException("요청한 사용자의 데이터가 존재하지 않습니다.");
-        }
-
         Map<UUID, Channel> memoryDatabase = new HashMap<>(Channels); // 파일을 덮어 씌우고
         memoryDatabase.replace(id, channel); // 데이터 저장해
         this.fileSave(memoryDatabase); // 데이터 파일로 만들어
@@ -76,9 +69,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void delete(UUID id) {
         Map<UUID, Channel> Channels = this.load(); // 파일 로드해서
-        if (!Channels.containsKey(id)) {
-            throw new RuntimeException("요청한 사용자의 데이터가 존재하지 않습니다.");
-        }
         Channels.remove(id);
         fileSave(Channels);
     }
