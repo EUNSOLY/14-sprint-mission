@@ -1,5 +1,19 @@
 # 14-sprint-mission
 
+## 🎯 학습 목표
+
+- [ ] **Git & GitHub**를 활용한 프로젝트 버전 관리
+- [ ] **채팅 서비스 도메인 모델** 설계 및 Java 구현
+- [ ] **인터페이스** 설계와 구현체 분리 구현
+- [ ] **싱글톤 패턴(Singleton Pattern)** 구현 및 이해
+- [ ] **Java Collections Framework (JCF)** 데이터 C/U/D (생성·수정·삭제)
+- [ ] **Stream API**를 활용한 JCF 데이터 조회 및 가공
+
+<br/>
+
+> **🔥 [심화 목표]**
+> - [ ] 모듈 간 의존 관계 이해 및 **팩토리 패턴(Factory Pattern)**을 활용한 의존성 관리
+
 # 1차
 
 ## 기본 요구사항

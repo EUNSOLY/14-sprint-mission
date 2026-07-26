@@ -11,6 +11,18 @@ import java.util.UUID;
 public class JCFUserService implements UserService {
     private final Map<UUID, User> data = new HashMap<>();
 
+    // Service의 경우 다중으로 인스턴스가 생성될 필요성이 없을 것 같아 싱글톤 패턴 추가
+    private JCFUserService() {
+    }
+
+    private static class SingletonHolder {
+        private static final JCFUserService SINGLETON_INSTANCE = new JCFUserService();
+    }
+
+    public static JCFUserService getInstance() {
+        return SingletonHolder.SINGLETON_INSTANCE;
+    }
+
     @Override
     public void save(User user) {
         data.put(user.getId(), user); // 저장로직

@@ -11,6 +11,17 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data = new HashMap<>();
 
+    private JCFChannelService() {
+    }
+
+    private static class SingletonHolder {
+        private static final JCFChannelService SINGLETON_INSTANCE = new JCFChannelService();
+    }
+
+    public static JCFChannelService getInstance() {
+        return JCFChannelService.SingletonHolder.SINGLETON_INSTANCE;
+    }
+
     @Override
     public void save(Channel channel) {
         data.put(channel.getId(), channel);

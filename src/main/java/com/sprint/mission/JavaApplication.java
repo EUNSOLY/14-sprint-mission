@@ -23,7 +23,8 @@ public class JavaApplication {
         User caron = new User("Caron", "010-3333-3333", "caron", UserStatus.AWAY);
 
         // 사용자 저장
-        UserService userService = new JCFUserService();
+//        UserService userService = new JCFUserService();
+        UserService userService = JCFUserService.getInstance();
         userService.save(aaron);
         userService.save(baron);
         userService.save(caron);
@@ -51,7 +52,8 @@ public class JavaApplication {
         Channel channel2 = new Channel("모각코");
         Channel channel3 = new Channel("소통");
 
-        ChannelService channelService = new JCFChannelService();
+//        ChannelService channelService = new JCFChannelService();
+        ChannelService channelService = JCFChannelService.getInstance();
         // 채널 저장
         channelService.save(channel1);
         channelService.save(channel2);

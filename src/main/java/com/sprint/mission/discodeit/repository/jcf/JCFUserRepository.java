@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data = new HashMap<>();
+    private static final Map<UUID, User> data = new HashMap<>();
 
     @Override
     public void save(User user) {

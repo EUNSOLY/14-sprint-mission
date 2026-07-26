@@ -13,7 +13,7 @@ public class BaseEntity implements Serializable {
     public BaseEntity() {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
     }
 
     public void changeUpdatedAt() {
