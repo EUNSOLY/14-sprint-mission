@@ -57,10 +57,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findByChannelIdAndUserId(UUID channelId, UUID userId) {
+    public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
         return data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
                 .filter(message -> message.getUserId().equals(userId))
+                .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
     }
 

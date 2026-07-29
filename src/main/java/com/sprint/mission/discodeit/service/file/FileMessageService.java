@@ -89,7 +89,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findByChannelIdAndUserId(UUID channelId, UUID userId) {
+    public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
         Map<UUID, Message> messages = this.load();
         return messages.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))

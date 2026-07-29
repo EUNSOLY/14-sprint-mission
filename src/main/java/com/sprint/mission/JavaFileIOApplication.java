@@ -30,7 +30,7 @@ public class JavaFileIOApplication {
 
     }
 
-    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+    static void messageCreateTest(MessageService messageService, User author, Channel channel) {
         System.out.println("메시지 생성");
         messageService.save(new Message("메세지1", author.getId(), channel.getId()));
     }
@@ -55,7 +55,7 @@ public class JavaFileIOApplication {
         Channel channel = setupChannel(channelFileService);
 
         //x테스트
-        messageCreateTest(messageFileService, channel, user);
+        messageCreateTest(messageFileService, user, channel);
 
     }
 }

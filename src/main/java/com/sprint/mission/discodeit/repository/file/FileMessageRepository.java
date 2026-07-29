@@ -56,12 +56,12 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
 
 
     }
-
+    
     @Override
-    public List<Message> findByChannelIdAndUserId(UUID channelId, UUID userId) {
+    public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
         return this.cache.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
                 .filter(message -> message.getUserId().equals(userId))
+                .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
     }
 
