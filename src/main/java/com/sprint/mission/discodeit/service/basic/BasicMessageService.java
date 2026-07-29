@@ -57,7 +57,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findByChannelIdAndUserId(UUID channelId, UUID userId) {
+    public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
         if (Objects.isNull(userService.find(userId)) || Objects.isNull(channelService.find(channelId))) {
             throw new RuntimeException("회원정보 또는 채널 정보가 잘못 됬습니다.");
         }

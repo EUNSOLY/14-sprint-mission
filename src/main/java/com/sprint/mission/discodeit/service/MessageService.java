@@ -14,7 +14,7 @@ public interface MessageService {
 
     List<Message> findByChannelId(UUID channelId);
 
-    List<Message> findByChannelIdAndUserId(UUID channelId, UUID userId);
+    List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId);
 
     List<Message> findAll();
 
