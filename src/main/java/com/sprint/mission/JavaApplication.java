@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
-import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -138,8 +137,8 @@ public class JavaApplication {
             channelByUserMessage.forEach(System.out::println);
 
             //심화 검증 테스트
-            Message message6 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
-            messageService.save(message6);
+//            Message message6 = new Message("네번째 메세지 입니다.", UUID.randomUUID(), channel1.getId());
+//            messageService.save(message6);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

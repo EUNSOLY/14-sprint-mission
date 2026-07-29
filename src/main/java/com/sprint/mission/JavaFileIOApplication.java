@@ -42,9 +42,9 @@ public class JavaFileIOApplication {
         ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
         MessageService messageService = new BasicMessageService(new JCFMessageRepository(), userService, channelService);
 
-        UserService userFileService = new BasicUserService(new FileUserRepository());
-        ChannelService channelFileService = new BasicChannelService(new FileChannelRepository());
-        MessageService messageFileService = new BasicMessageService(new FileMessageRepository(), userFileService, channelFileService);
+        UserService userFileService = new BasicUserService(FileUserRepository.getInstance());
+        ChannelService channelFileService = new BasicChannelService(FileChannelRepository.getInstance());
+        MessageService messageFileService = new BasicMessageService(FileMessageRepository.getInstance(), userFileService, channelFileService);
 
 //        UserService userService = new JCFUserService();
 //        ChannelService channelService = new JCFChannelService();
