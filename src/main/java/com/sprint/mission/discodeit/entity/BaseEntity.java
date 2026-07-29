@@ -15,9 +15,10 @@ public abstract class BaseEntity implements Serializable {
     private Long updatedAt;
 
     public BaseEntity() {
+        long now = System.currentTimeMillis();
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     public void changeUpdatedAt() {
