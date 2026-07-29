@@ -10,7 +10,20 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
-    private static final Map<UUID, Message> data = new HashMap<>();
+    private static JCFMessageRepository INSTANCE;
+    private final Map<UUID, Message> data = new HashMap<>();
+
+    private JCFMessageRepository() {
+    }
+
+    // 싱글턴
+    public static JCFMessageRepository getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new JCFMessageRepository();
+        }
+        return INSTANCE;
+    }
+
 
     @Override
     public void save(Message message) {
