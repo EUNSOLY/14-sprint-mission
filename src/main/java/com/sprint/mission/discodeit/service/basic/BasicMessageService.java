@@ -26,8 +26,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void save(Message user) {
-        messageRepository.save(user);
+    public void save(Message message) {
+        messageRepository.save(message);
     }
 
     @Override
@@ -72,12 +72,12 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void update(UUID id, Message user) {
+    public void update(UUID id, Message message) {
         Message findMessage = messageRepository.findById(id);
         if (Objects.isNull(findMessage)) {
             throw new RuntimeException("수정 할 메세지가 존재하지 않습니다.");
         }
-        messageRepository.update(id, user);
+        messageRepository.update(id, message);
     }
 
     @Override

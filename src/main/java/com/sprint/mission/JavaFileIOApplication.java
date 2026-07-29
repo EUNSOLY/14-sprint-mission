@@ -44,7 +44,7 @@ public class JavaFileIOApplication {
 
         UserService userFileService = new BasicUserService(new FileUserRepository());
         ChannelService channelFileService = new BasicChannelService(new FileChannelRepository());
-        MessageService messageFileService = new BasicMessageService(new FileMessageRepository(), userService, channelService);
+        MessageService messageFileService = new BasicMessageService(new FileMessageRepository(), userFileService, channelFileService);
 
 //        UserService userService = new JCFUserService();
 //        ChannelService channelService = new JCFChannelService();
