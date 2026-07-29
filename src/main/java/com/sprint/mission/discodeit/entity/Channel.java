@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+@Getter
 public class Channel extends BaseEntity {
     private String name; // 이름
 
@@ -11,10 +14,6 @@ public class Channel extends BaseEntity {
     public void changeName(String name) {
         this.name = name;
         super.changeUpdatedAt();
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     @Override

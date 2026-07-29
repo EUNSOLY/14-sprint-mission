@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+@Getter
 public class User extends BaseEntity {
     private String name; // 이름
     private String phone;
@@ -14,29 +17,13 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.status = status;
     }
-    
+
     public void update(String name, String phone, UserStatus status, String nickname) {
         if (name != null) this.name = name;
         if (phone != null) this.phone = phone;
         if (status != null) this.status = status;
         if (nickname != null) this.nickname = nickname;
         super.changeUpdatedAt();
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getPhone() {
-        return this.phone;
-    }
-
-    public UserStatus getStatus() {
-        return this.status;
-    }
-
-    public String getNickname() {
-        return this.nickname;
     }
 
     @Override
