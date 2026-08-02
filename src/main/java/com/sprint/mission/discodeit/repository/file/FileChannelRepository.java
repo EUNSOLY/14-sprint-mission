@@ -10,23 +10,13 @@ import java.util.UUID;
 
 public class FileChannelRepository extends FileAbstractRepository implements ChannelRepository {
     private static final String FILE_NAME = "channel.dir";
-    private static FileChannelRepository INSTANCE;
     private final Map<UUID, Channel> cache = new HashMap<>();
 
-    private FileChannelRepository() {
+    public FileChannelRepository() {
         super(FILE_NAME);
         cache.putAll(super.load());
     }
-
-    // 싱글턴
-    public static FileChannelRepository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new FileChannelRepository();
-        }
-        return INSTANCE;
-    }
-
-
+    
     @Override
     public void save(Channel channel) {
         this.cache.put(channel.getId(), channel); // 신규 데이터 저장

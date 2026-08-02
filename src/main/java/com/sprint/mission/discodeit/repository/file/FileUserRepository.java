@@ -10,20 +10,11 @@ import java.util.UUID;
 
 public class FileUserRepository extends FileAbstractRepository implements UserRepository {
     private static final String FILE_NAME = "user.dir";
-    private static FileUserRepository INSTANCE;
     private final Map<UUID, User> cache = new HashMap<>();
 
-    private FileUserRepository() {
+    public FileUserRepository() {
         super(FILE_NAME);
         cache.putAll(super.load());
-    }
-
-    // 싱글턴
-    public static FileUserRepository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new FileUserRepository();
-        }
-        return INSTANCE;
     }
 
 

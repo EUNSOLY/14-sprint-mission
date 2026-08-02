@@ -10,21 +10,11 @@ import java.util.UUID;
 
 public class FileMessageRepository extends FileAbstractRepository implements MessageRepository {
     private static final String FILE_NAME = "message.dir";
-    private static FileMessageRepository INSTANCE;
     private final Map<UUID, Message> cache = new HashMap<>();
 
-    private FileMessageRepository() {
+    public FileMessageRepository() {
         super(FILE_NAME);
         this.cache.putAll(super.load());
-    }
-
-
-    // 싱글턴
-    public static FileMessageRepository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new FileMessageRepository();
-        }
-        return INSTANCE;
     }
 
 
@@ -56,7 +46,7 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
 
 
     }
-    
+
     @Override
     public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
         return this.cache.values().stream()
