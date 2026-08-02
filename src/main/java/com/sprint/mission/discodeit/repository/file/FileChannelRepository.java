@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository extends FileAbstractRepository implements ChannelRepository {
     private static final String FILE_NAME = "channel.dir";
     private final Map<UUID, Channel> cache = new HashMap<>();
@@ -16,7 +18,7 @@ public class FileChannelRepository extends FileAbstractRepository implements Cha
         super(FILE_NAME);
         cache.putAll(super.load());
     }
-    
+
     @Override
     public void save(Channel channel) {
         this.cache.put(channel.getId(), channel); // 신규 데이터 저장

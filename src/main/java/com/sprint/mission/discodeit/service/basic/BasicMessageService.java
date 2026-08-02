@@ -5,26 +5,21 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
+
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
-
-    public BasicMessageService(
-            MessageRepository messageRepository,
-            UserService basicUserService,
-            ChannelService basicChannelService
-    ) {
-        this.messageRepository = messageRepository;
-        this.userService = basicUserService;
-        this.channelService = basicChannelService;
-    }
-
+    
     @Override
     public void save(Message message) {
         messageRepository.save(message);
