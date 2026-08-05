@@ -21,7 +21,7 @@ public class Channel extends BaseEntity {
     }
 
 
-    public void update(String newName, String newDescription, ChannelType type) {
+    public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
 
         if (newName != null) {
@@ -31,11 +31,6 @@ public class Channel extends BaseEntity {
 
         if (newDescription != null) {
             this.description = newDescription;
-            anyValueUpdated = true;
-        }
-
-        if (type != null) {
-            this.type = type;
             anyValueUpdated = true;
         }
 

@@ -1,56 +1,134 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
 
-
+    // FIXME : 삭제?
     @Override
     public void save(Channel channel) {
         channelRepository.save(channel);
     }
 
     @Override
-    public Channel find(UUID id) {
-        Channel findChannel = channelRepository.findById(id);
-        if (Objects.isNull(findChannel)) {
-            throw new RuntimeException("찾으시는 채널이 존재하지 않습니다.");
-        }
-
-        return findChannel;
+    public void savePublicChannel(PublicChannelCreateRequestDto request) {
+        Channel savedChannel = request.toEntity();
+        channelRepository.save(savedChannel);
     }
 
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public void savePrivateChannel(PrivateChannelCreateRequestDto request) {
+        Channel savedChannel = request.toEntity();
+        List<UUID> userIds = request.getUserIds();
+
+        // 사용자별 ReadStatus 생성
+        userIds.forEach(userId -> {
+            ReadStatus readStatus = new ReadStatus(userId, savedChannel.getId());
+            readStatusRepository.save(readStatus);
+        });
+
+        channelRepository.save(savedChannel);
+
     }
 
     @Override
-    public void update(UUID id, Channel user) {
-        Channel findChannel = channelRepository.findById(id);
-        if (Objects.isNull(findChannel)) {
-            throw new RuntimeException("수정 할 채널이 존재하지 않습니다.");
+    public ChannelResponseDto find(UUID id) {
+        return channelRepository.findById(id)
+                .map(channel -> {
+                    Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
+                            .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                            .map(BaseEntity::getCreatedAt)
+                            .findFirst().orElse(null);
+
+                    if (channel.getType().equals(ChannelType.PUBLIC)) {
+                        return ChannelResponseDto.publicFrom(channel, messageLastTime);
+                    }
+
+                    List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
+                            .map(ReadStatus::getUserId)
+                            .toList();
+
+                    return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
+
+                })
+                .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
+
+    }
+
+    @Override
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+        return channelRepository.findAll().stream()
+                .filter(channel -> {
+                    // 공개 채널은 통과
+                    if (channel.getType().equals(ChannelType.PUBLIC)) {
+                        return true;
+                    }
+                    // 비공개 채널이면 user가 포함된 채널만 통과
+                    return readStatusRepository.findByChannelId(channel.getId())
+                            .stream().anyMatch(readStatus -> readStatus.getUserId().equals(userId));
+                })
+                .map(channel -> {
+                    // 최신 메시지 시간 정보
+                    Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
+                            .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                            .map(BaseEntity::getCreatedAt)
+                            .findFirst().orElse(null);
+
+                    if (channel.getType().equals(ChannelType.PUBLIC)) {
+                        return ChannelResponseDto.publicFrom(channel, messageLastTime);
+                    }
+
+                    List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
+                            .map(ReadStatus::getUserId)
+                            .toList();
+
+                    return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
+                }).toList();
+    }
+
+    @Override
+    public void update(ChannelUpdateRequestDto requestDto) {
+        Channel updateChannel = channelRepository.findById(requestDto.getId())
+                .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
+
+        if (updateChannel.getType().equals(ChannelType.PRIVATE)) {
+            throw new RuntimeException("비공개 채널은 수정할 수 없습니다.");
         }
-        channelRepository.update(id, user);
+
+        updateChannel.update(requestDto.getName(), requestDto.getDescription());
+        channelRepository.update(updateChannel.getId(), updateChannel);
+
     }
 
     @Override
     public void delete(UUID id) {
-        Channel findChannel = channelRepository.findById(id);
-        if (Objects.isNull(findChannel)) {
-            throw new RuntimeException("삭제 할 채널이 존재하지 않습니다.");
-        }
+        Channel deleteChannel = channelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
+
+        readStatusRepository.deleteByChannelId(deleteChannel.getId());
+        messageRepository.deleteByChannelId(deleteChannel.getId());
         channelRepository.delete(id);
     }
 }

@@ -12,7 +12,11 @@ public interface ReadStatusRepository {
 
     List<ReadStatus> findAll();
 
+    List<ReadStatus> findByChannelId(UUID channelId);
+
     ReadStatus update(UUID id, ReadStatus readStatus);
 
     void delete(UUID id);
+
+    void deleteByChannelId(UUID id);
 }

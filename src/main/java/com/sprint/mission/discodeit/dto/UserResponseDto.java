@@ -2,11 +2,12 @@ package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatusType;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserResponseDto {
     private final String name;
     private final String email;
