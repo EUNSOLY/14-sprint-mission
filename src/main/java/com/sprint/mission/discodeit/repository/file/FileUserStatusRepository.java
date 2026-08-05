@@ -9,7 +9,7 @@ public class FileUserStatusRepository extends FileAbstractRepository implements 
     private static final String FILE_NAME = "user-status.dir";
     private final Map<UUID, UserStatus> cache = new HashMap<>();
 
-    protected FileUserStatusRepository() {
+    public FileUserStatusRepository() {
         super(FILE_NAME);
         cache.putAll(super.load());
     }

@@ -32,14 +32,18 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new RuntimeException("유효한 채널이 아닙니다."));
 
         Message savedMessage = requestDto.toEntity();
-        List<UUID> savedBinaryContentIds = requestDto.getFiles().stream()
-                .map(BinaryContent::new)
-                .map(binaryContent -> {
-                    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-                    return savedBinaryContent.getId();
-                }).toList();
 
-        savedMessage.addAttachmentIds(savedBinaryContentIds);
+        if (!requestDto.getFiles().isEmpty()) {
+            List<UUID> savedBinaryContentIds = requestDto.getFiles().stream()
+                    .map(BinaryContent::new)
+                    .map(binaryContent -> {
+                        BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                        return savedBinaryContent.getId();
+                    }).toList();
+
+            savedMessage.addAttachmentIds(savedBinaryContentIds);
+        }
+
         messageRepository.save(savedMessage);
     }
 

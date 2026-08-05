@@ -6,15 +6,18 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserResponseDto {
+    private final UUID id;
     private final String name;
     private final String email;
     private final UserStatusType userStatus;
 //    private final Byte[] profile;
 
     public static UserResponseDto from(User userEntity, UserStatusType status) {
-        return new UserResponseDto(userEntity.getName(), userEntity.getEmail(), status);
+        return new UserResponseDto(userEntity.getId(), userEntity.getName(), userEntity.getEmail(), status);
     }
 }

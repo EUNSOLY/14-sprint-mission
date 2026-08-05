@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -11,26 +8,29 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
+
 @SpringBootApplication
 public class DiscodeitApplication {
 
-    static User setupUser(UserService userService) {
-        userService.save(new User("woody", "woody@codeit.com", "woody1234"));
-        return userService.findAll().stream().filter(user -> user.getName().equals("woody")).findFirst().orElse(null);
-
+    static UserResponseDto setupUser(UserService userService) {
+        UserCreateRequestDto requestDto = new UserCreateRequestDto("woody", "woody@codeit.com", "woody1234", null);
+        userService.save(requestDto);
+        return userService.findAll().stream().filter(user -> user.getName().equals("woody"))
+                .findFirst()
+                .orElse(null);
     }
 
-    static Channel setupChannel(ChannelService channelService) {
-        channelService.save(new Channel(ChannelType.PUBLIC, "공지", "공지 채널입니다."));
-        return channelService.findAll().stream().filter(user -> user.getName().equals("공지")).findFirst().orElse(null);
-
+    static ChannelResponseDto setupChannel(ChannelService channelService) {
+        PublicChannelCreateRequestDto requestDto = new PublicChannelCreateRequestDto("공지", "공지 채널입니다.");
+        return channelService.savePublicChannel(requestDto);
     }
 
-    static void messageCreateTest(MessageService messageService, User author, Channel channel) {
+    static void messageCreateTest(MessageService messageService, UserResponseDto author, ChannelResponseDto channel) {
+        MessageCreateRequestDto requestDto = new MessageCreateRequestDto("메세지1", author.getId(), channel.getId(), List.of());
         System.out.println("메시지 생성");
-        messageService.save(new Message("메세지1", author.getId(), channel.getId()));
+        messageService.save(requestDto);
     }
-
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
@@ -42,12 +42,10 @@ public class DiscodeitApplication {
         MessageService messageService = context.getBean(MessageService.class);
 
         // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        UserResponseDto user = setupUser(userService);
+        ChannelResponseDto channel = setupChannel(channelService);
         // 테스트
         messageCreateTest(messageService, user, channel);
-
-
     }
 
 }

@@ -9,7 +9,7 @@ public class FileBinaryContentRepository extends FileAbstractRepository implemen
     private static final String FILE_NAME = "binary.dir";
     private final Map<UUID, BinaryContent> cache = new HashMap<>();
 
-    protected FileBinaryContentRepository() {
+    public FileBinaryContentRepository() {
         super(FILE_NAME);
         cache.putAll(super.load());
 

@@ -9,7 +9,7 @@ public class FileReadStatusRepository extends FileAbstractRepository implements 
     private static final String FILE_NAME = "read-status.dir";
     private final Map<UUID, ReadStatus> cache = new HashMap<>();
 
-    protected FileReadStatusRepository() {
+    public FileReadStatusRepository() {
         super(FILE_NAME);
         cache.putAll(super.load());
 

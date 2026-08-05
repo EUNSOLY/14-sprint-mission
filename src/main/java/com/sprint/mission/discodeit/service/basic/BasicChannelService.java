@@ -26,20 +26,16 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
-    // FIXME : 삭제?
-    @Override
-    public void save(Channel channel) {
-        channelRepository.save(channel);
-    }
 
     @Override
-    public void savePublicChannel(PublicChannelCreateRequestDto request) {
+    public ChannelResponseDto savePublicChannel(PublicChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         channelRepository.save(savedChannel);
+        return this.find(savedChannel.getId());
     }
 
     @Override
-    public void savePrivateChannel(PrivateChannelCreateRequestDto request) {
+    public ChannelResponseDto savePrivateChannel(PrivateChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         List<UUID> userIds = request.getUserIds();
 
@@ -50,7 +46,7 @@ public class BasicChannelService implements ChannelService {
         });
 
         channelRepository.save(savedChannel);
-
+        return this.find(savedChannel.getId());
     }
 
     @Override
@@ -76,6 +72,7 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
 
     }
+
 
     @Override
     public List<ChannelResponseDto> findAllByUserId(UUID userId) {
