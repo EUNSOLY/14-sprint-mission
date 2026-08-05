@@ -14,11 +14,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    
+
 
     @Override
-    public void save(Channel user) {
-        channelRepository.save(user);
+    public void save(Channel channel) {
+        channelRepository.save(channel);
     }
 
     @Override

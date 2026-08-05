@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileUserRepository extends FileAbstractRepository implements UserRepository {
     private static final String FILE_NAME = "user.dir";
@@ -26,8 +23,8 @@ public class FileUserRepository extends FileAbstractRepository implements UserRe
 
 
     @Override
-    public User findById(UUID id) {
-        return this.cache.get(id);
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.cache.get(id));
     }
 
     @Override
