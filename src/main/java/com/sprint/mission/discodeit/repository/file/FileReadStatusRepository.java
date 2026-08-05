@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository extends FileAbstractRepository implements ReadStatusRepository {
     private static final String FILE_NAME = "read-status.dir";
     private final Map<UUID, ReadStatus> cache = new HashMap<>();

@@ -1,3 +1,9 @@
 spring:
   application:
     name: 14-sprint-mission
+
+
+discodeit:
+  repository:
+    type: jcf # jcf | file
+
