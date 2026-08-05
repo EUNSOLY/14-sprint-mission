@@ -1,86 +1,106 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    private final UserService userService;
-    private final ChannelService channelService;
-    
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
+
     @Override
-    public void save(Message message) {
-        messageRepository.save(message);
+    public void save(MessageCreateRequestDto requestDto) {
+        userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("유효한 사용자가 아닙니다."));
+
+        channelRepository.findById(requestDto.getChannelId())
+                .orElseThrow(() -> new RuntimeException("유효한 채널이 아닙니다."));
+
+        Message savedMessage = requestDto.toEntity();
+        List<UUID> savedBinaryContentIds = requestDto.getFiles().stream()
+                .map(BinaryContent::new)
+                .map(binaryContent -> {
+                    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                    return savedBinaryContent.getId();
+                }).toList();
+
+        savedMessage.addAttachmentIds(savedBinaryContentIds);
+        messageRepository.save(savedMessage);
     }
 
     @Override
     public Message find(UUID id) {
-        Message findMessage = messageRepository.findById(id);
-        if (Objects.isNull(findMessage)) {
-            throw new RuntimeException("찾으시는 메세지가 존재하지 않습니다.");
-        }
-
-        return findMessage;
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("찾으시는 메세지가 존재하지 않습니다."));
     }
 
     @Override
     public List<Message> findByUserId(UUID userId) {
-        if (Objects.isNull(userService.find(userId))) {
-            throw new RuntimeException("회원정보가 잘못 됬습니다.");
-        }
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
+
         return messageRepository.findByUserId(userId);
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
-        if (Objects.isNull(channelService.find(channelId))) {
-            throw new RuntimeException("채널 정보가 잘못 됬습니다.");
-        }
-        return messageRepository.findByChannelId(channelId);
-    }
-
-    @Override
     public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
-        if (Objects.isNull(userService.find(userId)) || Objects.isNull(channelService.find(channelId))) {
-            throw new RuntimeException("회원정보 또는 채널 정보가 잘못 됬습니다.");
-        }
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
+        channelRepository.findById(channelId).orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
+
 
         return messageRepository.findByChannelIdAndUserId(userId, channelId);
 
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findallByChannelId(UUID channelId) {
+        channelRepository.findById(channelId)
+                .orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
+
+        return messageRepository.findByChannelId(channelId);
     }
 
     @Override
-    public void update(UUID id, Message message) {
-        Message findMessage = messageRepository.findById(id);
-        if (Objects.isNull(findMessage)) {
-            throw new RuntimeException("수정 할 메세지가 존재하지 않습니다.");
-        }
-        messageRepository.update(id, message);
+    public void update(MessageUpdateRequestDto request) {
+        Message updateMessage = messageRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("수정 메세지가 존재하지 않습니다."));
+
+        binaryContentRepository.deleteInIds(request.getDeleteFileIds()); // 수정 파일 Id 값들 전부 데이터 삭제
+        updateMessage.removeAttachmentIds(request.getDeleteFileIds()); // 메세지에도 Id 값들 제거
+
+        List<UUID> newFileIds = request.getFiles()
+                .stream()
+                .map(BinaryContent::new)
+                .map(binaryContent -> {
+                    binaryContentRepository.save(binaryContent);
+                    return binaryContent.getId();
+                })
+                .toList();
+
+        updateMessage.update(request.getMessage());
+        messageRepository.update(updateMessage.getId(), updateMessage);
     }
 
     @Override
     public void delete(UUID id) {
-        Message findMessage = messageRepository.findById(id);
-        if (Objects.isNull(findMessage)) {
-            throw new RuntimeException("삭제 할 메세지가 존재하지 않습니다.");
-        }
-        messageRepository.delete(id);
+        Message deleteMessage = messageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("삭제 할 메세지가 존재하지 않습니다."));
+
+        binaryContentRepository.deleteInIds(deleteMessage.getAttachmentIds()); // 관련 파일 삭제
+        messageRepository.delete(id); // 메시지 삭제
     }
 }

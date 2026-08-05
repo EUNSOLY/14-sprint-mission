@@ -14,7 +14,7 @@ public class Message extends BaseEntity {
     private final UUID userId;
     private final UUID channelId;
     private List<UUID> attachmentIds;
-    
+
     public Message(String message, UUID userId, UUID channelId) {
         super();
         this.message = message;
@@ -27,6 +27,18 @@ public class Message extends BaseEntity {
             this.message = message;
             super.updatedAt();
         }
+    }
+
+    public void addAttachmentId(UUID attachmentId) {
+        this.attachmentIds.add(attachmentId);
+    }
+
+    public void addAttachmentIds(List<UUID> attachmentIds) {
+        this.attachmentIds.addAll(attachmentIds);
+    }
+
+    public void removeAttachmentIds(List<UUID> attachmentIds) {
+        attachmentIds.forEach(id -> this.attachmentIds.remove(id));
     }
 
     @Override
