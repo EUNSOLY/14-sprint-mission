@@ -8,36 +8,45 @@ import java.io.Serial;
 public class User extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String name; // 이름
-    private String phone;
-    private String nickname;
-    private UserStatus status;
+    private String name;
+    private String email;
+    private String password;
 
 
-    public User(String name, String phone, String nickname, UserStatus status) {
+    public User(String username, String email, String password) {
         super();
-        this.name = name;
-        this.phone = phone;
-        this.nickname = nickname;
-        this.status = status;
+        this.name = username;
+        this.email = email;
+        this.password = password;
     }
 
-    public void update(String name, String phone, UserStatus status, String nickname) {
-        if (name != null) this.name = name;
-        if (phone != null) this.phone = phone;
-        if (status != null) this.status = status;
-        if (nickname != null) this.nickname = nickname;
-        super.changeUpdatedAt();
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null) {
+            this.name = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            super.updatedAt();
+        }
     }
 
     @Override
     public String toString() {
         return String.format("User ( \n" +
-                        " id=%s, createdAt=%s, updateAt=%s \n" +
-                        " name=%s, nickname=%s, phone=%s, status=%s \n" +
+                        " id=%s, createdAt=%s, updatedAt=%s \n" +
+                        " name=%s, email=%s, password=%s \n" +
                         ")",
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
-                this.name, this.nickname, this.phone, this.status
+                this.name, this.email, this.password // 비밀번호는 노출안되도록 제거 할 필요있음
         );
     }
 }

@@ -8,25 +8,47 @@ import java.io.Serial;
 public class Channel extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String name; // 이름
+    private ChannelType type;
+    private String name;
+    private String description;
 
-    public Channel(String name) {
+    public Channel(ChannelType type, String name, String description) {
         super();
+        //
+        this.type = type;
         this.name = name;
+        this.description = description;
     }
 
-    public void changeName(String name) {
-        this.name = name;
-        super.changeUpdatedAt();
+
+    public void update(String newName, String newDescription, ChannelType type) {
+        boolean anyValueUpdated = false;
+
+        if (newName != null) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+
+        if (newDescription != null) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (type != null) {
+            this.type = type;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            super.updatedAt();
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("Channel ( \n" +
-                        " id=%s, createdAt=%s, updateAt=%s \n" +
-                        " name=%s \n" + ")",
-                super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
-                this.name
+        return String.format(
+                "Channel{id=%s, type=%s, name='%s', description='%s', createdAt=%s, updatedAt=%s}",
+                super.getId(), this.type, this.name, this.description, super.getCreatedAt(), super.getUpdatedAt()
         );
     }
 }

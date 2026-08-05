@@ -9,7 +9,7 @@ import java.util.UUID;
 public class Message extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String message; // 이름
+    private String message;
     private final UUID userId;
     private final UUID channelId;
 
@@ -21,9 +21,11 @@ public class Message extends BaseEntity {
         this.channelId = channelId;
     }
 
-    public void changeMessage(String message) {
-        this.message = message;
-        super.changeUpdatedAt();
+    public void update(String message) {
+        if (message != null) {
+            this.message = message;
+            super.updatedAt();
+        }
     }
 
     @Override

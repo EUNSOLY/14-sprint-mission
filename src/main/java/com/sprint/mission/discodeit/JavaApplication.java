@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -19,14 +19,14 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
-        userService.save(new User("woody", "010-0000-1111", "woody1234", UserStatus.ONLINE));
+        userService.save(new User("woody", "woody@codeit.com", "woody1234"));
         return userService.findAll().stream().filter(user -> user.getName().equals("woody")).findFirst().orElse(null);
 
     }
 
     static Channel setupChannel(ChannelService channelService) {
-        channelService.save(new Channel("채널1"));
-        return channelService.findAll().stream().filter(user -> user.getName().equals("채널1")).findFirst().orElse(null);
+        channelService.save(new Channel(ChannelType.PUBLIC, "공지", "공지 채널입니다."));
+        return channelService.findAll().stream().filter(user -> user.getName().equals("공지")).findFirst().orElse(null);
 
     }
 

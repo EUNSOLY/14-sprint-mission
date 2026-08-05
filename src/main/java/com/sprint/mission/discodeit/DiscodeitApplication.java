@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -15,14 +15,14 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DiscodeitApplication {
 
     static User setupUser(UserService userService) {
-        userService.save(new User("woody", "010-0000-1111", "woody1234", UserStatus.ONLINE));
+        userService.save(new User("woody", "woody@codeit.com", "woody1234"));
         return userService.findAll().stream().filter(user -> user.getName().equals("woody")).findFirst().orElse(null);
 
     }
 
     static Channel setupChannel(ChannelService channelService) {
-        channelService.save(new Channel("채널1"));
-        return channelService.findAll().stream().filter(user -> user.getName().equals("채널1")).findFirst().orElse(null);
+        channelService.save(new Channel(ChannelType.PUBLIC, "공지", "공지 채널입니다."));
+        return channelService.findAll().stream().filter(user -> user.getName().equals("공지")).findFirst().orElse(null);
 
     }
 
@@ -34,7 +34,7 @@ public class DiscodeitApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-        
+
 
         // TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
         UserService userService = context.getBean(UserService.class);
