@@ -41,6 +41,10 @@ public class User extends BaseEntity {
         }
     }
 
+    public void updateProfile(UUID profileId) {
+        this.profileId = profileId;
+    }
+
     @Override
     public String toString() {
         return String.format("User ( \n" +

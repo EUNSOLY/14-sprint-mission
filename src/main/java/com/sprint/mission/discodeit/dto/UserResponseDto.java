@@ -1,0 +1,19 @@
+package com.sprint.mission.discodeit.dto;
+
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatusType;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public class UserResponseDto {
+    private final String name;
+    private final String email;
+    private final UserStatusType userStatus;
+//    private final Byte[] profile;
+
+    public static UserResponseDto from(User userEntity, UserStatusType status) {
+        return new UserResponseDto(userEntity.getName(), userEntity.getEmail(), status);
+    }
+}

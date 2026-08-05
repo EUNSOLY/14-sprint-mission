@@ -13,8 +13,8 @@ public class UserStatus extends BaseEntity {
     private final UUID userId;
     private Instant lastAccessAt;
 
-    public UserStatus(UUID userid) {
-        this.userId = userid;
+    public UserStatus(UUID userId) {
+        this.userId = userId;
         this.lastAccessAt = Instant.now();
     }
 

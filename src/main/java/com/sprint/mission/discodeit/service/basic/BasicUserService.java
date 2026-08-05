@@ -1,7 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.UserResponseDto;
+import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatusType;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,42 +22,92 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    
-    @Override
-    public void save(User user) {
-        userRepository.save(user);
-    }
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User find(UUID id) {
-        User findUser = userRepository.findById(id);
-        if (Objects.isNull(findUser)) {
-            throw new RuntimeException("찾으시는 회원이 존재하지 않습니다.");
+    public void save(UserCreateRequestDto requestDto) {
+        boolean hasDuplicateName = userRepository.findAll()
+                .stream()
+                .anyMatch(user -> user.getName().equals(requestDto.getName()));
+
+        boolean hasDuplicateEmail = userRepository.findAll()
+                .stream()
+                .anyMatch(user -> user.getEmail().equals(requestDto.getEmail()));
+
+        // 이름 중복 검증
+        if (hasDuplicateName) {
+            throw new RuntimeException("이미 존재하는 이름입니다. 다른 이름을 입력해주세요.");
+        }
+        // 이메일 중복 검증
+        if (hasDuplicateEmail) {
+            throw new RuntimeException("이미 존재하는 이메일입니다. 다른 이메일을 입력해주세요.");
         }
 
-        return findUser;
+        User savedUser = requestDto.toEntity(); // 저장될 User Entity
+
+        UserStatus userStatus = new UserStatus(savedUser.getId()); // User 로그인 일시 핸들러 Entity 생성
+        userStatusRepository.save(userStatus); // UserStatus 저장
+
+        BinaryContent binaryContent = new BinaryContent(requestDto.getProfile()); // User 프로필 파일 저장 Entity 생성
+        binaryContentRepository.save(binaryContent); // BinaryContent 저장
+
+        savedUser.updateProfile(binaryContent.getId()); // 프로필 Entity 연계
+
+        userRepository.save(savedUser); // 저장
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public UserResponseDto find(UUID id) {
+        User currentUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
+        boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("찾으시는 회원의 로그인 정보가 존재하지 않습니다."))
+                .isCurrentlyLoggedIn();
+
+        UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
+        return UserResponseDto.from(currentUser, userStatusType);
     }
 
     @Override
-    public void update(UUID id, User user) {
-        User findUser = userRepository.findById(id);
-        if (Objects.isNull(findUser)) {
-            throw new RuntimeException("수정 할 회원이 존재하지 않습니다.");
+    public List<UserResponseDto> findAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> {
+                    boolean userStatus = userStatusRepository.findByUserId(user.getId())
+                            .orElseThrow(() -> new RuntimeException("찾으시는 회원의 로그인 정보가 존재하지 않습니다."))
+                            .isCurrentlyLoggedIn();
+                    UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
+                    return UserResponseDto.from(user, userStatusType);
+                })
+                .toList();
+    }
+
+    @Override
+    public void update(UserUpdateRequestDto updateRequestDto) {
+        User currentUser = userRepository.findById(updateRequestDto.getId())
+                .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
+
+        currentUser.update(updateRequestDto.getName(), updateRequestDto.getEmail(), updateRequestDto.getPassword());
+
+        // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
+        if (Objects.nonNull(updateRequestDto.getProfile())) {
+            binaryContentRepository.delete(currentUser.getProfileId());
+            BinaryContent newProfile = new BinaryContent(updateRequestDto.getProfile());
+            binaryContentRepository.save(newProfile);
+            currentUser.updateProfile(newProfile.getId());
         }
-        userRepository.update(id, user);
+
+        userRepository.update(currentUser.getId(), currentUser);
     }
 
     @Override
     public void delete(UUID id) {
-        User findUser = userRepository.findById(id);
-        if (Objects.isNull(findUser)) {
-            throw new RuntimeException("삭제 할 회원이 존재하지 않습니다.");
-        }
-        userRepository.delete(id);
+        User deleteUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
+
+        userStatusRepository.deleteByUserId(id); // 로그인 상태 삭제
+        binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
+        userRepository.delete(id); // 유저 삭제
     }
 }
