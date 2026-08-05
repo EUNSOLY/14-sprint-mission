@@ -45,11 +45,11 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void deleteByUserId(UUID userId) {
-        this.data.values()
-                .forEach(status -> {
-                    if (status.getUserId().equals(userId)) {
-                        this.data.remove(status.getId());
-                    }
-                });
+        List<UUID> toRemove = data.values().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .map(UserStatus::getId)
+                .toList();
+
+        toRemove.forEach(this.data::remove);
     }
 }
