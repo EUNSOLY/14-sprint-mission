@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serial;
+import java.util.UUID;
 
 @Getter
 public class User extends BaseEntity {
@@ -11,6 +12,7 @@ public class User extends BaseEntity {
     private String name;
     private String email;
     private String password;
+    private UUID profileId;
 
 
     public User(String username, String email, String password) {

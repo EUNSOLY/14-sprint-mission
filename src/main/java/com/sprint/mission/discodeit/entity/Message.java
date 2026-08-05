@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serial;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -12,8 +13,8 @@ public class Message extends BaseEntity {
     private String message;
     private final UUID userId;
     private final UUID channelId;
-
-
+    private List<UUID> attachmentIds;
+    
     public Message(String message, UUID userId, UUID channelId) {
         super();
         this.message = message;
