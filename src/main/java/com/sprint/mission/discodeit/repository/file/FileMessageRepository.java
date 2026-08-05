@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileMessageRepository extends FileAbstractRepository implements MessageRepository {
     private static final String FILE_NAME = "message.dir";
@@ -26,8 +23,8 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
 
 
     @Override
-    public Message findById(UUID id) {
-        return this.cache.get(id);
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(this.cache.get(id));
     }
 
     @Override
@@ -70,6 +67,14 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
     @Override
     public void delete(UUID id) {
         this.cache.remove(id);
+        super.fileSave(this.cache);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        this.cache.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .forEach(message -> this.cache.remove(message.getId()));
         super.fileSave(this.cache);
     }
 }

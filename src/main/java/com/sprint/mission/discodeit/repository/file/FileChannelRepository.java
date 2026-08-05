@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileChannelRepository extends FileAbstractRepository implements ChannelRepository {
     private static final String FILE_NAME = "channel.dir";
@@ -24,8 +21,8 @@ public class FileChannelRepository extends FileAbstractRepository implements Cha
     }
 
     @Override
-    public Channel findById(UUID id) {
-        return this.cache.get(id);
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.cache.get(id));
     }
 
     @Override
