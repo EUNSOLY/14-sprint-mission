@@ -79,7 +79,7 @@ public class BasicMessageService implements MessageService {
         Message updateMessage = messageRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("수정 메세지가 존재하지 않습니다."));
 
-        binaryContentRepository.deleteInIds(request.getDeleteFileIds()); // 수정 파일 Id 값들 전부 데이터 삭제
+        request.getDeleteFileIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
         updateMessage.removeAttachmentIds(request.getDeleteFileIds()); // 메세지에도 Id 값들 제거
 
         List<UUID> newFileIds = request.getFiles()
@@ -100,7 +100,7 @@ public class BasicMessageService implements MessageService {
         Message deleteMessage = messageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("삭제 할 메세지가 존재하지 않습니다."));
 
-        binaryContentRepository.deleteInIds(deleteMessage.getAttachmentIds()); // 관련 파일 삭제
+        deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
         messageRepository.delete(id); // 메시지 삭제
     }
 }
