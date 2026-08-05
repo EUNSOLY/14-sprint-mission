@@ -2,11 +2,9 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
 public class FileUserStatusRepository extends FileAbstractRepository implements UserStatusRepository {
     private static final String FILE_NAME = "user-status.dir";
     private final Map<UUID, UserStatus> cache = new HashMap<>();
