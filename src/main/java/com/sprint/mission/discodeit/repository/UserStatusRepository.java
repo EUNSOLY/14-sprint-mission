@@ -9,17 +9,15 @@ import java.util.UUID;
 public interface UserStatusRepository {
     void save(UserStatus userStatus);
 
-    UserStatus findById(UUID id);
+    Optional<UserStatus> findById(UUID id);
 
     Optional<UserStatus> findByUserId(UUID id);
 
     List<UserStatus> findAll();
 
-    UserStatus update(UUID id, UserStatus userStatus);
-
+    UserStatus update(UserStatus userStatus);
+    
     void delete(UUID id);
 
     void deleteByUserId(UUID userId);
-
-
 }
