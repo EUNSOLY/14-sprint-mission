@@ -48,34 +48,38 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message find(MessageIdRequestDto requestDto) {
-        return messageRepository.findById(requestDto.getId())
+    public MessageRespnoseDto find(MessageIdRequestDto requestDto) {
+        Message message = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 메세지가 존재하지 않습니다."));
+
+        return MessageRespnoseDto.from(message);
     }
 
     @Override
-    public List<Message> findByUserId(UserIdRequestDto requestDto) {
+    public List<MessageRespnoseDto> findByUserId(UserIdRequestDto requestDto) {
         userRepository.findById(requestDto.getId()).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
 
-        return messageRepository.findByUserId(requestDto.getId());
+        return messageRepository.findByUserId(requestDto.getId())
+                .stream().map(MessageRespnoseDto::from).toList();
     }
 
     @Override
-    public List<Message> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
+    public List<MessageRespnoseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
         userRepository.findById(userRequestDto.getId()).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
         channelRepository.findById(channelRequestDto.getId()).orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
 
-
-        return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId());
+        return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId())
+                .stream().map(MessageRespnoseDto::from).toList();
 
     }
 
     @Override
-    public List<Message> findAllByChannelId(ChannelIdRequestDto requestDto) {
+    public List<MessageRespnoseDto> findAllByChannelId(ChannelIdRequestDto requestDto) {
         channelRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
 
-        return messageRepository.findByChannelId(requestDto.getId());
+        return messageRepository.findByChannelId(requestDto.getId())
+                .stream().map(MessageRespnoseDto::from).toList();
     }
 
     @Override
