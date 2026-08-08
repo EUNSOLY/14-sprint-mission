@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -15,9 +16,13 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
 
     public FileMessageRepository() {
         super(FILE_NAME);
-        this.cache.putAll(super.load());
+
     }
 
+    @PostConstruct
+    public void init() {
+        cache.putAll(super.load());
+    }
 
     @Override
     public void save(Message message) {

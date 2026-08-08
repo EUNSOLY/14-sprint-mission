@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +16,11 @@ public class FileReadStatusRepository extends FileAbstractRepository implements 
 
     public FileReadStatusRepository() {
         super(FILE_NAME);
-        cache.putAll(super.load());
+    }
 
+    @PostConstruct
+    public void init() {
+        cache.putAll(super.load());
     }
 
     @Override

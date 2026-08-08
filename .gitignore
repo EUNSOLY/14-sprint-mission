@@ -44,5 +44,5 @@ bin/
 .DS_Store
 
 #File I/O
-*.dir
+.discodeit
 

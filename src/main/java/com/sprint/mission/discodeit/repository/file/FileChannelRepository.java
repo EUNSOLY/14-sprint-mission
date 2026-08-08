@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,10 @@ public class FileChannelRepository extends FileAbstractRepository implements Cha
 
     public FileChannelRepository() {
         super(FILE_NAME);
+    }
+
+    @PostConstruct
+    public void init() {
         cache.putAll(super.load());
     }
 

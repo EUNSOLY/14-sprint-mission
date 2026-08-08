@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,10 @@ public class FileUserStatusRepository extends FileAbstractRepository implements 
 
     public FileUserStatusRepository() {
         super(FILE_NAME);
+    }
+
+    @PostConstruct
+    public void init() {
         cache.putAll(super.load());
     }
 

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +16,11 @@ public class FileBinaryContentRepository extends FileAbstractRepository implemen
 
     public FileBinaryContentRepository() {
         super(FILE_NAME);
-        cache.putAll(super.load());
+    }
 
+    @PostConstruct
+    public void init() {
+        cache.putAll(super.load());
     }
 
     @Override
