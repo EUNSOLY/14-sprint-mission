@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
+import com.sprint.mission.discodeit.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.IdRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -21,24 +22,27 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public BinaryContent save(BinaryContentCreateRequestDto requestDto) {
+    public BinaryContentResponseDto save(BinaryContentCreateRequestDto requestDto) {
         if (requestDto.getFile().isEmpty()) throw new RuntimeException("저장할 파일이 존재하지 않습니다.");
 
         String imageName = fileStorageUtil.imageUpload(requestDto.getFile());
-        return this.binaryContentRepository.save(requestDto.toEntity(imageName));
+        BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity(imageName));
 
+        return BinaryContentResponseDto.from(savedContent);
     }
 
     @Override
-    public BinaryContent find(BinaryContentIdRequestDto requestDto) {
+    public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
+                .map(BinaryContentResponseDto::from)
                 .orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<BinaryContentIdRequestDto> requestDto) {
+    public List<BinaryContentResponseDto> findAllByIdIn(List<BinaryContentIdRequestDto> requestDto) {
         List<UUID> ids = requestDto.stream().map(IdRequestDto::getId).toList();
-        return this.binaryContentRepository.findAllByIdIn(ids);
+        return this.binaryContentRepository.findAllByIdIn(ids)
+                .stream().map(BinaryContentResponseDto::from).toList();
     }
 
     @Override
