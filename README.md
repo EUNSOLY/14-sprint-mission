@@ -1,5 +1,35 @@
 # 14-sprint-mission-3
 
+## 🎯 학습 목표
+
+- [x] Spring Boot 마이그레이션 및 IoC Container / DI / Bean 이해
+- [x] Lombok, DTO를 활용한 계층 리팩토링
+- [x] 신규 도메인 모델링 및 Service 계층 고도화
+
+## 기본 요구사항
+
+- [x] Spring Initializr로 프로젝트 생성 (Gradle-Groovy, Java 17, Boot 3.4.0, `com.sprint.mission`/`discodeit`, Jar,
+  Lombok/Spring Web) 후 기존 프로젝트에 병합
+- [x] `application.properties` → `.yaml` 전환, `DiscodeitApplication` 실행 확인
+- [x] `File*Repository`, `Basic*Service`를 Bean으로 등록
+- [x] `JavaApplication`의 테스트 코드를 `DiscodeitApplication`으로 이관, Spring Context 기반 초기화로 교체
+- [x] IoC Container / DI / Bean 개념 정리 → PR에 첨부
+- [x] Lombok 적용 (`@Getter`, `@RequiredArgsConstructor`)
+
+## 추가 기능 요구사항
+
+- [x] 시간 필드 타입을 `Instant`로 통일
+- [x] 신규 도메인 추가: `ReadStatus`(채널별 마지막 읽음 시간), `UserStatus`(마지막 접속 시간, 5분 이내 온라인 판단 메소드), `BinaryContent`(불변, updatedAt
+  없음) + 각 Repository 인터페이스 선언
+- [x] 모든 Service 파라미터를 DTO로 그룹화, Service 간 직접 의존 대신 Repository 직접 주입
+- [x] `UserService`: 프로필 이미지 선택 등록, username/email 중복 검증, UserStatus 동시 생성, 조회 시 온라인 상태 포함·비밀번호 제외, 삭제 시 연관 도메인 함께 삭제
+- [x] `AuthService`: username/password 기반 일치하는 유저가 있는지 검증 서비스 생성
+- [x] `ChannelService`: PUBLIC/PRIVATE 생성 분리, 조회 시 최근 메시지 시간·참여자 정보 포함(`findAllByUserId`), PRIVATE 수정 불가, 삭제 시 연관 도메인 함께
+  삭제
+- [x] `MessageService`: 다중 첨부파일 등록, `findAllByChannelId`, 삭제 시 첨부파일 함께 삭제
+- [x] `ReadStatusService`, `UserStatusService`, `BinaryContentService`: CRUD 구현/고도화 (존재·중복 검증 포함)
+- [x] 신규 도메인(`ReadStatus`/`UserStatus`/`BinaryContent`)의 JCF/File Repository 구현체 작성
+
 <br/>
 
 ----
