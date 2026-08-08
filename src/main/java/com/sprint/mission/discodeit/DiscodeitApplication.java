@@ -46,6 +46,9 @@ public class DiscodeitApplication {
         ChannelResponseDto channel = setupChannel(channelService);
         // 테스트
         messageCreateTest(messageService, user, channel);
+
+//        UserIdRequestDto requestDto = new UserIdRequestDto(user.getId());
+//        userService.delete(requestDto);
     }
 
 }

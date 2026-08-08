@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.UserResponseDto;
 import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -58,8 +58,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto find(UUID id) {
-        User currentUser = userRepository.findById(id)
+    public UserResponseDto find(UserIdRequestDto requestDto) {
+        User currentUser = userRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
         boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 회원의 로그인 정보가 존재하지 않습니다."))
@@ -102,12 +102,12 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void delete(UUID id) {
-        User deleteUser = userRepository.findById(id)
+    public void delete(UserIdRequestDto requestDto) {
+        User deleteUser = userRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
 
-        userStatusRepository.deleteByUserId(id); // 로그인 상태 삭제
+        userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
         binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
-        userRepository.delete(id); // 유저 삭제
+        userRepository.delete(requestDto.getId()); // 유저 삭제
     }
 }

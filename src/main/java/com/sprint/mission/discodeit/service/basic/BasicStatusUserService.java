@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.UserStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +34,8 @@ public class BasicStatusUserService implements UserStatusService {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
-        return this.userStatusRepository.findById(id)
+    public UserStatus findById(UserStatusIdRequestDto requestDto) {
+        return this.userStatusRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
     }
 
@@ -54,8 +55,8 @@ public class BasicStatusUserService implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateByUserId(UUID userId) {
-        UserStatus updateUserStatus = this.userStatusRepository.findByUserId(userId)
+    public UserStatus updateByUserId(UserIdRequestDto requestDto) {
+        UserStatus updateUserStatus = this.userStatusRepository.findByUserId(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
 
         updateUserStatus.updateLastAccessAt();
@@ -65,10 +66,10 @@ public class BasicStatusUserService implements UserStatusService {
     }
 
     @Override
-    public void delete(UUID id) {
-        this.userStatusRepository.findByUserId(id)
+    public void delete(UserStatusIdRequestDto requestDto) {
+        this.userStatusRepository.findByUserId(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
 
-        this.userStatusRepository.delete(id);
+        this.userStatusRepository.delete(requestDto.getId());
     }
 }

@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -31,7 +28,8 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto savePublicChannel(PublicChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         channelRepository.save(savedChannel);
-        return this.find(savedChannel.getId());
+
+        return this.find(new ChannelIdRequestDto(savedChannel.getId()));
     }
 
     @Override
@@ -46,12 +44,12 @@ public class BasicChannelService implements ChannelService {
         });
 
         channelRepository.save(savedChannel);
-        return this.find(savedChannel.getId());
+        return this.find(new ChannelIdRequestDto(savedChannel.getId()));
     }
 
     @Override
-    public ChannelResponseDto find(UUID id) {
-        return channelRepository.findById(id)
+    public ChannelResponseDto find(ChannelIdRequestDto requestDto) {
+        return channelRepository.findById(requestDto.getId())
                 .map(channel -> {
                     Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
                             .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
@@ -75,7 +73,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelResponseDto> findAllByUserId(UserIdRequestDto requestDto) {
         return channelRepository.findAll().stream()
                 .filter(channel -> {
                     // 공개 채널은 통과
@@ -84,7 +82,7 @@ public class BasicChannelService implements ChannelService {
                     }
                     // 비공개 채널이면 user가 포함된 채널만 통과
                     return readStatusRepository.findByChannelId(channel.getId())
-                            .stream().anyMatch(readStatus -> readStatus.getUserId().equals(userId));
+                            .stream().anyMatch(readStatus -> readStatus.getUserId().equals(requestDto.getId()));
                 })
                 .map(channel -> {
                     // 최신 메시지 시간 정보
@@ -120,12 +118,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(UUID id) {
-        Channel deleteChannel = channelRepository.findById(id)
+    public void delete(ChannelIdRequestDto requestDto) {
+        Channel deleteChannel = channelRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
 
         readStatusRepository.deleteByChannelId(deleteChannel.getId());
         messageRepository.deleteByChannelId(deleteChannel.getId());
-        channelRepository.delete(id);
+        channelRepository.delete(requestDto.getId());
     }
 }

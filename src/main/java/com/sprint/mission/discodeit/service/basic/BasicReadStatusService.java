@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ReadStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.ReadStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -37,14 +39,14 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus find(UUID id) {
-        return this.readStatusRepository.findById(id)
+    public ReadStatus find(ReadStatusIdRequestDto requestDto) {
+        return this.readStatusRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 데이터 입니다."));
     }
 
     @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return this.readStatusRepository.findByUserId(userId);
+    public List<ReadStatus> findAllByUserId(UserIdRequestDto requestDto) {
+        return this.readStatusRepository.findByUserId(requestDto.getId());
     }
 
     @Override

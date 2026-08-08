@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -48,34 +47,34 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message find(UUID id) {
-        return messageRepository.findById(id)
+    public Message find(MessageIdRequestDto requestDto) {
+        return messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 메세지가 존재하지 않습니다."));
     }
 
     @Override
-    public List<Message> findByUserId(UUID userId) {
-        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
+    public List<Message> findByUserId(UserIdRequestDto requestDto) {
+        userRepository.findById(requestDto.getId()).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
 
-        return messageRepository.findByUserId(userId);
+        return messageRepository.findByUserId(requestDto.getId());
     }
 
     @Override
-    public List<Message> findByChannelIdAndUserId(UUID userId, UUID channelId) {
-        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
-        channelRepository.findById(channelId).orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
+    public List<Message> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
+        userRepository.findById(userRequestDto.getId()).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
+        channelRepository.findById(channelRequestDto.getId()).orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
 
 
-        return messageRepository.findByChannelIdAndUserId(userId, channelId);
+        return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId());
 
     }
 
     @Override
-    public List<Message> findallByChannelId(UUID channelId) {
-        channelRepository.findById(channelId)
+    public List<Message> findAllByChannelId(ChannelIdRequestDto requestDto) {
+        channelRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
 
-        return messageRepository.findByChannelId(channelId);
+        return messageRepository.findByChannelId(requestDto.getId());
     }
 
     @Override
@@ -100,11 +99,11 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void delete(UUID id) {
-        Message deleteMessage = messageRepository.findById(id)
+    public void delete(MessageIdRequestDto requestDto) {
+        Message deleteMessage = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("삭제 할 메세지가 존재하지 않습니다."));
 
         deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
-        messageRepository.delete(id); // 메시지 삭제
+        messageRepository.delete(requestDto.getId()); // 메시지 삭제
     }
 }
