@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
@@ -40,12 +41,13 @@ public class JavaApplication {
         ReadStatusRepository readStatusRepository = new FileReadStatusRepository();
         UserStatusRepository userStatusRepository = new FileUserStatusRepository();
         BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository();
+        FileStorageUtil fileStorageUtil = new FileStorageUtil(".upload-file-directory");
 
 
         // 서비스 초기화
-        UserService userService = new BasicUserService(userRepository, userStatusRepository, binaryContentRepository);
+        UserService userService = new BasicUserService(userRepository, userStatusRepository, binaryContentRepository, fileStorageUtil);
         ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository, binaryContentRepository);
+        MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository, binaryContentRepository, fileStorageUtil);
 
         // 셋업
         UserResponseDto user = setupUser(userService);

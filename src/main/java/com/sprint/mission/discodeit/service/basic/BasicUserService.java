@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.UserResponseDto;
@@ -24,6 +25,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final FileStorageUtil fileStorageUtil;
 
     @Override
     public void save(UserCreateRequestDto requestDto) {
@@ -49,11 +51,12 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(savedUser.getId()); // User 로그인 일시 핸들러 Entity 생성
         userStatusRepository.save(userStatus); // UserStatus 저장
 
-        BinaryContent binaryContent = new BinaryContent(requestDto.getProfile()); // User 프로필 파일 저장 Entity 생성
-        binaryContentRepository.save(binaryContent); // BinaryContent 저장
-
-        savedUser.updateProfile(binaryContent.getId()); // 프로필 Entity 연계
-
+        if (Objects.nonNull(requestDto.getProfile())) {
+            String imageName = fileStorageUtil.imageUpload(requestDto.getProfile().getFile());
+            BinaryContent binaryContent = requestDto.getProfile().toEntity(imageName); // User 프로필 파일 저장 Entity 생성
+            binaryContentRepository.save(binaryContent); // BinaryContent 저장
+            savedUser.updateProfile(binaryContent.getId()); // 프로필 Entity 연계
+        }
         userRepository.save(savedUser); // 저장
     }
 
@@ -66,7 +69,15 @@ public class BasicUserService implements UserService {
                 .isCurrentlyLoggedIn();
 
         UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-        return UserResponseDto.from(currentUser, userStatusType);
+
+        String profileImagePath = null;
+        if (Objects.nonNull(currentUser.getProfileId())) {
+            BinaryContent binaryContent = binaryContentRepository.findById(currentUser.getProfileId())
+                    .orElseThrow(() -> new RuntimeException("프로필 이미지가 존재하지 않습니다."));
+            profileImagePath = binaryContent.getImageUrl();
+        }
+
+        return UserResponseDto.from(currentUser, userStatusType, profileImagePath);
     }
 
     @Override
@@ -78,7 +89,13 @@ public class BasicUserService implements UserService {
                             .orElseThrow(() -> new RuntimeException("찾으시는 회원의 로그인 정보가 존재하지 않습니다."))
                             .isCurrentlyLoggedIn();
                     UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-                    return UserResponseDto.from(user, userStatusType);
+                    String profileImagePath = null;
+                    if (Objects.nonNull(user.getProfileId())) {
+                        BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId())
+                                .orElseThrow(() -> new RuntimeException("프로필 이미지가 존재하지 않습니다."));
+                        profileImagePath = binaryContent.getImageUrl();
+                    }
+                    return UserResponseDto.from(user, userStatusType, profileImagePath);
                 })
                 .toList();
     }
@@ -92,10 +109,16 @@ public class BasicUserService implements UserService {
 
         // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
         if (Objects.nonNull(updateRequestDto.getProfile())) {
-            binaryContentRepository.delete(currentUser.getProfileId());
-            BinaryContent newProfile = new BinaryContent(updateRequestDto.getProfile());
-            binaryContentRepository.save(newProfile);
-            currentUser.updateProfile(newProfile.getId());
+            String imageName = fileStorageUtil.imageUpload(updateRequestDto.getProfile().getFile());
+            if (Objects.nonNull(currentUser.getProfileId())) {
+                BinaryContent originImage = binaryContentRepository.findById(currentUser.getProfileId())
+                        .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
+                binaryContentRepository.delete(currentUser.getProfileId()); // 기존 프로필 데이터 삭제
+                fileStorageUtil.deleteUploadImage(originImage.getImageUrl());
+            }
+            BinaryContent newProfile = updateRequestDto.getProfile().toEntity(imageName); // User 프로필 파일 저장 Entity 생성
+            binaryContentRepository.save(newProfile); // BinaryContent 저장
+            currentUser.updateProfile(newProfile.getId()); // 프로필 Entity 연계
         }
 
         userRepository.update(currentUser.getId(), currentUser);
@@ -107,7 +130,13 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
 
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
-        binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
+        if (Objects.nonNull(deleteUser.getProfileId())) {
+            BinaryContent originImage = binaryContentRepository.findById(deleteUser.getProfileId())
+                    .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
+            binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
+            fileStorageUtil.deleteUploadImage(originImage.getImageUrl());
+        }
+        
         userRepository.delete(requestDto.getId()); // 유저 삭제
     }
 }

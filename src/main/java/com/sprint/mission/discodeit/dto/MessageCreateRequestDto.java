@@ -13,7 +13,7 @@ public class MessageCreateRequestDto {
     private final String message;
     private final UUID userId;
     private final UUID channelId;
-    private final List<Byte[]> files;
+    private final List<BinaryContentCreateRequestDto> filesContent;
 
 
     public Message toEntity() {

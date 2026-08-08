@@ -4,15 +4,18 @@ import lombok.Getter;
 
 @Getter
 public class BinaryContent extends BaseEntity {
-    private final Byte[] bytes;
+    private final String title;
+    private final String imageUrl;
 
-    public BinaryContent(Byte[] bytes) {
-        this.bytes = bytes;
+
+    public BinaryContent(String title, String imageUrl) {
+        this.title = title;
+        this.imageUrl = imageUrl;
     }
 
     @Override
     public void updatedAt() {
         throw new RuntimeException("업데이트가 불가능합니다.");
     }
-    
+
 }

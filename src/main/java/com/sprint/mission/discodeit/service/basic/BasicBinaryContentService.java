@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
 import com.sprint.mission.discodeit.dto.IdRequestDto;
@@ -16,10 +17,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
+    private final FileStorageUtil fileStorageUtil;
+
 
     @Override
     public BinaryContent save(BinaryContentCreateRequestDto requestDto) {
-        return this.binaryContentRepository.save(requestDto.toEntity());
+        if (requestDto.getFile().isEmpty()) throw new RuntimeException("저장할 파일이 존재하지 않습니다.");
+
+        String imageName = fileStorageUtil.imageUpload(requestDto.getFile());
+        return this.binaryContentRepository.save(requestDto.toEntity(imageName));
+
     }
 
     @Override

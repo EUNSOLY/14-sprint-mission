@@ -12,5 +12,5 @@ public class UserUpdateRequestDto {
     private final String name;
     private final String email;
     private final String password;
-    private final Byte[] profile;
+    private final BinaryContentCreateRequestDto profile;
 }

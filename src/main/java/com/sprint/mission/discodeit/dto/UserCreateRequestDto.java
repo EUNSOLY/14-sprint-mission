@@ -10,7 +10,7 @@ public class UserCreateRequestDto {
     private final String name;
     private final String email;
     private final String password;
-    private final Byte[] profile;
+    private final BinaryContentCreateRequestDto profile;
 
     public User toEntity() {
         return new User(this.name, this.email, this.password);

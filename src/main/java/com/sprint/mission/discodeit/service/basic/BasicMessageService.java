@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
@@ -21,6 +22,8 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final FileStorageUtil fileStorageUtil;
+
 
     @Override
     public void save(MessageCreateRequestDto requestDto) {
@@ -32,17 +35,15 @@ public class BasicMessageService implements MessageService {
 
         Message savedMessage = requestDto.toEntity();
 
-        if (!requestDto.getFiles().isEmpty()) {
-            List<UUID> savedBinaryContentIds = requestDto.getFiles().stream()
-                    .map(BinaryContent::new)
-                    .map(binaryContent -> {
-                        BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-                        return savedBinaryContent.getId();
-                    }).toList();
-
-            savedMessage.addAttachmentIds(savedBinaryContentIds);
-        }
-
+        requestDto.getFilesContent().stream()
+                .filter((dto -> !dto.getFile().isEmpty()))
+                .forEach(binaryContent -> {
+                    String imageName = fileStorageUtil.imageUpload(binaryContent.getFile());
+                    BinaryContent result = binaryContent.toEntity(imageName);
+                    BinaryContent savedBinaryContent = binaryContentRepository.save(result); // BinaryContent 저장
+                    UUID contentUuid = savedBinaryContent.getId();
+                    savedMessage.addAttachmentId(contentUuid);
+                });
         messageRepository.save(savedMessage);
     }
 
@@ -82,19 +83,27 @@ public class BasicMessageService implements MessageService {
         Message updateMessage = messageRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("수정 메세지가 존재하지 않습니다."));
 
-        request.getDeleteFileIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
-        updateMessage.removeAttachmentIds(request.getDeleteFileIds()); // 메세지에도 Id 값들 제거
+        if (!request.getDeleteFileIds().isEmpty()) {
+            request.getDeleteFileIds().forEach(uuid -> {
+                BinaryContent binaryContent = binaryContentRepository.findById(uuid)
+                        .orElseThrow(() -> new RuntimeException("컨텐츠가 존재하지 않습니다."));
+                fileStorageUtil.deleteUploadImage(binaryContent.getImageUrl());
+                binaryContentRepository.delete(uuid);// 수정 파일 Id 값들 전부 데이터 삭제
+            });
+            updateMessage.removeAttachmentIds(request.getDeleteFileIds()); // 메세지에도 Id 값들 제거
+        }
 
-        List<UUID> newFileIds = request.getFiles()
-                .stream()
-                .map(BinaryContent::new)
+        List<UUID> savedBinaryContentIds = request.getFilesContent().stream()
+                .filter((dto -> !dto.getFile().isEmpty()))
                 .map(binaryContent -> {
-                    binaryContentRepository.save(binaryContent);
-                    return binaryContent.getId();
-                })
-                .toList();
+                    String imageName = fileStorageUtil.imageUpload(binaryContent.getFile());
+                    BinaryContent result = binaryContent.toEntity(imageName);
+                    BinaryContent savedBinaryContent = binaryContentRepository.save(result); // BinaryContent 저장
+                    return savedBinaryContent.getId();
+                }).toList();
 
         updateMessage.update(request.getMessage());
+        updateMessage.addAttachmentIds(savedBinaryContentIds);
         messageRepository.update(updateMessage.getId(), updateMessage);
     }
 
