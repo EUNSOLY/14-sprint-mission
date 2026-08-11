@@ -54,4 +54,14 @@ public class FileUserRepository extends FileAbstractRepository implements UserRe
         this.cache.remove(id);
         super.fileSave(this.cache);
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        return this.cache.values().stream().anyMatch(user -> user.getName().equals(name));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.cache.values().stream().anyMatch(user -> user.getEmail().equals(email));
+    }
 }
