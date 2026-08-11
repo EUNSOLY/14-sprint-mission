@@ -29,12 +29,11 @@ public class BasicUserService implements UserService {
 
     @Override
     public void save(UserCreateRequestDto requestDto) {
-        boolean hasDuplicateName = userRepository.findAll()
-                .stream()
+        List<User> users = userRepository.findAll();
+        boolean hasDuplicateName = users.stream()
                 .anyMatch(user -> user.getName().equals(requestDto.getName()));
 
-        boolean hasDuplicateEmail = userRepository.findAll()
-                .stream()
+        boolean hasDuplicateEmail = users.stream()
                 .anyMatch(user -> user.getEmail().equals(requestDto.getEmail()));
 
         // 이름 중복 검증
