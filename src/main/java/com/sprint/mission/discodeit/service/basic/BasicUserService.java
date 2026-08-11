@@ -65,8 +65,8 @@ public class BasicUserService implements UserService {
         User currentUser = userRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
         boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 회원의 로그인 정보가 존재하지 않습니다."))
-                .isCurrentlyLoggedIn();
+                .map(UserStatus::isCurrentlyLoggedIn)
+                .orElse(false);
 
         UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
 
@@ -87,8 +87,9 @@ public class BasicUserService implements UserService {
         return users.stream()
                 .map(user -> {
                     boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                            .orElseThrow(() -> new RuntimeException("찾으시는 회원의 로그인 정보가 존재하지 않습니다."))
-                            .isCurrentlyLoggedIn();
+                            .map(UserStatus::isCurrentlyLoggedIn)
+                            .orElse(false);
+
                     UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
                     String profileImagePath = null;
                     if (Objects.nonNull(user.getProfileId())) {
