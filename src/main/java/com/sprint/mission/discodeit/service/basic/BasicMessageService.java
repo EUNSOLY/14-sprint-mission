@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -28,10 +29,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public void save(MessageCreateRequestDto requestDto) {
         userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("유효한 사용자가 아닙니다."));
+                .orElseThrow(() -> new NoSuchElementException("유효한 사용자가 아닙니다."));
 
         channelRepository.findById(requestDto.getChannelId())
-                .orElseThrow(() -> new RuntimeException("유효한 채널이 아닙니다."));
+                .orElseThrow(() -> new NoSuchElementException("유효한 채널이 아닙니다."));
 
         Message savedMessage = requestDto.toEntity();
 
@@ -50,14 +51,14 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto find(MessageIdRequestDto requestDto) {
         Message message = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 메세지가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("찾으시는 메세지가 존재하지 않습니다."));
 
         return MessageResponseDto.from(message);
     }
 
     @Override
     public List<MessageResponseDto> findByUserId(UserIdRequestDto requestDto) {
-        userRepository.findById(requestDto.getId()).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
+        userRepository.findById(requestDto.getId()).orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
 
         return messageRepository.findByUserId(requestDto.getId())
                 .stream().map(MessageResponseDto::from).toList();
@@ -65,8 +66,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageResponseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
-        userRepository.findById(userRequestDto.getId()).orElseThrow(() -> new RuntimeException("회원정보가 잘못 됬습니다."));
-        channelRepository.findById(channelRequestDto.getId()).orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
+        userRepository.findById(userRequestDto.getId()).orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
+        channelRepository.findById(channelRequestDto.getId()).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
 
         return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId())
                 .stream().map(MessageResponseDto::from).toList();
@@ -76,7 +77,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<MessageResponseDto> findAllByChannelId(ChannelIdRequestDto requestDto) {
         channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("채널 정보가 잘못 됬습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
 
         return messageRepository.findByChannelId(requestDto.getId())
                 .stream().map(MessageResponseDto::from).toList();
@@ -85,12 +86,12 @@ public class BasicMessageService implements MessageService {
     @Override
     public void update(MessageUpdateRequestDto request) {
         Message updateMessage = messageRepository.findById(request.getId())
-                .orElseThrow(() -> new RuntimeException("수정 메세지가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("수정할 메세지가 존재하지 않습니다."));
 
         if (!request.getDeleteFileIds().isEmpty()) {
             request.getDeleteFileIds().forEach(uuid -> {
                 BinaryContent binaryContent = binaryContentRepository.findById(uuid)
-                        .orElseThrow(() -> new RuntimeException("컨텐츠가 존재하지 않습니다."));
+                        .orElseThrow(() -> new NoSuchElementException("컨텐츠가 존재하지 않습니다."));
                 fileStorageUtil.deleteUploadImage(binaryContent.getPath());
                 binaryContentRepository.delete(uuid);// 수정 파일 Id 값들 전부 데이터 삭제
             });
@@ -115,7 +116,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("삭제 할 메세지가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("삭제 할 메세지가 존재하지 않습니다."));
 
         deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
         messageRepository.delete(requestDto.getId()); // 메시지 삭제

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -67,7 +68,7 @@ public class BasicChannelService implements ChannelService {
                     return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
 
                 })
-                .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("찾으시는 채널이 존재하지 않습니다."));
 
     }
 
@@ -106,10 +107,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void update(ChannelUpdateRequestDto requestDto) {
         Channel updateChannel = channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("찾으시는 채널이 존재하지 않습니다."));
 
         if (updateChannel.getType().equals(ChannelType.PRIVATE)) {
-            throw new RuntimeException("비공개 채널은 수정할 수 없습니다.");
+            throw new IllegalStateException("비공개 채널은 수정할 수 없습니다.");
         }
 
         updateChannel.update(requestDto.getName(), requestDto.getDescription());
@@ -120,7 +121,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(ChannelIdRequestDto requestDto) {
         Channel deleteChannel = channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("찾으시는 채널이 존재하지 않습니다."));
 
         readStatusRepository.deleteByChannelId(deleteChannel.getId());
         messageRepository.deleteByChannelId(deleteChannel.getId());

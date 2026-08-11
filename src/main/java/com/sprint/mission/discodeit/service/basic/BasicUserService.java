@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -36,11 +37,11 @@ public class BasicUserService implements UserService {
 
         // 이름 중복 검증
         if (hasDuplicateName) {
-            throw new RuntimeException("이미 존재하는 이름입니다. 다른 이름을 입력해주세요.");
+            throw new IllegalArgumentException("이미 존재하는 이름입니다. 다른 이름을 입력해주세요.");
         }
         // 이메일 중복 검증
         if (hasDuplicateEmail) {
-            throw new RuntimeException("이미 존재하는 이메일입니다. 다른 이메일을 입력해주세요.");
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다. 다른 이메일을 입력해주세요.");
         }
 
         User savedUser = requestDto.toEntity(); // 저장될 User Entity
@@ -60,7 +61,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto find(UserIdRequestDto requestDto) {
         User currentUser = userRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("찾으시는 회원이 존재하지 않습니다."));
         boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
                 .map(UserStatus::isCurrentlyLoggedIn)
                 .orElse(false);
@@ -70,7 +71,7 @@ public class BasicUserService implements UserService {
         String profileImagePath = null;
         if (Objects.nonNull(currentUser.getProfileId())) {
             BinaryContent binaryContent = binaryContentRepository.findById(currentUser.getProfileId())
-                    .orElseThrow(() -> new RuntimeException("프로필 이미지가 존재하지 않습니다."));
+                    .orElseThrow(() -> new NoSuchElementException("프로필 이미지가 존재하지 않습니다."));
             profileImagePath = binaryContent.getPath();
         }
 
@@ -91,7 +92,7 @@ public class BasicUserService implements UserService {
                     String profileImagePath = null;
                     if (Objects.nonNull(user.getProfileId())) {
                         BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId())
-                                .orElseThrow(() -> new RuntimeException("프로필 이미지가 존재하지 않습니다."));
+                                .orElseThrow(() -> new NoSuchElementException("프로필 이미지가 존재하지 않습니다."));
                         profileImagePath = binaryContent.getPath();
                     }
                     return UserResponseDto.from(user, userStatusType, profileImagePath);
@@ -102,7 +103,7 @@ public class BasicUserService implements UserService {
     @Override
     public void update(UserUpdateRequestDto updateRequestDto) {
         User currentUser = userRepository.findById(updateRequestDto.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("찾으시는 회원이 존재하지 않습니다."));
 
         currentUser.update(updateRequestDto.getName(), updateRequestDto.getEmail(), updateRequestDto.getPassword());
 
@@ -111,7 +112,7 @@ public class BasicUserService implements UserService {
             String imagePath = fileStorageUtil.imageUpload(updateRequestDto.getProfile().getFileName(), updateRequestDto.getProfile().getBytes());
             if (Objects.nonNull(currentUser.getProfileId())) {
                 BinaryContent originImage = binaryContentRepository.findById(currentUser.getProfileId())
-                        .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
+                        .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
                 binaryContentRepository.delete(currentUser.getProfileId()); // 기존 프로필 데이터 삭제
                 fileStorageUtil.deleteUploadImage(originImage.getPath());
             }
@@ -126,12 +127,12 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UserIdRequestDto requestDto) {
         User deleteUser = userRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("찾으시는 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("찾으시는 회원이 존재하지 않습니다."));
 
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
         if (Objects.nonNull(deleteUser.getProfileId())) {
             BinaryContent originImage = binaryContentRepository.findById(deleteUser.getProfileId())
-                    .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
+                    .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
             binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
             fileStorageUtil.deleteUploadImage(originImage.getPath());
         }

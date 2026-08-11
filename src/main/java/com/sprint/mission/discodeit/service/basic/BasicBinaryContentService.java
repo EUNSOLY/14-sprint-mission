@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -34,7 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
                 .map(BinaryContentResponseDto::from)
-                .orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("데이터가 존재하지 않습니다."));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(BinaryContentIdRequestDto requestDto) {
         this.binaryContentRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new RuntimeException("삭제 할 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("삭제 할 데이터가 존재하지 않습니다."));
 
         this.binaryContentRepository.delete(requestDto.getId());
     }
