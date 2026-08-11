@@ -7,13 +7,13 @@ import java.util.List;
 public interface MessageService {
     void save(MessageCreateRequestDto requestDto);
 
-    MessageRespnoseDto find(MessageIdRequestDto requestDto);
+    MessageResponseDto find(MessageIdRequestDto requestDto);
 
-    List<MessageRespnoseDto> findByUserId(UserIdRequestDto requestDto);
+    List<MessageResponseDto> findByUserId(UserIdRequestDto requestDto);
 
-    List<MessageRespnoseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto);
+    List<MessageResponseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto);
 
-    List<MessageRespnoseDto> findAllByChannelId(ChannelIdRequestDto requestDto);
+    List<MessageResponseDto> findAllByChannelId(ChannelIdRequestDto requestDto);
 
     void update(MessageUpdateRequestDto request);
 

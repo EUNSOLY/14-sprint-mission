@@ -9,14 +9,14 @@ import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
-public class MessageRespnoseDto {
+public class MessageResponseDto {
     private final UUID id;
     private final String message;
     private final UUID userId;
     private final UUID channelId;
     private final List<UUID> imageIds;
 
-    public static MessageRespnoseDto from(Message message) {
-        return new MessageRespnoseDto(message.getId(), message.getMessage(), message.getUserId(), message.getChannelId(), message.getAttachmentIds());
+    public static MessageResponseDto from(Message message) {
+        return new MessageResponseDto(message.getId(), message.getMessage(), message.getUserId(), message.getChannelId(), message.getAttachmentIds());
     }
 }
