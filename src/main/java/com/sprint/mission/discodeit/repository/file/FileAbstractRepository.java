@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
@@ -12,15 +11,18 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class FileAbstractRepository {
-    @Value("${discodeit.repository.file-directory}")
-    private String uploadFolder;
+    private final String uploadFolder;
     private final String fileName;
 
-    protected FileAbstractRepository(String fileName) {
+    protected FileAbstractRepository(
+            @Value("${discodeit.repository.file-directory}") String uploadFolder,
+            String fileName
+    ) {
+        this.uploadFolder = uploadFolder;
         this.fileName = fileName;
+        this.initUploadFolder();
     }
 
-    @PostConstruct
     private void initUploadFolder() {
         try {
             assert uploadFolder != null;
