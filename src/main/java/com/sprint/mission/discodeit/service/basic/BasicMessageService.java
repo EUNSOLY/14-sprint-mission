@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.FileStorageUtil;
+import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
+import com.sprint.mission.discodeit.common.validator.ChannelValidator;
+import com.sprint.mission.discodeit.common.validator.UserValidator;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,19 +21,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final FileStorageUtil fileStorageUtil;
+    private final ChannelValidator channelValidator;
+    private final UserValidator userValidator;
+    private final BinaryContentValidator binaryContentValidator;
 
 
     @Override
     public void save(MessageCreateRequestDto requestDto) {
-        userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("유효한 사용자가 아닙니다."));
 
-        channelRepository.findById(requestDto.getChannelId())
-                .orElseThrow(() -> new NoSuchElementException("유효한 채널이 아닙니다."));
+        userValidator.getOrThrow(requestDto.getUserId());
+        channelValidator.getOrThrow(requestDto.getChannelId());
 
         Message savedMessage = requestDto.toEntity();
 
@@ -58,7 +58,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageResponseDto> findByUserId(UserIdRequestDto requestDto) {
-        userRepository.findById(requestDto.getId()).orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
+        userValidator.getOrThrow(requestDto.getId());
 
         return messageRepository.findByUserId(requestDto.getId())
                 .stream().map(MessageResponseDto::from).toList();
@@ -66,8 +66,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageResponseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
-        userRepository.findById(userRequestDto.getId()).orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다."));
-        channelRepository.findById(channelRequestDto.getId()).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
+
+        userValidator.getOrThrow(userRequestDto.getId());
+        channelValidator.getOrThrow(channelRequestDto.getId());
 
         return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId())
                 .stream().map(MessageResponseDto::from).toList();
@@ -76,8 +77,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageResponseDto> findAllByChannelId(ChannelIdRequestDto requestDto) {
-        channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다."));
+        channelValidator.getOrThrow(requestDto.getId());
 
         return messageRepository.findByChannelId(requestDto.getId())
                 .stream().map(MessageResponseDto::from).toList();
@@ -90,8 +90,7 @@ public class BasicMessageService implements MessageService {
 
         if (!request.getDeleteFileIds().isEmpty()) {
             request.getDeleteFileIds().forEach(uuid -> {
-                BinaryContent binaryContent = binaryContentRepository.findById(uuid)
-                        .orElseThrow(() -> new NoSuchElementException("컨텐츠가 존재하지 않습니다."));
+                BinaryContent binaryContent = binaryContentValidator.getOrThrow(uuid);
                 fileStorageUtil.deleteUploadImage(binaryContent.getPath());
                 binaryContentRepository.delete(uuid);// 수정 파일 Id 값들 전부 데이터 삭제
             });

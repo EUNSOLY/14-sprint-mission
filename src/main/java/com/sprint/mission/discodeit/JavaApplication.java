@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.common.config.FileProperties;
+import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
+import com.sprint.mission.discodeit.common.validator.ChannelValidator;
+import com.sprint.mission.discodeit.common.validator.UserValidator;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
@@ -44,12 +47,14 @@ public class JavaApplication {
         UserStatusRepository userStatusRepository = new FileUserStatusRepository(fileProperties);
         BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository(fileProperties);
         FileStorageUtil fileStorageUtil = new FileStorageUtil(".upload-file-directory");
-
+        UserValidator userValidator = new UserValidator(userRepository);
+        ChannelValidator channelValidator = new ChannelValidator(channelRepository);
+        BinaryContentValidator binaryContentValidator = new BinaryContentValidator(binaryContentRepository);
 
         // 서비스 초기화
-        UserService userService = new BasicUserService(userRepository, userStatusRepository, binaryContentRepository, fileStorageUtil);
+        UserService userService = new BasicUserService(userRepository, userStatusRepository, binaryContentRepository, fileStorageUtil, userValidator, binaryContentValidator);
         ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository, binaryContentRepository, fileStorageUtil);
+        MessageService messageService = new BasicMessageService(messageRepository, binaryContentRepository, fileStorageUtil, channelValidator, userValidator, binaryContentValidator);
 
         // 셋업
         UserResponseDto user = setupUser(userService);

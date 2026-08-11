@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.FileStorageUtil;
+import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
+import com.sprint.mission.discodeit.common.validator.UserValidator;
 import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.UserResponseDto;
@@ -17,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -27,6 +28,8 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final FileStorageUtil fileStorageUtil;
+    private final UserValidator userValidator;
+    private final BinaryContentValidator binaryContentValidator;
 
     @Override
     public void save(UserCreateRequestDto requestDto) {
@@ -60,8 +63,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto find(UserIdRequestDto requestDto) {
-        User currentUser = userRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾으시는 회원이 존재하지 않습니다."));
+        User currentUser = userValidator.getOrThrow(requestDto.getId());
         boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
                 .map(UserStatus::isCurrentlyLoggedIn)
                 .orElse(false);
@@ -70,8 +72,7 @@ public class BasicUserService implements UserService {
 
         String profileImagePath = null;
         if (Objects.nonNull(currentUser.getProfileId())) {
-            BinaryContent binaryContent = binaryContentRepository.findById(currentUser.getProfileId())
-                    .orElseThrow(() -> new NoSuchElementException("프로필 이미지가 존재하지 않습니다."));
+            BinaryContent binaryContent = binaryContentValidator.getOrThrow(currentUser.getProfileId());
             profileImagePath = binaryContent.getPath();
         }
 
@@ -91,8 +92,7 @@ public class BasicUserService implements UserService {
                     UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
                     String profileImagePath = null;
                     if (Objects.nonNull(user.getProfileId())) {
-                        BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId())
-                                .orElseThrow(() -> new NoSuchElementException("프로필 이미지가 존재하지 않습니다."));
+                        BinaryContent binaryContent = binaryContentValidator.getOrThrow(user.getProfileId());
                         profileImagePath = binaryContent.getPath();
                     }
                     return UserResponseDto.from(user, userStatusType, profileImagePath);
@@ -102,8 +102,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void update(UserUpdateRequestDto updateRequestDto) {
-        User currentUser = userRepository.findById(updateRequestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾으시는 회원이 존재하지 않습니다."));
+        User currentUser = userValidator.getOrThrow(updateRequestDto.getId());
 
         currentUser.update(updateRequestDto.getName(), updateRequestDto.getEmail(), updateRequestDto.getPassword());
 
@@ -111,8 +110,7 @@ public class BasicUserService implements UserService {
         if (Objects.nonNull(updateRequestDto.getProfile())) {
             String imagePath = fileStorageUtil.imageUpload(updateRequestDto.getProfile().getFileName(), updateRequestDto.getProfile().getBytes());
             if (Objects.nonNull(currentUser.getProfileId())) {
-                BinaryContent originImage = binaryContentRepository.findById(currentUser.getProfileId())
-                        .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+                BinaryContent originImage = binaryContentValidator.getOrThrow(currentUser.getProfileId());
                 binaryContentRepository.delete(currentUser.getProfileId()); // 기존 프로필 데이터 삭제
                 fileStorageUtil.deleteUploadImage(originImage.getPath());
             }
@@ -126,13 +124,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UserIdRequestDto requestDto) {
-        User deleteUser = userRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾으시는 회원이 존재하지 않습니다."));
+        User deleteUser = userValidator.getOrThrow(requestDto.getId());
+
 
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
         if (Objects.nonNull(deleteUser.getProfileId())) {
-            BinaryContent originImage = binaryContentRepository.findById(deleteUser.getProfileId())
-                    .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+            BinaryContent originImage = binaryContentValidator.getOrThrow(deleteUser.getProfileId());
             binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
             fileStorageUtil.deleteUploadImage(originImage.getPath());
         }

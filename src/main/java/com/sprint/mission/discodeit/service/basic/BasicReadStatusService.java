@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.validator.ChannelValidator;
+import com.sprint.mission.discodeit.common.validator.UserValidator;
 import com.sprint.mission.discodeit.dto.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.ReadStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,15 +20,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
+    private final ChannelValidator channelValidator;
+    private final UserValidator userValidator;
 
     @Override
     public void save(ReadStatusCreateRequestDto request) {
-        this.userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
-        this.channelRepository.findById(request.getChannelId())
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+
+        userValidator.getOrThrow(request.getUserId());
+        channelValidator.getOrThrow(request.getChannelId());
 
         // ifPresent : 값이 있다면 실행
         this.readStatusRepository.findByUserIdAndChannelId(request.getUserId(), request.getChannelId())
