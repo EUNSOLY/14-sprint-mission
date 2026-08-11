@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.config.FileProperties;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -17,9 +18,11 @@ public class FileUserRepository extends FileAbstractRepository implements UserRe
     // 동일한 구조 추상클래스로 분할해보기
 
 
-    public FileUserRepository() {
-        super(FILE_NAME);
+    public FileUserRepository(FileProperties properties) {
+        super(properties.getFileDirectory(), FILE_NAME);
+        cache.putAll(super.load());
     }
+    
 
     @PostConstruct
     public void init() {

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.config.FileProperties;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -14,13 +14,8 @@ public class FileMessageRepository extends FileAbstractRepository implements Mes
     private static final String FILE_NAME = "message.dir";
     private final Map<UUID, Message> cache = new HashMap<>();
 
-    public FileMessageRepository() {
-        super(FILE_NAME);
-
-    }
-
-    @PostConstruct
-    public void init() {
+    public FileMessageRepository(FileProperties properties) {
+        super(properties.getFileDirectory(), FILE_NAME);
         cache.putAll(super.load());
     }
 

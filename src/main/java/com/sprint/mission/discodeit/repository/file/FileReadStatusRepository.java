@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.config.FileProperties;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -14,12 +14,8 @@ public class FileReadStatusRepository extends FileAbstractRepository implements 
     private static final String FILE_NAME = "read-status.dir";
     private final Map<UUID, ReadStatus> cache = new HashMap<>();
 
-    public FileReadStatusRepository() {
-        super(FILE_NAME);
-    }
-
-    @PostConstruct
-    public void init() {
+    public FileReadStatusRepository(FileProperties properties) {
+        super(properties.getFileDirectory(), FILE_NAME);
         cache.putAll(super.load());
     }
 

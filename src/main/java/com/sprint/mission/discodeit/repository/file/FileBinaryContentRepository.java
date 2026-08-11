@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.config.FileProperties;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
@@ -14,9 +15,9 @@ public class FileBinaryContentRepository extends FileAbstractRepository implemen
     private static final String FILE_NAME = "binary.dir";
     private final Map<UUID, BinaryContent> cache = new HashMap<>();
 
-    public FileBinaryContentRepository() {
-        super(FILE_NAME);
-        
+    public FileBinaryContentRepository(FileProperties properties) {
+        super(properties.getFileDirectory(), FILE_NAME);
+        cache.putAll(super.load());
     }
 
     @PostConstruct

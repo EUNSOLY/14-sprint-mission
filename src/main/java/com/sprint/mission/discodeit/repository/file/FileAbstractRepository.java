@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +13,7 @@ public abstract class FileAbstractRepository {
     private final String fileName;
 
     protected FileAbstractRepository(
-            @Value("${discodeit.repository.file-directory}") String uploadFolder,
+            String uploadFolder,
             String fileName
     ) {
         this.uploadFolder = uploadFolder;
