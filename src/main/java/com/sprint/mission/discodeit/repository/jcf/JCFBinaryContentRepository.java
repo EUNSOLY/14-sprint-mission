@@ -9,6 +9,7 @@ import java.util.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+// 어플리케이션값에 따라 Bean으로 등록하냐마냐
 public class JCFBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> data = new HashMap<>();
 

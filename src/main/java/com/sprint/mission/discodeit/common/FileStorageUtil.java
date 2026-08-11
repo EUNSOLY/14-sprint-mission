@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.common;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,13 +17,13 @@ public class FileStorageUtil {
         this.uploadFolder = uploadFolder;
     }
 
-    public String imageUpload(MultipartFile file) {
+    public String imageUpload(String originalFileName, byte[] bytes) {
         UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + "_" + file.getOriginalFilename();
+        String imageFileName = uuid + "_" + originalFileName;
         System.out.println("이미지 이름: " + imageFileName);
         Path imageFilePath = Paths.get(uploadFolder, imageFileName);
         try {
-            Files.write(imageFilePath, file.getBytes());
+            Files.write(imageFilePath, bytes);
         } catch (Exception e) {
             throw new RuntimeException("이미지를 저장할 수 없습니다.", e);
         }
@@ -32,9 +31,9 @@ public class FileStorageUtil {
         return imageFilePath.toFile().getName();
     }
 
-    public void deleteUploadImage(String fileName) {
-        System.out.println("삭제 이미지 이름: " + fileName);
-        Path imageFilePath = Paths.get(uploadFolder, fileName);
+    public void deleteUploadImage(String filePath) {
+        System.out.println("삭제 파일 경로 : " + filePath);
+        Path imageFilePath = Paths.get(uploadFolder, filePath);
 
         try {
             Files.delete(imageFilePath);

@@ -4,13 +4,14 @@ import lombok.Getter;
 
 @Getter
 public class BinaryContent extends BaseEntity {
-    private final String title;
-    private final String imageUrl;
+    private final String fileName;
+    private final byte[] bytes;
+    private final String path;
 
-
-    public BinaryContent(String title, String imageUrl) {
-        this.title = title;
-        this.imageUrl = imageUrl;
+    public BinaryContent(String fileName, byte[] bytes, String path) {
+        this.fileName = fileName;
+        this.bytes = bytes;
+        this.path = path;
     }
 
     @Override

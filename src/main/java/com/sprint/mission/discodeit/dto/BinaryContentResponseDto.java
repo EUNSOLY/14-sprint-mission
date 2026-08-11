@@ -14,6 +14,6 @@ public class BinaryContentResponseDto {
     private final String filePath;
 
     public static BinaryContentResponseDto from(BinaryContent binaryContent) {
-        return new BinaryContentResponseDto(binaryContent.getId(), binaryContent.getTitle(), binaryContent.getImageUrl());
+        return new BinaryContentResponseDto(binaryContent.getId(), binaryContent.getFileName(), binaryContent.getPath());
     }
 }

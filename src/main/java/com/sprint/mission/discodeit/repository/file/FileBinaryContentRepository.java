@@ -16,6 +16,7 @@ public class FileBinaryContentRepository extends FileAbstractRepository implemen
 
     public FileBinaryContentRepository() {
         super(FILE_NAME);
+        
     }
 
     @PostConstruct

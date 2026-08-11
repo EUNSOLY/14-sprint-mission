@@ -3,15 +3,14 @@ package com.sprint.mission.discodeit.dto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @RequiredArgsConstructor
 public class BinaryContentCreateRequestDto {
-    private final MultipartFile file;
-    private final String title;
+    private String fileName;
+    private byte[] bytes;
 
-    public BinaryContent toEntity(String imageName) {
-        return new BinaryContent(this.title, imageName);
+    public BinaryContent toEntity(String path) {
+        return new BinaryContent(this.fileName, this.bytes, path);
     }
 }

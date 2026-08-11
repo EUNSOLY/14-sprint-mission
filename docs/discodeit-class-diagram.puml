@@ -1,0 +1,185 @@
+@startuml discodeit-class-diagram
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+skinparam packageStyle rectangle
+skinparam linetype ortho
+hide empty members
+left to right direction
+
+' ===================== com.sprint.mission.discodeit =====================
+package "com.sprint.mission.discodeit" #E8F1FF {
+    class DiscodeitApplication
+    class JavaApplication
+}
+
+' ===================== com.sprint.mission.discodeit.common =====================
+package "com.sprint.mission.discodeit.common" #EAF7EA {
+    class FileStorageUtil
+}
+
+' ===================== com.sprint.mission.discodeit.entity =====================
+package "com.sprint.mission.discodeit.entity" #F3EAFB {
+    abstract class BaseEntity
+
+    class User
+    class BinaryContent
+    class Message
+    class UserStatus
+    class Channel
+    class ReadStatus
+
+    enum ChannelType {
+        PUBLIC
+        PRIVATE
+    }
+
+    enum UserStatusType {
+        ONLINE
+        OFFLINE
+        - status
+    }
+
+    BaseEntity <|-- User
+    BaseEntity <|-- BinaryContent
+    BaseEntity <|-- Message
+    BaseEntity <|-- UserStatus
+    BaseEntity <|-- Channel
+    BaseEntity <|-- ReadStatus
+
+    User "1" -- "0..1" BinaryContent : profile
+    User "1" -- "0..*" Message : sending
+    User "1" -- "1" UserStatus : status
+    User "1" -- "0..*" ReadStatus : reads
+
+    BinaryContent "1" -- "0..*" Message : attachments
+
+    Message "0..*" -- "1" Channel : in
+    Channel "1" -- "0..*" ReadStatus : read in
+}
+
+' ===================== com.sprint.mission.discodeit.dto =====================
+package "com.sprint.mission.discodeit.dto" #E8F1FF {
+    abstract class IdRequestDto
+
+    class UserIdRequestDto
+    class ChannelIdRequestDto
+    class MessageIdRequestDto
+    class ReadStatusIdRequestDto
+    class UserStatusIdRequestDto
+    class BinaryContentIdRequestDto
+
+    IdRequestDto <|-- UserIdRequestDto
+    IdRequestDto <|-- ChannelIdRequestDto
+    IdRequestDto <|-- MessageIdRequestDto
+    IdRequestDto <|-- ReadStatusIdRequestDto
+    IdRequestDto <|-- UserStatusIdRequestDto
+    IdRequestDto <|-- BinaryContentIdRequestDto
+
+    class LoginRequestDto
+    class UserCreateRequestDto
+    class UserUpdateRequestDto
+    class UserResponseDto
+
+    class UserStatusCreateRequestDto
+    class UserStatusUpdateRequestDto
+
+    class ChannelResponseDto
+    class ChannelUpdateRequestDto
+    class PublicChannelCreateRequestDto
+    class PrivateChannelCreateRequestDto
+
+    class MessageCreateRequestDto
+    class MessageUpdateRequestDto
+    class MessageResponseDto
+
+    class ReadStatusCreateRequestDto
+    class ReadStatusUpdateRequestDto
+
+    class
+    class BinaryContentResponseDto
+}
+
+' ===================== com.sprint.mission.discodeit.service =====================
+package "com.sprint.mission.discodeit.service" #FCEFDC {
+    class BasicUserService
+    class BasicChannelService
+    class BasicMessageService
+    class BasicReadStatusService
+    class BasicUserStatusService
+    class BasicBinaryContentService
+}
+
+' ===================== com.sprint.mission.discodeit.repository =====================
+package "com.sprint.mission.discodeit.repository" #FBEAEA {
+    interface UserRepository
+    interface ChannelRepository
+    interface MessageRepository
+    interface ReadStatusRepository
+    interface UserStatusRepository
+    interface BinaryContentRepository
+}
+
+' ===================== com.sprint.mission.discodeit.repository.jcf =====================
+package "com.sprint.mission.discodeit.repository.jcf" #E6F7F7 {
+    class JCFUserRepository
+    class JCFChannelRepository
+    class JCFMessageRepository
+    class JCFReadStatusRepository
+    class JCFUserStatusRepository
+    class JCFBinaryContentRepository
+}
+
+' ===================== Application -> Common -> Entity =====================
+JavaApplication ..> FileStorageUtil
+FileStorageUtil ..> User
+
+' ===================== DTO <-> Service dependencies =====================
+LoginRequestDto ..> BasicUserService
+UserCreateRequestDto ..> BasicUserService
+UserUpdateRequestDto ..> BasicUserService
+BasicUserService ..> UserResponseDto
+UserIdRequestDto ..> BasicUserService
+
+ChannelResponseDto ..> BasicChannelService
+ChannelUpdateRequestDto ..> BasicChannelService
+PublicChannelCreateRequestDto ..> BasicChannelService
+PrivateChannelCreateRequestDto ..> BasicChannelService
+ChannelIdRequestDto ..> BasicChannelService
+
+MessageCreateRequestDto ..> BasicMessageService
+MessageUpdateRequestDto ..> BasicMessageService
+BasicMessageService ..> MessageResponseDto
+MessageIdRequestDto ..> BasicMessageService
+
+ReadStatusCreateRequestDto ..> BasicReadStatusService
+ReadStatusUpdateRequestDto ..> BasicReadStatusService
+ReadStatusIdRequestDto ..> BasicReadStatusService
+
+UserStatusCreateRequestDto ..> BasicUserStatusService
+UserStatusUpdateRequestDto ..> BasicUserStatusService
+UserStatusIdRequestDto ..> BasicUserStatusService
+
+BinaryContentCreateRequestDto ..> BasicBinaryContentService
+BasicBinaryContentService ..> BinaryContentResponseDto
+BinaryContentIdRequestDto ..> BasicBinaryContentService
+
+' ===================== Service -> Repository (interface) =====================
+BasicUserService ..> UserRepository
+BasicChannelService ..> ChannelRepository
+BasicMessageService ..> MessageRepository
+BasicReadStatusService ..> ReadStatusRepository
+BasicUserStatusService ..> UserStatusRepository
+BasicBinaryContentService ..> BinaryContentRepository
+
+' ===================== Repository (interface) <|.. Repository (JCF) =====================
+UserRepository <|.. JCFUserRepository
+ChannelRepository <|.. JCFChannelRepository
+MessageRepository <|.. JCFMessageRepository
+ReadStatusRepository <|.. JCFReadStatusRepository
+UserStatusRepository <|.. JCFUserStatusRepository
+BinaryContentRepository <|.. JCFBinaryContentRepository
+
+@enduml

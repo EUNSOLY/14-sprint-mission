@@ -23,13 +23,12 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContentResponseDto save(BinaryContentCreateRequestDto requestDto) {
-        if (requestDto.getFile().isEmpty()) throw new RuntimeException("저장할 파일이 존재하지 않습니다.");
-
-        String imageName = fileStorageUtil.imageUpload(requestDto.getFile());
+        String imageName = fileStorageUtil.imageUpload(requestDto.getFileName(), requestDto.getBytes());
         BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity(imageName));
 
         return BinaryContentResponseDto.from(savedContent);
     }
+
 
     @Override
     public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {

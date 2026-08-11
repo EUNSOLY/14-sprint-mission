@@ -13,6 +13,9 @@ import java.util.*;
 public class FileUserRepository extends FileAbstractRepository implements UserRepository {
     private static final String FILE_NAME = "user.dir";
     private final Map<UUID, User> cache = new HashMap<>();
+    // 추상 글래스로 받아보기
+    // 동일한 구조 추상클래스로 분할해보기
+
 
     public FileUserRepository() {
         super(FILE_NAME);

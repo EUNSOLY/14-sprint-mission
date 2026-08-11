@@ -52,8 +52,8 @@ public class BasicUserService implements UserService {
         userStatusRepository.save(userStatus); // UserStatus 저장
 
         if (Objects.nonNull(requestDto.getProfile())) {
-            String imageName = fileStorageUtil.imageUpload(requestDto.getProfile().getFile());
-            BinaryContent binaryContent = requestDto.getProfile().toEntity(imageName); // User 프로필 파일 저장 Entity 생성
+            String imagePath = fileStorageUtil.imageUpload(requestDto.getProfile().getFileName(), requestDto.getProfile().getBytes());
+            BinaryContent binaryContent = requestDto.getProfile().toEntity(imagePath); // User 프로필 파일 저장 Entity 생성
             binaryContentRepository.save(binaryContent); // BinaryContent 저장
             savedUser.updateProfile(binaryContent.getId()); // 프로필 Entity 연계
         }
@@ -74,12 +74,13 @@ public class BasicUserService implements UserService {
         if (Objects.nonNull(currentUser.getProfileId())) {
             BinaryContent binaryContent = binaryContentRepository.findById(currentUser.getProfileId())
                     .orElseThrow(() -> new RuntimeException("프로필 이미지가 존재하지 않습니다."));
-            profileImagePath = binaryContent.getImageUrl();
+            profileImagePath = binaryContent.getPath();
         }
 
         return UserResponseDto.from(currentUser, userStatusType, profileImagePath);
     }
 
+    // Stream 고민해보기 (메서드 분할 고민해보깅)
     @Override
     public List<UserResponseDto> findAll() {
         List<User> users = userRepository.findAll();
@@ -93,7 +94,7 @@ public class BasicUserService implements UserService {
                     if (Objects.nonNull(user.getProfileId())) {
                         BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId())
                                 .orElseThrow(() -> new RuntimeException("프로필 이미지가 존재하지 않습니다."));
-                        profileImagePath = binaryContent.getImageUrl();
+                        profileImagePath = binaryContent.getPath();
                     }
                     return UserResponseDto.from(user, userStatusType, profileImagePath);
                 })
@@ -109,14 +110,14 @@ public class BasicUserService implements UserService {
 
         // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
         if (Objects.nonNull(updateRequestDto.getProfile())) {
-            String imageName = fileStorageUtil.imageUpload(updateRequestDto.getProfile().getFile());
+            String imagePath = fileStorageUtil.imageUpload(updateRequestDto.getProfile().getFileName(), updateRequestDto.getProfile().getBytes());
             if (Objects.nonNull(currentUser.getProfileId())) {
                 BinaryContent originImage = binaryContentRepository.findById(currentUser.getProfileId())
                         .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
                 binaryContentRepository.delete(currentUser.getProfileId()); // 기존 프로필 데이터 삭제
-                fileStorageUtil.deleteUploadImage(originImage.getImageUrl());
+                fileStorageUtil.deleteUploadImage(originImage.getPath());
             }
-            BinaryContent newProfile = updateRequestDto.getProfile().toEntity(imageName); // User 프로필 파일 저장 Entity 생성
+            BinaryContent newProfile = updateRequestDto.getProfile().toEntity(imagePath); // User 프로필 파일 저장 Entity 생성
             binaryContentRepository.save(newProfile); // BinaryContent 저장
             currentUser.updateProfile(newProfile.getId()); // 프로필 Entity 연계
         }
@@ -134,9 +135,9 @@ public class BasicUserService implements UserService {
             BinaryContent originImage = binaryContentRepository.findById(deleteUser.getProfileId())
                     .orElseThrow(() -> new RuntimeException("파일이 존재하지 않습니다."));
             binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
-            fileStorageUtil.deleteUploadImage(originImage.getImageUrl());
+            fileStorageUtil.deleteUploadImage(originImage.getPath());
         }
-        
+
         userRepository.delete(requestDto.getId()); // 유저 삭제
     }
 }
