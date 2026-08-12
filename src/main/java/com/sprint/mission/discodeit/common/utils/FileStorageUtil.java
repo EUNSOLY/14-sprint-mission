@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common;
+package com.sprint.mission.discodeit.common.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,28 +17,28 @@ public class FileStorageUtil {
         this.uploadFolder = uploadFolder;
     }
 
-    public String imageUpload(String originalFileName, byte[] bytes) {
+    public String saveFile(String originalFileName, byte[] bytes) {
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + originalFileName;
-        System.out.println("이미지 이름: " + imageFileName);
+        System.out.println("파일 이름: " + imageFileName);
         Path imageFilePath = Paths.get(uploadFolder, imageFileName);
         try {
             Files.write(imageFilePath, bytes);
         } catch (Exception e) {
-            throw new RuntimeException("이미지를 저장할 수 없습니다.", e);
+            throw new RuntimeException("파일을 저장할 수 없습니다.", e);
         }
 
         return imageFilePath.toFile().getName();
     }
 
-    public void deleteUploadImage(String filePath) {
+    public void deleteFile(String filePath) {
         System.out.println("삭제 파일 경로 : " + filePath);
         Path imageFilePath = Paths.get(uploadFolder, filePath);
 
         try {
             Files.delete(imageFilePath);
         } catch (Exception e) {
-            throw new RuntimeException("이미지를 삭제할 수 없습니다.", e);
+            throw new RuntimeException("파일을 삭제할 수 없습니다.", e);
         }
     }
 }
