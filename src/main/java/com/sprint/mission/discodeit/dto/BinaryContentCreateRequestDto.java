@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,9 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BinaryContentCreateRequestDto {
     private final String fileName;
+    private final String contentType;
     private final byte[] bytes;
 
-    public BinaryContent toEntity(String path) {
-        return new BinaryContent(this.fileName, this.bytes, path);
-    }
+//    public BinaryContent toEntity(String path) {
+//        return new BinaryContent(this.fileName, this.bytes, path);
+//    }
 }
