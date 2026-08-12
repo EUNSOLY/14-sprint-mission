@@ -3,7 +3,11 @@ package com.sprint.mission.discodeit.dto;
 import java.util.UUID;
 
 public class ReadStatusIdRequestDto extends IdRequestDto {
-    public ReadStatusIdRequestDto(UUID id) {
+    private ReadStatusIdRequestDto(UUID id) {
         super(id);
+    }
+
+    public static ReadStatusIdRequestDto from(UUID id) {
+        return new ReadStatusIdRequestDto(id);
     }
 }

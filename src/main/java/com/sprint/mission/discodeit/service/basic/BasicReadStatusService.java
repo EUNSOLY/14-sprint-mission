@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.validator.ChannelValidator;
 import com.sprint.mission.discodeit.common.validator.UserValidator;
-import com.sprint.mission.discodeit.dto.ReadStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.ReadStatusIdRequestDto;
-import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.UserIdRequestDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,31 +35,35 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus find(ReadStatusIdRequestDto requestDto) {
+    public ReadStatusResponseDto find(ReadStatusIdRequestDto requestDto) {
         return this.readStatusRepository.findById(requestDto.getId())
+                .map(ReadStatusResponseDto::from)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 데이터 입니다."));
     }
 
     @Override
-    public List<ReadStatus> findAllByUserId(UserIdRequestDto requestDto) {
-        return this.readStatusRepository.findByUserId(requestDto.getId());
+    public List<ReadStatusResponseDto> findAllByUserId(UserIdRequestDto requestDto) {
+        return this.readStatusRepository.findByUserId(requestDto.getId())
+                .stream().map(ReadStatusResponseDto::from).toList();
+
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateRequestDto requestDto) {
+    public ReadStatusResponseDto update(ReadStatusUpdateRequestDto requestDto) {
         ReadStatus updateReadStatus = this.readStatusRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("수정이 가능한 데이터가 존재하지 않습니다."));
 
         updateReadStatus.updateLastReadMessageAt();
 
-        return this.readStatusRepository.update(updateReadStatus);
+        ReadStatus readStatus = this.readStatusRepository.update(updateReadStatus);
+        return ReadStatusResponseDto.from(readStatus);
     }
 
     @Override
-    public void delete(UUID id) {
-        this.readStatusRepository.findById(id)
+    public void delete(ReadStatusIdRequestDto request) {
+        this.readStatusRepository.findById(request.getId())
                 .orElseThrow(() -> new NoSuchElementException("삭제 가능한 데이터가 존재하지 않습니다."));
 
-        this.readStatusRepository.delete(id);
+        this.readStatusRepository.delete(request.getId());
     }
 }
