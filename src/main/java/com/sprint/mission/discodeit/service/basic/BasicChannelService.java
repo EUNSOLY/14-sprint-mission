@@ -30,7 +30,7 @@ public class BasicChannelService implements ChannelService {
         Channel savedChannel = request.toEntity();
         channelRepository.save(savedChannel);
 
-        return this.find(new ChannelIdRequestDto(savedChannel.getId()));
+        return this.find(ChannelIdRequestDto.from(savedChannel.getId()));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class BasicChannelService implements ChannelService {
         });
 
         channelRepository.save(savedChannel);
-        return this.find(new ChannelIdRequestDto(savedChannel.getId()));
+        return this.find(ChannelIdRequestDto.from(savedChannel.getId()));
     }
 
     @Override
@@ -72,6 +72,27 @@ public class BasicChannelService implements ChannelService {
 
     }
 
+    public List<ChannelResponseDto> findAll() {
+        return channelRepository.findAll()
+                .stream()
+                .map(channel -> {
+                    Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
+                            .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                            .map(BaseEntity::getCreatedAt)
+                            .findFirst().orElse(null);
+
+                    if (channel.getType().equals(ChannelType.PUBLIC)) {
+                        return ChannelResponseDto.publicFrom(channel, messageLastTime);
+                    }
+
+                    List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
+                            .map(ReadStatus::getUserId)
+                            .toList();
+
+                    return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
+
+                }).toList();
+    }
 
     @Override
     public List<ChannelResponseDto> findAllByUserId(UserIdRequestDto requestDto) {

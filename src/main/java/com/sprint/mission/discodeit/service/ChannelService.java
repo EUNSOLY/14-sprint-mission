@@ -9,6 +9,8 @@ public interface ChannelService {
 
     ChannelResponseDto savePrivateChannel(PrivateChannelCreateRequestDto request);
 
+    List<ChannelResponseDto> findAll();
+
     ChannelResponseDto find(ChannelIdRequestDto requestDto);
 
     List<ChannelResponseDto> findAllByUserId(UserIdRequestDto requestDto);
