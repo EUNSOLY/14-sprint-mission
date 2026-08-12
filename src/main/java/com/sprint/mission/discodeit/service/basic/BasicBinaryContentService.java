@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentResponseDto;
@@ -19,18 +18,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
-    private final FileStorageUtil fileStorageUtil;
 
 
     @Override
     public BinaryContentResponseDto save(BinaryContentCreateRequestDto requestDto) {
-        String imageName = fileStorageUtil.imageUpload(requestDto.getFileName(), requestDto.getBytes());
-        BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity(imageName));
+        BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity());
 
         return BinaryContentResponseDto.from(savedContent);
     }
 
-
+    
     @Override
     public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
@@ -52,5 +49,4 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         this.binaryContentRepository.delete(requestDto.getId());
     }
-
 }

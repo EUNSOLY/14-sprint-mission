@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
 import com.sprint.mission.discodeit.common.validator.ChannelValidator;
 import com.sprint.mission.discodeit.common.validator.UserValidator;
@@ -13,38 +12,40 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final FileStorageUtil fileStorageUtil;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
     private final BinaryContentValidator binaryContentValidator;
 
 
     @Override
-    public void save(MessageCreateRequestDto requestDto) {
+    public void save(
+            MessageCreateRequestDto requestDto,
+            List<BinaryContentCreateRequestDto> messageContentCreateRequests
+    ) {
 
         userValidator.getOrThrow(requestDto.getUserId());
         channelValidator.getOrThrow(requestDto.getChannelId());
 
         Message savedMessage = requestDto.toEntity();
 
-        if (!requestDto.getFilesContent().isEmpty()) {
-            requestDto.getFilesContent().forEach(binaryContent -> {
-                String imageName = fileStorageUtil.imageUpload(binaryContent.getFileName(), binaryContent.getBytes());
-                BinaryContent result = binaryContent.toEntity(imageName);
-                BinaryContent savedBinaryContent = binaryContentRepository.save(result); // BinaryContent 저장
-                UUID contentUuid = savedBinaryContent.getId();
-                savedMessage.addAttachmentId(contentUuid);
-            });
-        }
+        List<UUID> contentIds = Optional.ofNullable(messageContentCreateRequests)
+                .filter(list -> !list.isEmpty())
+                .map(messageBinaryContents -> {
+                    return messageBinaryContents.stream().map(messageBinaryContent -> {
+                        BinaryContent binaryContent = messageBinaryContent.toEntity();
+                        return binaryContentRepository.save(binaryContent).getId();
+                    }).toList();
+                })
+                .orElse(Collections.emptyList());
+
+        savedMessage.addAttachmentIds(contentIds);
         messageRepository.save(savedMessage);
     }
 
@@ -84,30 +85,33 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void update(MessageUpdateRequestDto request) {
+    public void update(
+            MessageUpdateRequestDto request,
+            List<BinaryContentCreateRequestDto> messageContentCreateRequests
+    ) {
         Message updateMessage = messageRepository.findById(request.getId())
                 .orElseThrow(() -> new NoSuchElementException("수정할 메세지가 존재하지 않습니다."));
 
-        if (!request.getDeleteFileIds().isEmpty()) {
-            request.getDeleteFileIds().forEach(uuid -> {
-                BinaryContent binaryContent = binaryContentValidator.getOrThrow(uuid);
-                fileStorageUtil.deleteUploadImage(binaryContent.getPath());
-                binaryContentRepository.delete(uuid);// 수정 파일 Id 값들 전부 데이터 삭제
-            });
-            updateMessage.removeAttachmentIds(request.getDeleteFileIds()); // 메세지에도 Id 값들 제거
-        }
+        Optional.ofNullable(request.getDeleteFileIds())
+                .ifPresent(deleteContentIds -> {
+                    deleteContentIds.forEach(deleteId -> {
+                        binaryContentValidator.getOrThrow(deleteId);
+                        binaryContentRepository.delete(deleteId);
+                    });
+                });
 
-        if (!request.getFilesContent().isEmpty()) {
-            List<UUID> savedBinaryContentIds = request.getFilesContent().stream()
-                    .map(binaryContent -> {
-                        String imageName = fileStorageUtil.imageUpload(binaryContent.getFileName(), binaryContent.getBytes());
-                        BinaryContent result = binaryContent.toEntity(imageName);
-                        BinaryContent savedBinaryContent = binaryContentRepository.save(result); // BinaryContent 저장
-                        return savedBinaryContent.getId();
+        List<UUID> saveContentIds = Optional.ofNullable(messageContentCreateRequests)
+                .filter(list -> !list.isEmpty())
+                .map(messageBinaryContents -> {
+                    return messageBinaryContents.stream().map(messageBinaryContent -> {
+                        BinaryContent binaryContent = messageBinaryContent.toEntity();
+                        return binaryContentRepository.save(binaryContent).getId();
                     }).toList();
-            updateMessage.addAttachmentIds(savedBinaryContentIds);
-        }
+                })
+                .orElse(Collections.emptyList());
 
+
+        updateMessage.addAttachmentIds(saveContentIds);
         updateMessage.update(request.getMessage());
         messageRepository.update(updateMessage.getId(), updateMessage);
     }

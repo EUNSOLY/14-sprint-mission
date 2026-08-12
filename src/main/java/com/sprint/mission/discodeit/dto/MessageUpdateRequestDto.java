@@ -14,5 +14,4 @@ public class MessageUpdateRequestDto {
     private final UUID userId;
     private final UUID channelId;
     private final List<UUID> deleteFileIds;
-    private final List<BinaryContentCreateRequestDto> filesContent;
 }

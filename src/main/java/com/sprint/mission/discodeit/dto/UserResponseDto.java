@@ -15,9 +15,9 @@ public class UserResponseDto {
     private final String name;
     private final String email;
     private final UserStatusType userStatus;
-    private final String profile;
+    private final UUID profileId;
 
-    public static UserResponseDto from(User userEntity, UserStatusType status, String profile) {
-        return new UserResponseDto(userEntity.getId(), userEntity.getName(), userEntity.getEmail(), status, profile);
+    public static UserResponseDto from(User userEntity, UserStatusType status) {
+        return new UserResponseDto(userEntity.getId(), userEntity.getName(), userEntity.getEmail(), status, userEntity.getProfileId());
     }
 }

@@ -1,12 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.FileStorageUtil;
 import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
 import com.sprint.mission.discodeit.common.validator.UserValidator;
-import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.UserResponseDto;
-import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -19,7 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +24,14 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final FileStorageUtil fileStorageUtil;
     private final UserValidator userValidator;
     private final BinaryContentValidator binaryContentValidator;
 
     @Override
-    public void save(UserCreateRequestDto requestDto) {
+    public void save(
+            UserCreateRequestDto requestDto,
+            BinaryContentCreateRequestDto profileCreateRequest
+    ) {
         List<User> users = userRepository.findAll();
         boolean hasDuplicateName = userRepository.existsByName(requestDto.getName());
 
@@ -52,12 +51,14 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(savedUser.getId()); // User 로그인 일시 핸들러 Entity 생성
         userStatusRepository.save(userStatus); // UserStatus 저장
 
-        if (Objects.nonNull(requestDto.getProfile())) {
-            String imagePath = fileStorageUtil.imageUpload(requestDto.getProfile().getFileName(), requestDto.getProfile().getBytes());
-            BinaryContent binaryContent = requestDto.getProfile().toEntity(imagePath); // User 프로필 파일 저장 Entity 생성
-            binaryContentRepository.save(binaryContent); // BinaryContent 저장
-            savedUser.updateProfile(binaryContent.getId()); // 프로필 Entity 연계
-        }
+        // 프로필 있으면 생성 후 UUID 반환
+        UUID profileId = Optional.ofNullable(profileCreateRequest)
+                .map((profileRequest) -> {
+                    BinaryContent binaryContent = profileRequest.toEntity();
+                    return binaryContentRepository.save(binaryContent).getId();
+                }).orElse(null);
+
+        savedUser.updateProfile(profileId); // 프로필 ID 업데이트
         userRepository.save(savedUser); // 저장
     }
 
@@ -70,16 +71,9 @@ public class BasicUserService implements UserService {
 
         UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
 
-        String profileImagePath = null;
-        if (Objects.nonNull(currentUser.getProfileId())) {
-            BinaryContent binaryContent = binaryContentValidator.getOrThrow(currentUser.getProfileId());
-            profileImagePath = binaryContent.getPath();
-        }
-
-        return UserResponseDto.from(currentUser, userStatusType, profileImagePath);
+        return UserResponseDto.from(currentUser, userStatusType);
     }
 
-    // Stream 고민해보기 (메서드 분할 고민해보깅)
     @Override
     public List<UserResponseDto> findAll() {
         List<User> users = userRepository.findAll();
@@ -90,34 +84,35 @@ public class BasicUserService implements UserService {
                             .orElse(false);
 
                     UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-                    String profileImagePath = null;
-                    if (Objects.nonNull(user.getProfileId())) {
-                        BinaryContent binaryContent = binaryContentValidator.getOrThrow(user.getProfileId());
-                        profileImagePath = binaryContent.getPath();
-                    }
-                    return UserResponseDto.from(user, userStatusType, profileImagePath);
+                    return UserResponseDto.from(user, userStatusType);
                 })
                 .toList();
     }
 
     @Override
-    public void update(UserUpdateRequestDto updateRequestDto) {
+    public void update(
+            UserUpdateRequestDto updateRequestDto,
+            BinaryContentCreateRequestDto profileCreateRequest
+    ) {
         User currentUser = userValidator.getOrThrow(updateRequestDto.getId());
 
         currentUser.update(updateRequestDto.getName(), updateRequestDto.getEmail(), updateRequestDto.getPassword());
 
         // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
-        if (Objects.nonNull(updateRequestDto.getProfile())) {
-            String imagePath = fileStorageUtil.imageUpload(updateRequestDto.getProfile().getFileName(), updateRequestDto.getProfile().getBytes());
-            if (Objects.nonNull(currentUser.getProfileId())) {
-                BinaryContent originImage = binaryContentValidator.getOrThrow(currentUser.getProfileId());
-                binaryContentRepository.delete(currentUser.getProfileId()); // 기존 프로필 데이터 삭제
-                fileStorageUtil.deleteUploadImage(originImage.getPath());
-            }
-            BinaryContent newProfile = updateRequestDto.getProfile().toEntity(imagePath); // User 프로필 파일 저장 Entity 생성
-            binaryContentRepository.save(newProfile); // BinaryContent 저장
-            currentUser.updateProfile(newProfile.getId()); // 프로필 Entity 연계
-        }
+        Optional.ofNullable(profileCreateRequest)
+                .ifPresent(profileRequest -> {
+                    // 이미 프로필이 있다면 제거
+                    Optional.ofNullable(currentUser.getProfileId())
+                            .ifPresent(contentId -> {
+                                binaryContentValidator.getOrThrow(contentId);
+                                binaryContentRepository.delete(contentId);
+                            });
+
+                    // 프로필 저장
+                    BinaryContent binaryContent = profileRequest.toEntity();
+                    binaryContentRepository.save(binaryContent);
+                    currentUser.updateProfile(binaryContent.getId());
+                });
 
         userRepository.update(currentUser.getId(), currentUser);
     }
@@ -126,13 +121,10 @@ public class BasicUserService implements UserService {
     public void delete(UserIdRequestDto requestDto) {
         User deleteUser = userValidator.getOrThrow(requestDto.getId());
 
-
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
-        if (Objects.nonNull(deleteUser.getProfileId())) {
-            BinaryContent originImage = binaryContentValidator.getOrThrow(deleteUser.getProfileId());
-            binaryContentRepository.delete(deleteUser.getProfileId()); // 프로필 파일 삭제
-            fileStorageUtil.deleteUploadImage(originImage.getPath());
-        }
+
+        Optional.ofNullable(deleteUser.getProfileId())
+                .ifPresent(binaryContentRepository::delete);
 
         userRepository.delete(requestDto.getId()); // 유저 삭제
     }

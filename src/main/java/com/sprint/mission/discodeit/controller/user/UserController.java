@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.controller.user;
 
-import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.UserResponseDto;
-import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.common.utils.BinaryContentMapper;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,17 +21,28 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST, value = "")
     public void createUser(
-            @RequestBody UserCreateRequestDto request
-    ) {
-        userService.save(request);
+            @ModelAttribute("user") String name,
+            @ModelAttribute("email") String email,
+            @ModelAttribute("password") String password,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) throws IOException {
+        UserCreateRequestDto request = new UserCreateRequestDto(name, email, password);
+        BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
+
+        userService.save(request, binaryRequest);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
     public void updateUser(
             @PathVariable(value = "id") UUID userId,
-            @RequestBody UserUpdateRequestDto request
-    ) {
-        userService.update(request);
+            @ModelAttribute("user") String name,
+            @ModelAttribute("email") String email,
+            @ModelAttribute("password") String password,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) throws IOException {
+        UserUpdateRequestDto request = new UserUpdateRequestDto(userId, name, email, password);
+        BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
+        userService.update(request, binaryRequest);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")

@@ -5,7 +5,10 @@ import com.sprint.mission.discodeit.dto.*;
 import java.util.List;
 
 public interface MessageService {
-    void save(MessageCreateRequestDto requestDto);
+    void save(
+            MessageCreateRequestDto requestDto,
+            List<BinaryContentCreateRequestDto> messageContentCreateRequests
+    );
 
     MessageResponseDto find(MessageIdRequestDto requestDto);
 
@@ -15,7 +18,11 @@ public interface MessageService {
 
     List<MessageResponseDto> findAllByChannelId(ChannelIdRequestDto requestDto);
 
-    void update(MessageUpdateRequestDto request);
+    void update(
+            MessageUpdateRequestDto request,
+            List<BinaryContentCreateRequestDto> messageContentCreateRequests
+
+    );
 
     void delete(MessageIdRequestDto requestDto);
 }

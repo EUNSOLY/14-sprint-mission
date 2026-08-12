@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -13,7 +12,6 @@ public class MessageCreateRequestDto {
     private final String message;
     private final UUID userId;
     private final UUID channelId;
-    private final List<BinaryContentCreateRequestDto> filesContent;
 
 
     public Message toEntity() {
