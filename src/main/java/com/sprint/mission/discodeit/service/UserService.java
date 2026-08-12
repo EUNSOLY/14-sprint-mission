@@ -17,4 +17,6 @@ public interface UserService {
     void update(UserUpdateRequestDto updateRequestDto);
 
     void delete(UserIdRequestDto requestDto);
+
+    void updateUserOnlineStatus(UserIdRequestDto requestDto);
 }

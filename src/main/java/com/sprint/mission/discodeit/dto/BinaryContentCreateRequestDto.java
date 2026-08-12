@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class BinaryContentCreateRequestDto {
-    private String fileName;
-    private byte[] bytes;
+    private final String fileName;
+    private final byte[] bytes;
 
     public BinaryContent toEntity(String path) {
         return new BinaryContent(this.fileName, this.bytes, path);

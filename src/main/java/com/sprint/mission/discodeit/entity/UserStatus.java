@@ -20,6 +20,7 @@ public class UserStatus extends BaseEntity {
 
     public Instant updateLastAccessAt() {
         this.lastAccessAt = Instant.now();
+        super.updatedAt();
         return this.lastAccessAt;
     }
 

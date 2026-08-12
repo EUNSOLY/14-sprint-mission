@@ -136,4 +136,13 @@ public class BasicUserService implements UserService {
 
         userRepository.delete(requestDto.getId()); // 유저 삭제
     }
+
+    @Override
+    public void updateUserOnlineStatus(UserIdRequestDto requestDto) {
+        User user = userValidator.getOrThrow(requestDto.getId());
+        UserStatus status = userStatusRepository.findByUserId(user.getId())
+                .orElse(new UserStatus(requestDto.getId()));
+        status.updateLastAccessAt();
+        userStatusRepository.update(status);
+    }
 }
