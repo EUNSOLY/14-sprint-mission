@@ -18,7 +18,7 @@ public enum ErrorCode {
     CONTENT_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "파일이 존재하지 않습니다."),
 
     // 500 INTERNAL_SERVER_ERROR: 서버 에러
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.NOT_FOUND.value(), "서버 내부 에러가 발생했습니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 에러가 발생했습니다.");
 
     private final HttpStatus status;   // HTTP 상태코드, ResponseEntity에 전달할 때 사용
     private final int code;            // 커스텀 에러 코드 (기본HTTP 상태코드, 다른 예외상황에 따라 변경가능)

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository userRepository;
 
-    User validateCredentials(LoginRequestDto requestDto) {
+    public User validateCredentials(LoginRequestDto requestDto) {
         return userRepository.findAll().stream()
                 .filter(user -> user.getName().equals(requestDto.getName()))
                 .filter(user -> user.getPassword().equals(requestDto.getPassword()))
