@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.dto.*;
 import java.util.List;
 
 public interface ChannelService {
-    ChannelResponseDto savePublicChannel(PublicChannelCreateRequestDto request);
+    ChannelResponseDto save(PublicChannelCreateRequestDto request);
 
-    ChannelResponseDto savePrivateChannel(PrivateChannelCreateRequestDto request);
+    ChannelResponseDto save(PrivateChannelCreateRequestDto request);
 
     List<ChannelResponseDto> findAll();
 

@@ -20,14 +20,14 @@ public class ChannelController {
     public ChannelResponseDto createPublicChannel(
             @RequestBody PublicChannelCreateRequestDto request
     ) {
-        return channelService.savePublicChannel(request);
+        return channelService.save(request);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/private")
     public ChannelResponseDto createPrivateChannel(
             @RequestBody PrivateChannelCreateRequestDto request
     ) {
-        return channelService.savePrivateChannel(request);
+        return channelService.save(request);
     }
 
 

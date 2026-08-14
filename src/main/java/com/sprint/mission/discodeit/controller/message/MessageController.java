@@ -22,12 +22,9 @@ public class MessageController {
 
     @RequestMapping(method = RequestMethod.POST, value = "")
     public void sendMessage(
-            @ModelAttribute("message") String message,
-            @ModelAttribute("userId") UUID userId,
-            @ModelAttribute("channelId") UUID channelId,
-            @RequestPart(value = "profile", required = false) List<MultipartFile> contentFiles
+            @RequestPart(value = "messageInfo") MessageCreateRequestDto request,
+            @RequestPart(value = "contents", required = false) List<MultipartFile> contentFiles
     ) throws IOException {
-        MessageCreateRequestDto request = new MessageCreateRequestDto(message, userId, channelId);
         List<BinaryContentCreateRequestDto> binaryRequests = BinaryContentMapper.toList(contentFiles);
         messageService.save(request, binaryRequests);
     }
@@ -35,13 +32,9 @@ public class MessageController {
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
     public void updateMessage(
             @PathVariable(value = "id") UUID messageId,
-            @ModelAttribute("message") String message,
-            @ModelAttribute("userId") UUID userId,
-            @ModelAttribute("channelId") UUID channelId,
-            @ModelAttribute("deleteFileIds") List<UUID> deleteFileIds,
-            @RequestPart(value = "profile", required = false) List<MultipartFile> contentFiles
+            @RequestPart(value = "messageInfo") MessageUpdateRequestDto request,
+            @RequestPart(value = "contents", required = false) List<MultipartFile> contentFiles
     ) throws IOException {
-        MessageUpdateRequestDto request = new MessageUpdateRequestDto(messageId, message, userId, channelId, deleteFileIds);
         List<BinaryContentCreateRequestDto> binaryRequests = BinaryContentMapper.toList(contentFiles);
         messageService.update(request, binaryRequests);
     }

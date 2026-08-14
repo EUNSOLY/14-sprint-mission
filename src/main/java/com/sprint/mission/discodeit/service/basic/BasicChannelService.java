@@ -27,7 +27,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelResponseDto savePublicChannel(PublicChannelCreateRequestDto request) {
+    public ChannelResponseDto save(PublicChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         channelRepository.save(savedChannel);
 
@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto savePrivateChannel(PrivateChannelCreateRequestDto request) {
+    public ChannelResponseDto save(PrivateChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         List<UUID> userIds = request.getUserIds();
 
