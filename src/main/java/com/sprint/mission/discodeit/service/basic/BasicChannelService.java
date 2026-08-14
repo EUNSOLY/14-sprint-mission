@@ -100,6 +100,13 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelResponseDto> findAllByUserId(UserIdRequestDto requestDto) {
         return channelRepository.findAll().stream()
                 .filter(channel -> {
+
+                    List<ReadStatus> readStatuses = readStatusRepository.findByUserId(requestDto.getId());
+
+                    if (readStatuses.isEmpty()) {
+                        throw new GlobalCustomException(ErrorCode.USER_NOT_FOUND);
+                    }
+
                     // 공개 채널은 통과
                     if (channel.getType().equals(ChannelType.PUBLIC)) {
                         return true;
