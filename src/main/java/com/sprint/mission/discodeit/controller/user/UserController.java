@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/users")
+@RequestMapping(value = "/api/user")
 public class UserController {
     private final UserService userService;
 
@@ -50,6 +50,12 @@ public class UserController {
             @PathVariable(value = "id") UUID userId
     ) {
         return userService.find(UserIdRequestDto.from(userId));
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/findAll")
+    public List<UserResponseDto> findUsers(
+    ) {
+        return userService.findAll();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "")

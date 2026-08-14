@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -68,9 +67,9 @@ public class BasicUserService implements UserService {
                 .map(UserStatus::isCurrentlyLoggedIn)
                 .orElse(false);
 
-        UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
+//        UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
 
-        return UserResponseDto.from(currentUser, userStatusType);
+        return UserResponseDto.from(currentUser, userStatus);
     }
 
     @Override
@@ -82,8 +81,8 @@ public class BasicUserService implements UserService {
                             .map(UserStatus::isCurrentlyLoggedIn)
                             .orElse(false);
 
-                    UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-                    return UserResponseDto.from(user, userStatusType);
+//                    UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
+                    return UserResponseDto.from(user, userStatus);
                 })
                 .toList();
     }

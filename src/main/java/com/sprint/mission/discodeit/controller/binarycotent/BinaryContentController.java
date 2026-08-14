@@ -13,9 +13,17 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/files")
+@RequestMapping(value = "/api/binaryContent")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
+
+    @RequestMapping(method = RequestMethod.GET, value = "/find")
+
+    public BinaryContentResponseDto getFindFile(
+            @RequestParam UUID binaryContentId
+    ) {
+        return binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public BinaryContentResponseDto getFile(
