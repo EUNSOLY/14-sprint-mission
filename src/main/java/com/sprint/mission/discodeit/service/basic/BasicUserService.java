@@ -32,7 +32,6 @@ public class BasicUserService implements UserService {
             UserCreateRequestDto requestDto,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
-        List<User> users = userRepository.findAll();
         boolean hasDuplicateName = userRepository.existsByName(requestDto.getName());
 
         boolean hasDuplicateEmail = userRepository.existsByEmail(requestDto.getEmail());

@@ -8,6 +8,5 @@ discodeit:
     type: jcf # jcf | file
     file-directory: .discodeit
 
-
 file:
-  path: .upload-file-directory
+  path: .uploader

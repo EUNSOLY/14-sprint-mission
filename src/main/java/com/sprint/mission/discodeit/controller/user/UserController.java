@@ -21,26 +21,19 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST, value = "")
     public void createUser(
-            @ModelAttribute("user") String name,
-            @ModelAttribute("email") String email,
-            @ModelAttribute("password") String password,
+            @RequestPart(value = "user") UserCreateRequestDto request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
-        UserCreateRequestDto request = new UserCreateRequestDto(name, email, password);
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
-
         userService.save(request, binaryRequest);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
     public void updateUser(
             @PathVariable(value = "id") UUID userId,
-            @ModelAttribute("user") String name,
-            @ModelAttribute("email") String email,
-            @ModelAttribute("password") String password,
+            @RequestPart(value = "user") UserUpdateRequestDto request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
-        UserUpdateRequestDto request = new UserUpdateRequestDto(userId, name, email, password);
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
         userService.update(request, binaryRequest);
     }
