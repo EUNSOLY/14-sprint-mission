@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -68,7 +69,8 @@ public class BasicChannelService implements ChannelService {
                     return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
 
                 })
-                .orElseThrow(() -> new NoSuchElementException("찾으시는 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+
 
     }
 
@@ -128,10 +130,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void update(ChannelUpdateRequestDto requestDto) {
         Channel updateChannel = channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾으시는 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", requestDto.getId())));
 
         if (updateChannel.getType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalStateException("비공개 채널은 수정할 수 없습니다.");
+            throw new GlobalCustomException(ErrorCode.PRIVATE_CHANNEL_CANNOT_UPDATE);
         }
 
         updateChannel.update(requestDto.getName(), requestDto.getDescription());
@@ -142,7 +144,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(ChannelIdRequestDto requestDto) {
         Channel deleteChannel = channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾으시는 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", requestDto.getId())));
 
         readStatusRepository.deleteByChannelId(deleteChannel.getId());
         messageRepository.deleteByChannelId(deleteChannel.getId());

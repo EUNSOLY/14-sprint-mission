@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -16,6 +18,6 @@ public class AuthService {
                 .filter(user -> user.getName().equals(requestDto.getName()))
                 .filter(user -> user.getPassword().equals(requestDto.getPassword()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("이름 또는 패스워드가 일치하지않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.INVALID_CREDENTIALS));
     }
 }

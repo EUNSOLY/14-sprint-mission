@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.common.validator;
 
+import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Component
@@ -15,6 +16,7 @@ public class ChannelValidator {
 
     public Channel getOrThrow(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다. id=" + id));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", id)));
+
     }
 }

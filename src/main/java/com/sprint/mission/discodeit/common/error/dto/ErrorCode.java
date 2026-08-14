@@ -14,8 +14,17 @@ public enum ErrorCode {
     // 404 NOT_FOUND: 리소스를 찾을 수 없음
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "유저가 존재하지 않습니다."),
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "채널이 존재하지 않습니다."),
+    MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "메세지가 존재하지 않습니다."),
     PROFILE_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "프로필 사진이 존재하지 않습니다."),
     CONTENT_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "파일이 존재하지 않습니다."),
+    DATA_NOT_FOUND(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), "데이터가 존재하지 않습니다."),
+
+    DUPLICATE_DATA(HttpStatus.CONFLICT, HttpStatus.CONFLICT.value(), "이미 존재하는 데이터 입니다. 신규 생성이 불가합니다."),
+    DUPLICATE_NAME(HttpStatus.CONFLICT, HttpStatus.CONFLICT.value(), "이미 존재하는 이름입니다. 다른 이름을 입력해주세요."),
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, HttpStatus.CONFLICT.value(), "이미 존재하는 이메일입니다. 다른 이메일을 입력해주세요."),
+
+    PRIVATE_CHANNEL_CANNOT_UPDATE(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), "비공개 채널은 수정할 수 없습니다."),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.value(), "이름 또는 패스워드가 일치하지 않습니다."),
 
     // 500 INTERNAL_SERVER_ERROR: 서버 에러
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 에러가 발생했습니다.");

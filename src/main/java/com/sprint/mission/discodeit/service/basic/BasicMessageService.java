@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
 import com.sprint.mission.discodeit.common.validator.ChannelValidator;
 import com.sprint.mission.discodeit.common.validator.UserValidator;
@@ -12,7 +14,10 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +57,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto find(MessageIdRequestDto requestDto) {
         Message message = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("찾으시는 메세지가 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("id = %s", requestDto.getId())));
 
         return MessageResponseDto.from(message);
     }
@@ -90,7 +95,8 @@ public class BasicMessageService implements MessageService {
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     ) {
         Message updateMessage = messageRepository.findById(request.getId())
-                .orElseThrow(() -> new NoSuchElementException("수정할 메세지가 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("id = %s", request.getId())));
+
 
         Optional.ofNullable(request.getDeleteFileIds())
                 .ifPresent(deleteContentIds -> {
@@ -119,7 +125,8 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("삭제 할 메세지가 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+
 
         deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
         messageRepository.delete(requestDto.getId()); // 메시지 삭제

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentResponseDto;
@@ -11,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -27,12 +28,12 @@ public class BasicBinaryContentService implements BinaryContentService {
         return BinaryContentResponseDto.from(savedContent);
     }
 
-    
+
     @Override
     public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
                 .map(BinaryContentResponseDto::from)
-                .orElseThrow(() -> new NoSuchElementException("데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CONTENT_FILE_NOT_FOUND));
     }
 
     @Override
@@ -45,7 +46,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(BinaryContentIdRequestDto requestDto) {
         this.binaryContentRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("삭제 할 데이터가 존재하지 않습니다."));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CONTENT_FILE_NOT_FOUND, String.format("id = %s", requestDto.getId())));
 
         this.binaryContentRepository.delete(requestDto.getId());
     }
