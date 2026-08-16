@@ -10,11 +10,13 @@ public class GlobalCustomException extends RuntimeException {
     private final String detail;
 
     public GlobalCustomException(ErrorCode errorCode, String detail) {
+        super(errorCode.getMessage() + (detail != null ? " " + detail : ""));
         this.errorCode = errorCode;
         this.detail = detail;
     }
 
     public GlobalCustomException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
         this.detail = null;
     }

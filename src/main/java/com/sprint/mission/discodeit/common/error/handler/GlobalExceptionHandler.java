@@ -19,14 +19,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(GlobalCustomException.class)
     public ResponseEntity<ErrorResponseDto> handleCustomException(GlobalCustomException e) {
         String resultMessage = Objects.nonNull(e.getDetail()) ? e.getErrorCode().getMessage() + " " + e.getDetail() : e.getErrorCode().getMessage();
-        log.error("handleCustomException throw CustomException : {}", resultMessage);
+        log.error("handleCustomException throw CustomException : {}", resultMessage, e);
         return ErrorResponseDto.toResponseEntity(e.getErrorCode(), e.getDetail());
     }
 
     // 2. 그 외 모든 예외 처리 (예상치 못한 서버 에러)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception e) {
-        log.error("handleException throw Exception : {}", e.getMessage());
+        log.error("handleException throw Exception : {}", e.getMessage(), e);
         return ErrorResponseDto.toResponseEntity(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 }
