@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.common.validator.ChannelValidator;
 import com.sprint.mission.discodeit.common.validator.UserValidator;
@@ -29,7 +29,7 @@ public class BasicReadStatusService implements ReadStatusService {
         // ifPresent : 값이 있다면 실행
         this.readStatusRepository.findByUserIdAndChannelId(request.getUserId(), request.getChannelId())
                 .ifPresent(status -> {
-                    throw new GlobalCustomException(ErrorCode.DUPLICATE_DATA);
+                    throw new GlobalCustomException(CustomStatusCode.DUPLICATE_DATA);
 
                 });
 
@@ -40,7 +40,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusResponseDto find(ReadStatusIdRequestDto requestDto) {
         return this.readStatusRepository.findById(requestDto.getId())
                 .map(ReadStatusResponseDto::from)
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.DATA_NOT_FOUND));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResponseDto update(ReadStatusUpdateRequestDto requestDto) {
         ReadStatus updateReadStatus = this.readStatusRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.DATA_NOT_FOUND));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
 
         updateReadStatus.updateLastReadMessageAt();
@@ -65,7 +65,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void delete(ReadStatusIdRequestDto request) {
         this.readStatusRepository.findById(request.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.DATA_NOT_FOUND));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
         this.readStatusRepository.delete(request.getId());
     }

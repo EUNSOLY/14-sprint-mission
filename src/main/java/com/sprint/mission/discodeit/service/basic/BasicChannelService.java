@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.BaseEntity;
@@ -69,7 +69,7 @@ public class BasicChannelService implements ChannelService {
                     return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
 
                 })
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
 
     }
@@ -104,7 +104,7 @@ public class BasicChannelService implements ChannelService {
                     List<ReadStatus> readStatuses = readStatusRepository.findByUserId(requestDto.getId());
 
                     if (readStatuses.isEmpty()) {
-                        throw new GlobalCustomException(ErrorCode.USER_NOT_FOUND);
+                        throw new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND);
                     }
 
                     // 공개 채널은 통과
@@ -137,10 +137,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void update(ChannelUpdateRequestDto requestDto) {
         Channel updateChannel = channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
         if (updateChannel.getType().equals(ChannelType.PRIVATE)) {
-            throw new GlobalCustomException(ErrorCode.PRIVATE_CHANNEL_CANNOT_UPDATE);
+            throw new GlobalCustomException(CustomStatusCode.PRIVATE_CHANNEL_CANNOT_UPDATE);
         }
 
         updateChannel.update(requestDto.getName(), requestDto.getDescription());
@@ -151,7 +151,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(ChannelIdRequestDto requestDto) {
         Channel deleteChannel = channelRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
         readStatusRepository.deleteByChannelId(deleteChannel.getId());
         messageRepository.deleteByChannelId(deleteChannel.getId());

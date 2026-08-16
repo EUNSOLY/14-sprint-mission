@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.common.validator;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -16,6 +16,6 @@ public class UserValidator {
 
     public User getOrThrow(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.USER_NOT_FOUND, String.format("id = %s", id)));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND));
     }
 }

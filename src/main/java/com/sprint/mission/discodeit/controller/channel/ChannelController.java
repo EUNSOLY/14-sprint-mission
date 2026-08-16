@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.controller.channel;
 
+import com.sprint.mission.discodeit.common.dto.ApiResponse;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,44 +20,53 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(method = RequestMethod.POST, value = "")
-    public ChannelResponseDto createPublicChannel(
+    public ResponseEntity<ApiResponse<ChannelResponseDto>> createPublicChannel(
             @RequestBody PublicChannelCreateRequestDto request
     ) {
-        return channelService.save(request);
+        ChannelResponseDto responseDto = channelService.save(request);
+        return ApiResponse.toSuccess(CustomStatusCode.OK, responseDto);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/private")
-    public ChannelResponseDto createPrivateChannel(
+    public ResponseEntity<ApiResponse<ChannelResponseDto>> createPrivateChannel(
             @RequestBody PrivateChannelCreateRequestDto request
     ) {
-        return channelService.save(request);
+        ChannelResponseDto channelResponse = channelService.save(request);
+        return ApiResponse.toSuccess(CustomStatusCode.OK, channelResponse);
+
     }
 
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
-    public void updatePublicChannel(
+    public ResponseEntity<ApiResponse<Void>> updatePublicChannel(
             @PathVariable(value = "id") UUID channelId,
             @RequestBody ChannelUpdateRequestDto request
     ) {
         channelService.update(request);
+        return ApiResponse.toSuccess(CustomStatusCode.OK, null);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public void deleteChannel(
+    public ResponseEntity<ApiResponse<Void>> deleteChannel(
             @PathVariable(value = "id") UUID channelId
     ) {
         channelService.delete(ChannelIdRequestDto.from(channelId));
+        return ApiResponse.toSuccess(CustomStatusCode.OK, null);
+
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public List<ChannelResponseDto> findAccessibleChannelsByUserId(
+    public ResponseEntity<ApiResponse<List<ChannelResponseDto>>> findAccessibleChannelsByUserId(
             @PathVariable(value = "id") UUID userId
     ) {
-        return channelService.findAllByUserId(UserIdRequestDto.from(userId));
+        List<ChannelResponseDto> channelResponse = channelService.findAllByUserId(UserIdRequestDto.from(userId));
+        return ApiResponse.toSuccess(CustomStatusCode.OK, channelResponse);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "")
-    public List<ChannelResponseDto> getChannels() {
-        return channelService.findAll();
+    public ResponseEntity<ApiResponse<List<ChannelResponseDto>>> getChannels() {
+        List<ChannelResponseDto> channelResponse = channelService.findAll();
+
+        return ApiResponse.toSuccess(CustomStatusCode.OK, channelResponse);
     }
 }

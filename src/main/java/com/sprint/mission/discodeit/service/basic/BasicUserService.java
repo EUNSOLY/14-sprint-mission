@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
 import com.sprint.mission.discodeit.common.validator.UserValidator;
@@ -39,11 +39,11 @@ public class BasicUserService implements UserService {
 
         // 이름 중복 검증
         if (hasDuplicateName) {
-            throw new GlobalCustomException(ErrorCode.DUPLICATE_NAME);
+            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_NAME);
         }
         // 이메일 중복 검증
         if (hasDuplicateEmail) {
-            throw new GlobalCustomException(ErrorCode.DUPLICATE_EMAIL);
+            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_EMAIL);
         }
 
         User savedUser = requestDto.toEntity(); // 저장될 User Entity

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
@@ -33,7 +33,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
                 .map(BinaryContentResponseDto::from)
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CONTENT_FILE_NOT_FOUND));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(BinaryContentIdRequestDto requestDto) {
         this.binaryContentRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CONTENT_FILE_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
 
         this.binaryContentRepository.delete(requestDto.getId());
     }

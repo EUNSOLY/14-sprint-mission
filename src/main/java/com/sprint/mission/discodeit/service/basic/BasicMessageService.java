@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.common.validator.BinaryContentValidator;
 import com.sprint.mission.discodeit.common.validator.ChannelValidator;
@@ -57,7 +57,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto find(MessageIdRequestDto requestDto) {
         Message message = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
         return MessageResponseDto.from(message);
     }
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     ) {
         Message updateMessage = messageRepository.findById(request.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("id = %s", request.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
 
         Optional.ofNullable(request.getDeleteFileIds())
@@ -125,7 +125,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("id = %s", requestDto.getId())));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
 
         deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제

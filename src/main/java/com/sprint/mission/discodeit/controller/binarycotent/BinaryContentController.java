@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.controller.binarycotent;
 
+import com.sprint.mission.discodeit.common.dto.ApiResponse;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
 import com.sprint.mission.discodeit.dto.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,23 +22,26 @@ public class BinaryContentController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/find")
 
-    public BinaryContentResponseDto getFindFile(
+    public ResponseEntity<ApiResponse<BinaryContentResponseDto>> getFindFile(
             @RequestParam UUID binaryContentId
     ) {
-        return binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
+        BinaryContentResponseDto binaryContentResponse = binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
+        return ApiResponse.toSuccess(CustomStatusCode.OK, binaryContentResponse);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public BinaryContentResponseDto getFile(
+    public ResponseEntity<ApiResponse<BinaryContentResponseDto>> getFile(
             @PathVariable(value = "id") UUID binaryContentId
     ) {
-        return binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
+        BinaryContentResponseDto binaryContentResponse = binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
+        return ApiResponse.toSuccess(CustomStatusCode.OK, binaryContentResponse);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "")
-    public List<BinaryContentResponseDto> getFiles(
+    public ResponseEntity<ApiResponse<List<BinaryContentResponseDto>>> getFiles(
             @RequestBody List<BinaryContentIdRequestDto> requests
     ) {
-        return binaryContentService.findAllByIdIn(requests);
+        List<BinaryContentResponseDto> binaryContentResponse = binaryContentService.findAllByIdIn(requests);
+        return ApiResponse.toSuccess(CustomStatusCode.OK, binaryContentResponse);
     }
 }

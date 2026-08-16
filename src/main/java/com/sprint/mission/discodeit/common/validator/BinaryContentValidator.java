@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.common.validator;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -16,6 +16,6 @@ public class BinaryContentValidator {
 
     public BinaryContent getOrThrow(UUID id) {
         return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.CONTENT_FILE_NOT_FOUND, String.format("id = %s", id)));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
     }
 }

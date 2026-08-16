@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.common.error.dto.ErrorCode;
+import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -18,6 +18,6 @@ public class AuthService {
                 .filter(user -> user.getName().equals(requestDto.getName()))
                 .filter(user -> user.getPassword().equals(requestDto.getPassword()))
                 .findFirst()
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.INVALID_CREDENTIALS));
+                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.INVALID_CREDENTIALS));
     }
 }
