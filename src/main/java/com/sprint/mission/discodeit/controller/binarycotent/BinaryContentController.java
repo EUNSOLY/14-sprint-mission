@@ -16,20 +16,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/binaryContent")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/find")
-
-    public ResponseEntity<ApiResponse<BinaryContentResponseDto>> getFindFile(
-            @RequestParam UUID binaryContentId
-    ) {
-        BinaryContentResponseDto binaryContentResponse = binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
-        return ApiResponse.toSuccess(CustomStatusCode.OK, binaryContentResponse);
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/binaryContents/{id}")
     public ResponseEntity<ApiResponse<BinaryContentResponseDto>> getFile(
             @PathVariable(value = "id") UUID binaryContentId
     ) {
@@ -37,7 +27,7 @@ public class BinaryContentController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, binaryContentResponse);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/binaryContents")
     public ResponseEntity<ApiResponse<List<BinaryContentResponseDto>>> getFiles(
             @RequestBody List<BinaryContentIdRequestDto> requests
     ) {

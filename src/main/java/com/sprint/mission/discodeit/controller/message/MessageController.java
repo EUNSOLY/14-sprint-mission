@@ -24,11 +24,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/message")
 public class MessageController {
     private final MessageService messageService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/message")
     public ResponseEntity<ApiResponse<Void>> sendMessage(
             @RequestPart(value = "messageInfo") MessageCreateRequestDto request,
             @RequestPart(value = "contents", required = false) List<MultipartFile> contentFiles
@@ -38,7 +37,7 @@ public class MessageController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, null);
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/message/{id}")
     public ResponseEntity<ApiResponse<Void>> updateMessage(
             @PathVariable(value = "id") UUID messageId,
             @RequestPart(value = "messageInfo") MessageUpdateRequestDto request,
@@ -50,7 +49,7 @@ public class MessageController {
 
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/api/message/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteMessage(
             @PathVariable(value = "id") UUID messageId
     ) {
@@ -59,7 +58,7 @@ public class MessageController {
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "", params = "channelId")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/message", params = "channelId")
     public ResponseEntity<ApiResponse<List<MessageResponseDto>>> getMessagesByChannelId(
             @RequestParam("channelId") UUID channelId
     ) {

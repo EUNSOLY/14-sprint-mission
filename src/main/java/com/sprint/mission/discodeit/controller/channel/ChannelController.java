@@ -16,11 +16,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/channels")
 public class ChannelController {
     private final ChannelService channelService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/public")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/channels/public")
     public ResponseEntity<ApiResponse<ChannelResponseDto>> createPublicChannel(
             @RequestBody PublicChannelCreateRequestDto request
     ) {
@@ -28,7 +27,7 @@ public class ChannelController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, responseDto);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/private")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/channels/private")
     public ResponseEntity<ApiResponse<ChannelResponseDto>> createPrivateChannel(
             @RequestBody PrivateChannelCreateRequestDto request
     ) {
@@ -38,7 +37,7 @@ public class ChannelController {
     }
 
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/public/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/channels/public/{id}")
     public ResponseEntity<ApiResponse<Void>> updatePublicChannel(
             @PathVariable(value = "id") UUID channelId,
             @RequestBody ChannelUpdateRequestDto request
@@ -47,7 +46,7 @@ public class ChannelController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, null);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/api/channels/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteChannel(
             @PathVariable(value = "id") UUID channelId
     ) {
@@ -56,7 +55,7 @@ public class ChannelController {
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "", params = "userId")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/channels", params = "userId")
     public ResponseEntity<ApiResponse<List<ChannelResponseDto>>> findAccessibleChannelsByUserId(
             @RequestParam("userId") UUID userId
     ) {
@@ -64,7 +63,7 @@ public class ChannelController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, channelResponse);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/channels")
     public ResponseEntity<ApiResponse<List<ChannelResponseDto>>> getChannels() {
         List<ChannelResponseDto> channelResponse = channelService.findAll();
 

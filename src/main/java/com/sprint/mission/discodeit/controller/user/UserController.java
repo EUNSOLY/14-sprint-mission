@@ -22,11 +22,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/user")
 public class UserController {
     private final UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/users")
     public ResponseEntity<ApiResponse<Void>> createUser(
             @RequestPart(value = "user") UserCreateRequestDto request,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -37,7 +36,7 @@ public class UserController {
         return ApiResponse.toSuccess(CustomStatusCode.CREATED, null);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/users/{id}")
     public ResponseEntity<ApiResponse<Void>> updateUser(
             @PathVariable(value = "id") UUID userId,
             @RequestPart(value = "user") UserUpdateRequestDto request,
@@ -49,7 +48,7 @@ public class UserController {
 
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(
             @PathVariable(value = "id") UUID deleteUserId
     ) {
@@ -57,7 +56,7 @@ public class UserController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, null);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/users/{id}")
 
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(
             @PathVariable(value = "id") UUID userId
@@ -66,21 +65,14 @@ public class UserController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, userResponseDto);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/findAll")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> findUsers(
-    ) {
-        List<UserResponseDto> users = userService.findAll();
-        return ApiResponse.toSuccess(CustomStatusCode.OK, users);
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/users")
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> getUsers(
     ) {
         List<UserResponseDto> users = userService.findAll();
         return ApiResponse.toSuccess(CustomStatusCode.OK, users);
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{id}")
     public ResponseEntity<ApiResponse<Void>> updateOnlineStatus(
             @PathVariable(value = "id") UUID userId
     ) {

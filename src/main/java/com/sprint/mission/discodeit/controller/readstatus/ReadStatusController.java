@@ -18,11 +18,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/read-status")
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "")
+    @RequestMapping(method = RequestMethod.POST, value = "/api/read-status")
     public ResponseEntity<ApiResponse<Void>> createMessageReadStatus(
             @RequestBody ReadStatusCreateRequestDto request
     ) {
@@ -31,7 +30,7 @@ public class ReadStatusController {
 
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/api/read-status/{id}")
     public ResponseEntity<ApiResponse<Void>> updateMessageReadStatus(
             @PathVariable(value = "id") UUID readStatusId,
             @RequestBody ReadStatusUpdateRequestDto request
@@ -40,7 +39,7 @@ public class ReadStatusController {
         return ApiResponse.toSuccess(CustomStatusCode.OK, null);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/read-status/{id}")
     public ResponseEntity<ApiResponse<List<ReadStatusResponseDto>>> getMessageReadStatusByUserId(
             @PathVariable(value = "id") UUID userId
     ) {

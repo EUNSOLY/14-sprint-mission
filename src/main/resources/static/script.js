@@ -1,8 +1,8 @@
 // API endpoints
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/user/findAll`,
-    BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
+    USERS: `${API_BASE_URL}/users`,
+    BINARY_CONTENT: `${API_BASE_URL}/binaryContents`
 };
 
 // Initialize the application
@@ -16,7 +16,7 @@ async function fetchAndRenderUsers() {
         const response = await fetch(ENDPOINTS.USERS);
         if (!response.ok) throw new Error('Failed to fetch users');
         const users = await response.json();
-        renderUserList(users);
+        renderUserList(users.data);
     } catch (error) {
         console.error('Error fetching users:', error);
     }
@@ -25,12 +25,12 @@ async function fetchAndRenderUsers() {
 // Fetch user profile image
 async function fetchUserProfile(profileId) {
     try {
-        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}?binaryContentId=${profileId}`);
+        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}/${profileId}`);
         if (!response.ok) throw new Error('Failed to fetch profile');
         const profile = await response.json();
 
         // Convert base64 encoded bytes to data URL
-        return `data:${profile.contentType};base64,${profile.bytes}`;
+        return `data:${profile.contentType};base64,${profile.data.bytes}`;
     } catch (error) {
         console.error('Error fetching profile:', error);
         return '/default-avatar.png'; // Fallback to default avatar
@@ -39,6 +39,7 @@ async function fetchUserProfile(profileId) {
 
 // Render user list
 async function renderUserList(users) {
+    console.log(users, "users")
     const userListElement = document.getElementById('userList');
     userListElement.innerHTML = ''; // Clear existing content
 

@@ -19,12 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/login")
 public class AuthController {
     private final AuthService authService;
     private final UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "")
+    @RequestMapping(method = RequestMethod.POST, value = "/login")
     public ResponseEntity<ApiResponse<UserResponseDto>> login(
             @RequestBody LoginRequestDto request
     ) {
