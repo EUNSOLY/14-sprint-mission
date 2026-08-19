@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.readstatus;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
+import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;

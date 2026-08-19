@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.error.exception;
+package com.sprint.mission.discodeit.common.exception;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import lombok.Getter;

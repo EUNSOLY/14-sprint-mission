@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.channel;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
+import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;

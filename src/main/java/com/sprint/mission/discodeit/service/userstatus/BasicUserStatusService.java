@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.userstatus;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
+import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusIdRequestDto;

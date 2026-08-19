@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.binarycontent;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
+import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentIdRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;

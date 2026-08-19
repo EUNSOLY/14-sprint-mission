@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.channel;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
+import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;

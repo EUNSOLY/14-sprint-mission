@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.common.error.handler;
+package com.sprint.mission.discodeit.common.handler;
 
 import com.sprint.mission.discodeit.common.dto.ApiResponse;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.error.exception.GlobalCustomException;
+import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
