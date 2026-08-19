@@ -3,9 +3,14 @@ package com.sprint.mission.discodeit.controller.message;
 
 import com.sprint.mission.discodeit.common.dto.ApiResponse;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.utils.BinaryContentMapper;
-import com.sprint.mission.discodeit.dto.*;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
+import com.sprint.mission.discodeit.service.message.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

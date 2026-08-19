@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.controller.auth;
 
 import com.sprint.mission.discodeit.common.dto.ApiResponse;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.dto.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.UserResponseDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.service.auth.AuthService;
+import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.controller.binarycotent;
 
 import com.sprint.mission.discodeit.common.dto.ApiResponse;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.dto.BinaryContentIdRequestDto;
-import com.sprint.mission.discodeit.dto.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentIdRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

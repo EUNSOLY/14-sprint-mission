@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.controller.user;
 
 import com.sprint.mission.discodeit.common.dto.ApiResponse;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.utils.BinaryContentMapper;
-import com.sprint.mission.discodeit.dto.*;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
+import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

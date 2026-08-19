@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +16,7 @@ public interface UserStatusRepository {
     List<UserStatus> findAll();
 
     UserStatus update(UserStatus userStatus);
-    
+
     void delete(UUID id);
 
     void deleteByUserId(UUID userId);

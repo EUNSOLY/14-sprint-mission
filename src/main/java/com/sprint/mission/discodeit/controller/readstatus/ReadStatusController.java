@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.controller.readstatus;
 
 import com.sprint.mission.discodeit.common.dto.ApiResponse;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.dto.ReadStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.UserIdRequestDto;
-import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.service.readstatus.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

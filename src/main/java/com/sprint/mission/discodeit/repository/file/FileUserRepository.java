@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.common.config.FileProperties;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,7 +22,7 @@ public class FileUserRepository extends FileAbstractRepository implements UserRe
         super(properties.getFileDirectory(), FILE_NAME);
         cache.putAll(super.load());
     }
-    
+
 
     @PostConstruct
     public void init() {
