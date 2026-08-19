@@ -59,9 +59,9 @@ public class MessageController {
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "", params = "channelId")
     public ResponseEntity<ApiResponse<List<MessageResponseDto>>> getMessagesByChannelId(
-            @PathVariable(value = "id") UUID channelId
+            @RequestParam("channelId") UUID channelId
     ) {
         List<MessageResponseDto> messages = messageService.findAllByChannelId(ChannelIdRequestDto.from(channelId));
 

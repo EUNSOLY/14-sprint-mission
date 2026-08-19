@@ -16,11 +16,11 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/channel")
+@RequestMapping(value = "/api/channels")
 public class ChannelController {
     private final ChannelService channelService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "")
+    @RequestMapping(method = RequestMethod.POST, value = "/public")
     public ResponseEntity<ApiResponse<ChannelResponseDto>> createPublicChannel(
             @RequestBody PublicChannelCreateRequestDto request
     ) {
@@ -38,7 +38,7 @@ public class ChannelController {
     }
 
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/public/{id}")
     public ResponseEntity<ApiResponse<Void>> updatePublicChannel(
             @PathVariable(value = "id") UUID channelId,
             @RequestBody ChannelUpdateRequestDto request
@@ -56,9 +56,9 @@ public class ChannelController {
 
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "", params = "userId")
     public ResponseEntity<ApiResponse<List<ChannelResponseDto>>> findAccessibleChannelsByUserId(
-            @PathVariable(value = "id") UUID userId
+            @RequestParam("userId") UUID userId
     ) {
         List<ChannelResponseDto> channelResponse = channelService.findAllByUserId(UserIdRequestDto.from(userId));
         return ApiResponse.toSuccess(CustomStatusCode.OK, channelResponse);
