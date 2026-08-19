@@ -13,11 +13,10 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping(value = "")
 public class UserViewController {
     private final UserService userService;
 
-    @RequestMapping(value = "")
+    @RequestMapping(value = "/users")
     public String getUsersPage(ModelMap modelMap) {
         List<UserResponseDto> userResponse = userService.findAll();
         modelMap.addAttribute("users", userResponse);
