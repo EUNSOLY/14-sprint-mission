@@ -45,13 +45,6 @@ public class ApiResponse<T> {
     }
 
     public static ResponseEntity<ApiResponse<Void>> toFail(CustomStatusCode code) {
-        return ResponseEntity
-                .status(code.getStatus())
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .code(code.getCode())
-                        .message(code.getMessage())
-                        .build()
-                );
+        return ApiResponse.toFail(code, null);
     }
 }
