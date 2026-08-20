@@ -18,11 +18,8 @@ public class BaseAuthService implements AuthService {
         String password = loginRequest.password();
 
         boolean hasDuplicateName = userRepository.existsByName(username);
-        boolean hasDuplicateEmail = userRepository.existsByEmail(password);
-
-        
-        if (!hasDuplicateName || !hasDuplicateEmail) {
-            throw new GlobalCustomException(CustomStatusCode.INVALID_CREDENTIALS);
+        if (!hasDuplicateName) {
+            throw new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND);
         }
 
         return userRepository.findByUsername(username).orElseThrow(() -> new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND));
