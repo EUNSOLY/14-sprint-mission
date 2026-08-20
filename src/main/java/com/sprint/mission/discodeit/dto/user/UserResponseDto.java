@@ -16,8 +16,7 @@ public class UserResponseDto {
     private final boolean userStatus;
     private final UUID profileId;
 
-    public static UserResponseDto from(User userEntity,
-                                       boolean userStatus
+    public static UserResponseDto from(User userEntity, boolean userStatus
     ) {
         return new UserResponseDto(userEntity.getId(), userEntity.getName(), userEntity.getEmail(), userStatus, userEntity.getProfileId());
     }

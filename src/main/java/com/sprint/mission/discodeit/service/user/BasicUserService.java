@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.service.user;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
@@ -31,13 +31,13 @@ public class BasicUserService implements UserService {
     private final BinaryContentValidator binaryContentValidator;
 
     @Override
-    public void save(
-            UserCreateRequestDto requestDto,
+    public User save(
+            UserCreateRequest requestDto,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
-        boolean hasDuplicateName = userRepository.existsByName(requestDto.getName());
+        boolean hasDuplicateName = userRepository.existsByName(requestDto.name());
 
-        boolean hasDuplicateEmail = userRepository.existsByEmail(requestDto.getEmail());
+        boolean hasDuplicateEmail = userRepository.existsByEmail(requestDto.email());
 
         // 이름 중복 검증
         if (hasDuplicateName) {
@@ -62,43 +62,53 @@ public class BasicUserService implements UserService {
 
         savedUser.updateProfile(profileId); // 프로필 ID 업데이트
         userRepository.save(savedUser); // 저장
+
+        return savedUser;
     }
 
     @Override
-    public UserResponseDto find(UserIdRequestDto requestDto) {
+    public UserDto find(UserIdRequestDto requestDto) {
         User currentUser = userValidator.getOrThrow(requestDto.getId());
         boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
                 .map(UserStatus::isCurrentlyLoggedIn)
                 .orElse(false);
-
-//        UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-
-        return UserResponseDto.from(currentUser, userStatus);
+        return UserDto.of(currentUser, userStatus);
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
+    public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(user -> {
                     boolean userStatus = userStatusRepository.findByUserId(user.getId())
                             .map(UserStatus::isCurrentlyLoggedIn)
                             .orElse(false);
-
-//                    UserStatusType userStatusType = userStatus ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-                    return UserResponseDto.from(user, userStatus);
+                    return UserDto.of(user, userStatus);
                 })
                 .toList();
     }
 
     @Override
-    public void update(
-            UserUpdateRequestDto updateRequestDto,
+    public User update(
+            UserIdRequestDto userId, UserUpdateRequest userUpdateRequest,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
-        User currentUser = userValidator.getOrThrow(updateRequestDto.getId());
+        User currentUser = userValidator.getOrThrow(userId.getId());
 
-        currentUser.update(updateRequestDto.getName(), updateRequestDto.getEmail(), updateRequestDto.getPassword());
+        boolean hasDuplicateName = userRepository.existsByName(userUpdateRequest.newUsername());
+
+        boolean hasDuplicateEmail = userRepository.existsByEmail(userUpdateRequest.newEmail());
+
+        // 이름 중복 검증
+        if (hasDuplicateName) {
+            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_NAME);
+        }
+        // 이메일 중복 검증
+        if (hasDuplicateEmail) {
+            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_EMAIL);
+        }
+
+        currentUser.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword());
 
         // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
         Optional.ofNullable(profileCreateRequest)
@@ -117,6 +127,7 @@ public class BasicUserService implements UserService {
                 });
 
         userRepository.update(currentUser.getId(), currentUser);
+        return currentUser;
     }
 
     @Override
@@ -132,11 +143,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUserOnlineStatus(UserIdRequestDto requestDto) {
+    public UserStatus updateUserOnlineStatus(UserIdRequestDto requestDto) {
         User user = userValidator.getOrThrow(requestDto.getId());
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                 .orElse(new UserStatus(requestDto.getId()));
         status.updateLastAccessAt();
         userStatusRepository.update(status);
+
+        return status;
     }
 }
