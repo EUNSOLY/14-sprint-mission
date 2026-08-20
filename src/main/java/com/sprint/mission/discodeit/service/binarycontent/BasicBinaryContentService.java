@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentIdRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.common.IdRequestDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -21,25 +20,24 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public BinaryContentResponseDto save(BinaryContentCreateRequestDto requestDto) {
+    public BinaryContent save(BinaryContentCreateRequestDto requestDto) {
         BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity());
 
-        return BinaryContentResponseDto.from(savedContent);
+        return savedContent;
     }
 
 
     @Override
-    public BinaryContentResponseDto find(BinaryContentIdRequestDto requestDto) {
+    public BinaryContent find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
-                .map(BinaryContentResponseDto::from)
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
     }
 
     @Override
-    public List<BinaryContentResponseDto> findAllByIdIn(List<BinaryContentIdRequestDto> requestDto) {
+    public List<BinaryContent> findAllByIdIn(List<BinaryContentIdRequestDto> requestDto) {
         List<UUID> ids = requestDto.stream().map(IdRequestDto::getId).toList();
         return this.binaryContentRepository.findAllByIdIn(ids)
-                .stream().map(BinaryContentResponseDto::from).toList();
+                .stream().toList();
     }
 
     @Override
