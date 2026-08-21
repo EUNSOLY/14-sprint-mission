@@ -35,12 +35,12 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public void save(
+    public Message save(
             MessageCreateRequestDto requestDto,
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     ) {
 
-        userValidator.getOrThrow(requestDto.getUserId());
+        userValidator.getOrThrow(requestDto.getAuthorId());
         channelValidator.getOrThrow(requestDto.getChannelId());
 
         Message savedMessage = requestDto.toEntity();
@@ -57,6 +57,7 @@ public class BasicMessageService implements MessageService {
 
         savedMessage.addAttachmentIds(contentIds);
         messageRepository.save(savedMessage);
+        return savedMessage;
     }
 
     @Override
@@ -87,11 +88,11 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResponseDto> findAllByChannelId(ChannelIdRequestDto requestDto) {
+    public List<Message> findAllByChannelId(ChannelIdRequestDto requestDto) {
         channelValidator.getOrThrow(requestDto.getId());
 
         return messageRepository.findByChannelId(requestDto.getId())
-                .stream().map(MessageResponseDto::from).toList();
+                .stream().toList();
     }
 
     @Override

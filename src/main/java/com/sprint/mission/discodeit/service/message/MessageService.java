@@ -7,11 +7,12 @@ import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.entity.message.Message;
 
 import java.util.List;
 
 public interface MessageService {
-    void save(
+    Message save(
             MessageCreateRequestDto requestDto,
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     );
@@ -22,7 +23,7 @@ public interface MessageService {
 
     List<MessageResponseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto);
 
-    List<MessageResponseDto> findAllByChannelId(ChannelIdRequestDto requestDto);
+    List<Message> findAllByChannelId(ChannelIdRequestDto requestDto);
 
     void update(
             MessageUpdateRequestDto request,

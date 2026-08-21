@@ -9,12 +9,12 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 public class MessageCreateRequestDto {
-    private final String message;
-    private final UUID userId;
+    private final String content;
+    private final UUID authorId;
     private final UUID channelId;
 
 
     public Message toEntity() {
-        return new Message(this.message, this.userId, this.channelId);
+        return new Message(this.content, this.authorId, this.channelId);
     }
 }
