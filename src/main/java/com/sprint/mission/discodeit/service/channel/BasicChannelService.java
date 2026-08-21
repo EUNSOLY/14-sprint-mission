@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.channel;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
@@ -27,15 +28,15 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelResponseDto save(PublicChannelCreateRequestDto request) {
+    public Channel save(PublicChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         channelRepository.save(savedChannel);
 
-        return this.find(ChannelIdRequestDto.from(savedChannel.getId()));
+        return savedChannel;
     }
 
     @Override
-    public ChannelResponseDto save(PrivateChannelCreateRequestDto request) {
+    public Channel save(PrivateChannelCreateRequestDto request) {
         Channel savedChannel = request.toEntity();
         List<UUID> userIds = request.getUserIds();
 
@@ -46,7 +47,7 @@ public class BasicChannelService implements ChannelService {
         });
 
         channelRepository.save(savedChannel);
-        return this.find(ChannelIdRequestDto.from(savedChannel.getId()));
+        return savedChannel;
     }
 
     @Override
@@ -97,12 +98,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UserIdRequestDto requestDto) {
+    public List<ChannelDto> findAllByUserId(UserIdRequestDto requestDto) {
         return channelRepository.findAll().stream()
                 .filter(channel -> {
-
                     List<ReadStatus> readStatuses = readStatusRepository.findByUserId(requestDto.getId());
-
                     if (readStatuses.isEmpty()) {
                         throw new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND);
                     }
@@ -122,30 +121,27 @@ public class BasicChannelService implements ChannelService {
                             .map(BaseEntity::getCreatedAt)
                             .findFirst().orElse(null);
 
-                    if (channel.getType().equals(ChannelType.PUBLIC)) {
-                        return ChannelResponseDto.publicFrom(channel, messageLastTime);
-                    }
-
                     List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
                             .map(ReadStatus::getUserId)
                             .toList();
-
-                    return ChannelResponseDto.privateFrom(channel, messageLastTime, userIds);
-                }).toList();
+                    return ChannelDto.of(channel, userIds, messageLastTime);
+                })
+                .toList();
     }
 
     @Override
-    public void update(ChannelUpdateRequestDto requestDto) {
-        Channel updateChannel = channelRepository.findById(requestDto.getId())
+    public Channel update(ChannelIdRequestDto channelId, ChannelUpdateRequestDto requestDto) {
+        Channel updateChannel = channelRepository.findById(channelId.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
         if (updateChannel.getType().equals(ChannelType.PRIVATE)) {
             throw new GlobalCustomException(CustomStatusCode.PRIVATE_CHANNEL_CANNOT_UPDATE);
         }
 
-        updateChannel.update(requestDto.getName(), requestDto.getDescription());
+        updateChannel.update(requestDto.getNewName(), requestDto.getNewDescription());
         channelRepository.update(updateChannel.getId(), updateChannel);
 
+        return updateChannel;
     }
 
     @Override
