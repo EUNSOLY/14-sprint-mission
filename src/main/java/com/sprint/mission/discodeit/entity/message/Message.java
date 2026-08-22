@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import lombok.Getter;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,21 +12,22 @@ import java.util.UUID;
 public class Message extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String message;
-    private final UUID userId;
+    private String content;
+    private final UUID authorId;
     private final UUID channelId;
-    private List<UUID> attachmentIds;
+    private final List<UUID> attachmentIds;
 
     public Message(String message, UUID userId, UUID channelId) {
         super();
-        this.message = message;
-        this.userId = userId;
+        this.content = message;
+        this.authorId = userId;
         this.channelId = channelId;
+        this.attachmentIds = new ArrayList<>();
     }
 
     public void update(String message) {
         if (message != null) {
-            this.message = message;
+            this.content = message;
             super.updatedAt();
         }
     }
@@ -48,7 +50,7 @@ public class Message extends BaseEntity {
                         " id=%s, createdAt=%s, updateAt=%s \n" +
                         " name=%s, userId=%s, channelId=%s \n" + ")",
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
-                this.message, this.userId, this.channelId
+                this.content, this.authorId, this.channelId
         );
     }
 }

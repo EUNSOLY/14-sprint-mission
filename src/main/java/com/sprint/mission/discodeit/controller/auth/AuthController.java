@@ -22,25 +22,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Auth", description = "인증 API")
-@ApiResponse(
-        responseCode = "200",
-        description = "로그인 성공",
-        content = @Content(schema = @Schema(implementation = User.class))
-)
-@ApiResponse(
-        responseCode = "404",
-        description = "사용자를 찾을 수 없음",
-        content = @Content(schema = @Schema(implementation = String.class), examples = @ExampleObject("User with username {username} not found"))
-)
-@ApiResponse(
-        responseCode = "400",
-        description = "비밀번호가 일치하지 않음",
-        content = @Content(schema = @Schema(implementation = String.class), examples = @ExampleObject("Wrong password"))
-)
 public class AuthController {
     private final BaseAuthService authService;
 
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 인증한다.")
+    @Operation(summary = "로그인")
+    @ApiResponse(
+            responseCode = "200",
+            description = "로그인 성공",
+            content = @Content(schema = @Schema(implementation = User.class))
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "사용자를 찾을 수 없음",
+            content = @Content(examples = @ExampleObject("User with username {username} not found"))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "비밀번호가 일치하지 않음",
+            content = @Content(examples = @ExampleObject("Wrong password"))
+    )
     @RequestMapping(method = RequestMethod.POST, value = "/api/auth/login")
     public ResponseEntity<User> login(
             @RequestBody LoginRequest request

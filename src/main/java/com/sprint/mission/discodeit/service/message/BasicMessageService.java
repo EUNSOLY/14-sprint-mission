@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
@@ -61,29 +60,28 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto find(MessageIdRequestDto requestDto) {
-        Message message = messageRepository.findById(requestDto.getId())
+    public Message find(MessageIdRequestDto requestDto) {
+        return messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
-        return MessageResponseDto.from(message);
     }
 
     @Override
-    public List<MessageResponseDto> findByUserId(UserIdRequestDto requestDto) {
+    public List<Message> findByUserId(UserIdRequestDto requestDto) {
         userValidator.getOrThrow(requestDto.getId());
 
         return messageRepository.findByUserId(requestDto.getId())
-                .stream().map(MessageResponseDto::from).toList();
+                .stream().toList();
     }
 
     @Override
-    public List<MessageResponseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
+    public List<Message> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto) {
 
         userValidator.getOrThrow(userRequestDto.getId());
         channelValidator.getOrThrow(channelRequestDto.getId());
 
         return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId())
-                .stream().map(MessageResponseDto::from).toList();
+                .stream().toList();
 
     }
 
@@ -96,36 +94,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void update(
-            MessageUpdateRequestDto request,
-            List<BinaryContentCreateRequestDto> messageContentCreateRequests
+    public Message update(
+            MessageIdRequestDto messageIdRequest,
+            MessageUpdateRequestDto request
     ) {
-        Message updateMessage = messageRepository.findById(request.getId())
+        Message updateMessage = messageRepository.findById(messageIdRequest.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
-
-        Optional.ofNullable(request.getDeleteFileIds())
-                .ifPresent(deleteContentIds -> {
-                    deleteContentIds.forEach(deleteId -> {
-                        binaryContentValidator.getOrThrow(deleteId);
-                        binaryContentRepository.delete(deleteId);
-                    });
-                });
-
-        List<UUID> saveContentIds = Optional.ofNullable(messageContentCreateRequests)
-                .filter(list -> !list.isEmpty())
-                .map(messageBinaryContents -> {
-                    return messageBinaryContents.stream().map(messageBinaryContent -> {
-                        BinaryContent binaryContent = messageBinaryContent.toEntity();
-                        return binaryContentRepository.save(binaryContent).getId();
-                    }).toList();
-                })
-                .orElse(Collections.emptyList());
-
-
-        updateMessage.addAttachmentIds(saveContentIds);
-        updateMessage.update(request.getMessage());
+        updateMessage.update(request.getNewContent());
         messageRepository.update(updateMessage.getId(), updateMessage);
+
+        return updateMessage;
     }
 
     @Override

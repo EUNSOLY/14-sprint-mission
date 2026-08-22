@@ -26,7 +26,7 @@ public class UserDto {
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                user.getName(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getProfileId(),
                 online

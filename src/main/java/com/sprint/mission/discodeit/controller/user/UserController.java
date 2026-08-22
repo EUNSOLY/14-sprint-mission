@@ -11,9 +11,8 @@ import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +30,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(value = "/api/users")
 @Tag(name = "User", description = "User API")
 public class UserController {
     private final UserService userService;
@@ -47,9 +47,9 @@ public class UserController {
             description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
             content = @Content(schema = @Schema(implementation = String.class), examples = @ExampleObject("User with email {email} already exists"))
     )
+    @RequestBody(content = @Content(encoding = @Encoding(name = "userCreateRequest", contentType = MediaType.APPLICATION_JSON_VALUE)))
     @RequestMapping(
             method = RequestMethod.POST,
-            value = "/api/users",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<User> create(
@@ -60,11 +60,11 @@ public class UserController {
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
-        userService.save(request, binaryRequest);
+        User savedUser = userService.save(request, binaryRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .build();
+                .body(savedUser);
     }
 
 
@@ -87,12 +87,12 @@ public class UserController {
     )
     @RequestMapping(
             method = RequestMethod.PATCH,
-            value = "/api/users/{id}",
+            value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<User> update(
             @Parameter(description = "수정할 User ID")
-            @PathVariable("id") UserIdRequestDto userId,
+            @PathVariable("id") UUID userId,
 
             @Parameter(description = "User 수정 정보")
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
@@ -101,7 +101,7 @@ public class UserController {
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
-        User updatedUser = userService.update(userId, userUpdateRequest, binaryRequest);
+        User updatedUser = userService.update(UserIdRequestDto.from(userId), userUpdateRequest, binaryRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -118,8 +118,8 @@ public class UserController {
             description = "User를 찾을 수 없음",
             content = @Content(examples = @ExampleObject("User with id {id} not found"))
     )
-    @RequestMapping(method = RequestMethod.DELETE, value = "/api/users/{id}")
-    public ResponseEntity<UserIdRequestDto> delete(
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    public ResponseEntity<Void> delete(
             @Parameter(description = "삭제할 User ID")
             @PathVariable("id") UUID deleteUserId
     ) {
@@ -141,7 +141,7 @@ public class UserController {
             description = "User를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = String.class), examples = @ExampleObject("User with id {id} not found"))
     )
-    @RequestMapping(method = RequestMethod.GET, value = "/api/users/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<UserDto> getUser(
             @PathVariable(value = "id") UUID userId
     ) {
@@ -157,9 +157,9 @@ public class UserController {
     @ApiResponse(
             responseCode = "200",
             description = "User 목록 조회 성공",
-            content = @Content(schema = @Schema(implementation = UserDto.class))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class)))
     )
-    @RequestMapping(method = RequestMethod.GET, value = "/api/users")
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll(
     ) {
         List<UserDto> users = userService.findAll();
@@ -180,9 +180,10 @@ public class UserController {
             description = "User 온라인 상태가 성공적으로 업데이트됨",
             content = @Content(schema = @Schema(implementation = UserStatus.class))
     )
-    @RequestMapping(method = RequestMethod.PATCH, value = "/api/users/{id}/userStatus")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/userStatus")
     public ResponseEntity<UserStatus> updateOnlineStatus(
-            @PathVariable(value = "userId") UUID userId
+            @Parameter(description = "상태를 변경할 User ID")
+            @PathVariable(value = "id") UUID userId
     ) {
         UserStatus userStatus = userService.updateUserOnlineStatus(UserIdRequestDto.from(userId));
         return ResponseEntity.status(HttpStatus.OK).body(userStatus);

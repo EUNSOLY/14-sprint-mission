@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 public class PrivateChannelCreateRequestDto {
-    private final List<UUID> userIds;
+    private final List<UUID> participantIds;
 
     public Channel toEntity() {
         return new Channel(ChannelType.PRIVATE, "", "");

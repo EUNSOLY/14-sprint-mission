@@ -56,7 +56,7 @@ public class BinaryContentController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
             )
     )
-    @RequestMapping(method = RequestMethod.GET, value = "")
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<BinaryContent>> getFiles(
             @Parameter(description = "조회할 첨부 파일 ID 목록")
             @RequestParam List<UUID> binaryContentIds

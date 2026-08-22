@@ -10,8 +10,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageCreateRequestDto {
     private final String content;
-    private final UUID authorId;
     private final UUID channelId;
+    private final UUID authorId;
 
 
     public Message toEntity() {

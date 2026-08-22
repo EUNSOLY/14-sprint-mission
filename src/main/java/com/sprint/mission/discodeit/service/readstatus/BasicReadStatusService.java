@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusIdRequestDto;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -24,45 +22,41 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserValidator userValidator;
 
     @Override
-    public void save(ReadStatusCreateRequestDto request) {
+    public ReadStatus save(ReadStatusCreateRequestDto request) {
 
         userValidator.getOrThrow(request.getUserId());
         channelValidator.getOrThrow(request.getChannelId());
-
-        // ifPresent : 값이 있다면 실행
-        this.readStatusRepository.findByUserIdAndChannelId(request.getUserId(), request.getChannelId())
-                .ifPresent(status -> {
-                    throw new GlobalCustomException(CustomStatusCode.DUPLICATE_DATA);
-
+        
+        return this.readStatusRepository.findByUserIdAndChannelId(request.getUserId(), request.getChannelId())
+                .orElseGet(() -> {
+                    ReadStatus savedReadStatus = request.toEntity();
+                    this.readStatusRepository.save(savedReadStatus);
+                    return savedReadStatus;
                 });
-
-        this.readStatusRepository.save(request.toEntity()); // 저장
     }
 
     @Override
-    public ReadStatusResponseDto find(ReadStatusIdRequestDto requestDto) {
+    public ReadStatus find(ReadStatusIdRequestDto requestDto) {
         return this.readStatusRepository.findById(requestDto.getId())
-                .map(ReadStatusResponseDto::from)
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
     }
 
     @Override
-    public List<ReadStatusResponseDto> findAllByUserId(UserIdRequestDto requestDto) {
+    public List<ReadStatus> findAllByUserId(UserIdRequestDto requestDto) {
         return this.readStatusRepository.findByUserId(requestDto.getId())
-                .stream().map(ReadStatusResponseDto::from).toList();
-
+                .stream().toList();
     }
 
     @Override
-    public ReadStatusResponseDto update(ReadStatusUpdateRequestDto requestDto) {
-        ReadStatus updateReadStatus = this.readStatusRepository.findById(requestDto.getId())
+    public ReadStatus update(ReadStatusIdRequestDto requestIdDto) {
+        ReadStatus updateReadStatus = this.readStatusRepository.findById(requestIdDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
 
         updateReadStatus.updateLastReadMessageAt();
 
         ReadStatus readStatus = this.readStatusRepository.update(updateReadStatus);
-        return ReadStatusResponseDto.from(readStatus);
+        return readStatus;
     }
 
     @Override

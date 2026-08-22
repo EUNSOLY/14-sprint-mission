@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.message.Message;
@@ -17,18 +16,17 @@ public interface MessageService {
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     );
 
-    MessageResponseDto find(MessageIdRequestDto requestDto);
+    Message find(MessageIdRequestDto requestDto);
 
-    List<MessageResponseDto> findByUserId(UserIdRequestDto requestDto);
+    List<Message> findByUserId(UserIdRequestDto requestDto);
 
-    List<MessageResponseDto> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto);
+    List<Message> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto);
 
     List<Message> findAllByChannelId(ChannelIdRequestDto requestDto);
 
-    void update(
-            MessageUpdateRequestDto request,
-            List<BinaryContentCreateRequestDto> messageContentCreateRequests
-
+    Message update(
+            MessageIdRequestDto messageIdRequest,
+            MessageUpdateRequestDto request
     );
 
     void delete(MessageIdRequestDto requestDto);

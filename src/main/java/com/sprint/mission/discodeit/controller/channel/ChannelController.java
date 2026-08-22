@@ -115,7 +115,7 @@ public class ChannelController {
             description = "Channel 목록 조회 성공",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelDto.class)))
     )
-    @RequestMapping(method = RequestMethod.GET, params = "userId")
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<ChannelDto>> findAccessibleChannelsByUserId(
             @Parameter(description = "조회할 User ID")
             @RequestParam("userId") UUID userId

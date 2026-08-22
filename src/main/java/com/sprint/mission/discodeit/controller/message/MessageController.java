@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.controller.message;
 
 
-import com.sprint.mission.discodeit.common.dto.ApiCustomResponse;
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
@@ -13,10 +11,7 @@ import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -50,36 +45,60 @@ public class MessageController {
             description = "Message가 성공적으로 생성됨",
             content = @Content(schema = @Schema(implementation = Message.class))
     )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "messageCreateRequest", contentType = MediaType.APPLICATION_JSON_VALUE)))
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Message> create(
             @RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
 
             @Parameter(description = "Message 첨부 파일들")
-            @RequestPart(value = "contents", required = false) List<MultipartFile> contentFiles
+            @RequestPart(value = "attachments", required = false) List<MultipartFile> contentFiles
     ) throws IOException {
         List<BinaryContentCreateRequestDto> binaryRequests = BinaryContentMapper.toList(contentFiles);
         Message savedMessage = messageService.save(request, binaryRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
     }
 
+
+    @Operation(summary = "Message 내용 수정")
+    @ApiResponse(
+            responseCode = "404",
+            description = "Message를 찾을 수 없음",
+            content = @Content(examples = @ExampleObject("Message with id {messageId} not found"))
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Message가 성공적으로 수정됨",
+            content = @Content(schema = @Schema(implementation = Message.class))
+    )
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
-    public ResponseEntity<ApiCustomResponse<Void>> updateMessage(
+    public ResponseEntity<Message> updateMessage(
+            @Parameter(description = "수정할 Message ID")
             @PathVariable(value = "id") UUID messageId,
-            @RequestPart(value = "messageInfo") MessageUpdateRequestDto request,
-            @RequestPart(value = "contents", required = false) List<MultipartFile> contentFiles
+
+            @RequestBody MessageUpdateRequestDto request
     ) throws IOException {
-        List<BinaryContentCreateRequestDto> binaryRequests = BinaryContentMapper.toList(contentFiles);
-        messageService.update(request, binaryRequests);
-        return ApiCustomResponse.toSuccess(CustomStatusCode.OK, null);
+        messageService.update(MessageIdRequestDto.from(messageId), request);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
 
     }
 
+    @Operation(summary = "Message 삭제")
+    @ApiResponse(
+            responseCode = "404",
+            description = "Message를 찾을 수 없음"
+    )
+    @ApiResponse(
+            responseCode = "204",
+            description = "User를 찾을 수 없음",
+            content = @Content(schema = @Schema(examples = "User with id {userId} not found"))
+    )
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public ResponseEntity<ApiCustomResponse<Void>> deleteMessage(
+    public ResponseEntity<Void> deleteMessage(
+            @Parameter(description = "삭제할 Message ID")
             @PathVariable(value = "id") UUID messageId
     ) {
         messageService.delete(MessageIdRequestDto.from(messageId));
-        return ApiCustomResponse.toSuccess(CustomStatusCode.OK, null);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
@@ -89,7 +108,7 @@ public class MessageController {
             description = "Message 목록 조회 성공",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
     )
-    @RequestMapping(method = RequestMethod.GET, params = "channelId")
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Message>> getMessagesByChannelId(
             @Parameter(description = "조회할 Channel ID")
             @RequestParam("channelId") UUID channelId

@@ -25,11 +25,8 @@ public class BasicUserStatusService implements UserStatusService {
         this.userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND));
 
+//        this.userStatusRepository.findByUserId(request.getUserId())
 
-        this.userStatusRepository.findByUserId(request.getUserId())
-                .ifPresent(status -> {
-                    throw new GlobalCustomException(CustomStatusCode.DUPLICATE_DATA);
-                });
 
         this.userStatusRepository.save(request.toEntity());
 

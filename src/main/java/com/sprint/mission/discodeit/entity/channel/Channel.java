@@ -15,7 +15,6 @@ public class Channel extends BaseEntity {
 
     public Channel(ChannelType type, String name, String description) {
         super();
-        //
         this.type = type;
         this.name = name;
         this.description = description;

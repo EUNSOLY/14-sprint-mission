@@ -10,15 +10,14 @@ import java.util.UUID;
 public class User extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String name;
+    private String username;
     private String email;
     private String password;
     private UUID profileId;
 
-
     public User(String username, String email, String password) {
         super();
-        this.name = username;
+        this.username = username;
         this.email = email;
         this.password = password;
     }
@@ -26,7 +25,7 @@ public class User extends BaseEntity {
     public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
         if (newUsername != null) {
-            this.name = newUsername;
+            this.username = newUsername;
             anyValueUpdated = true;
         }
         if (newEmail != null) {
@@ -53,7 +52,7 @@ public class User extends BaseEntity {
                         " name=%s, email=%s, password=%s \n" +
                         ")",
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
-                this.name, this.email, this.password // 비밀번호는 노출안되도록 제거 할 필요있음
+                this.username, this.email, this.password // 비밀번호는 노출안되도록 제거 할 필요있음
         );
     }
 }

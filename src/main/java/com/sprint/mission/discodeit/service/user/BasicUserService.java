@@ -70,7 +70,7 @@ public class BasicUserService implements UserService {
     public UserDto find(UserIdRequestDto requestDto) {
         User currentUser = userValidator.getOrThrow(requestDto.getId());
         boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
-                .map(UserStatus::isCurrentlyLoggedIn)
+                .map(UserStatus::isOnline)
                 .orElse(false);
         return UserDto.of(currentUser, userStatus);
     }
@@ -81,7 +81,7 @@ public class BasicUserService implements UserService {
         return users.stream()
                 .map(user -> {
                     boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                            .map(UserStatus::isCurrentlyLoggedIn)
+                            .map(UserStatus::isOnline)
                             .orElse(false);
                     return UserDto.of(user, userStatus);
                 })
