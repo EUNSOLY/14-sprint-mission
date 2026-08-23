@@ -99,7 +99,7 @@ public class ChannelController {
             responseCode = "204",
             description = "Channel이 성공적으로 삭제됨"
     )
-    @RequestMapping(method = RequestMethod.DELETE, value = "/api/channels/{id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public ResponseEntity<Void> deleteChannel(
             @Parameter(description = "삭제할 Channel ID")
             @PathVariable(value = "id") UUID channelId
