@@ -1,4 +1,13 @@
-CREATE TABLE discodeit.binary_contents
+DROP TABLE IF EXISTS public.message_attachments CASCADE;
+DROP TABLE IF EXISTS public.messages CASCADE;
+DROP TABLE IF EXISTS public.read_statuses CASCADE;
+DROP TABLE IF EXISTS public.channels CASCADE;
+DROP TABLE IF EXISTS public.user_statuses CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+DROP TABLE IF EXISTS public.binary_contents CASCADE;
+
+
+CREATE TABLE public.binary_contents
 (
     id         uuid         NOT NULL,
     created_at timestamptz  NOT NULL,
@@ -8,7 +17,7 @@ CREATE TABLE discodeit.binary_contents
     CONSTRAINT binary_contents_pk PRIMARY KEY (id)
 );
 
-CREATE TABLE discodeit.users
+CREATE TABLE public.users
 (
     id         uuid         NOT NULL,
     created_at timestamptz  NOT NULL,
@@ -21,7 +30,7 @@ CREATE TABLE discodeit.users
     CONSTRAINT profile_pk FOREIGN KEY (profile_id) REFERENCES binary_contents (id) ON DELETE SET NULL
 );
 
-CREATE TABLE discodeit.user_statuses
+CREATE TABLE public.user_statuses
 (
     id             uuid        NOT NULL,
     created_at     timestamptz NOT NULL,
@@ -32,7 +41,7 @@ CREATE TABLE discodeit.user_statuses
     CONSTRAINT users_pk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE discodeit.channels
+CREATE TABLE public.channels
 (
     id          uuid        NOT NULL,
     created_at  timestamptz NOT NULL,
@@ -44,7 +53,7 @@ CREATE TABLE discodeit.channels
     CONSTRAINT channels_type_check CHECK ( type IN ('PUBLIC', 'PRIVATE') )
 );
 
-CREATE TABLE discodeit.read_statuses
+CREATE TABLE public.read_statuses
 (
     id           uuid        NOT NULL,
     created_at   timestamptz NOT NULL,
@@ -57,7 +66,7 @@ CREATE TABLE discodeit.read_statuses
     UNIQUE (user_id, channel_id)
 );
 
-CREATE TABLE discodeit.messages
+CREATE TABLE public.messages
 (
     id         uuid        NOT NULL,
     created_at timestamptz NOT NULL,
@@ -65,11 +74,12 @@ CREATE TABLE discodeit.messages
     content    text,
     author_id  uuid,
     channel_id uuid        NOT NULL,
+    CONSTRAINT messages_pk PRIMARY KEY (id),
     CONSTRAINT users_pk FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE SET NULL,
     CONSTRAINT channels_pk FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
 );
 
-CREATE TABLE discodeit.message_attachments
+CREATE TABLE public.message_attachments
 (
     message_id    uuid NOT NULL,
     attachment_id uuid NOT NULL,
