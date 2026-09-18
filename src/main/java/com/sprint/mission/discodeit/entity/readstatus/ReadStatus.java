@@ -38,6 +38,7 @@ public class ReadStatus extends BaseUpdatableEntity {
     ) {
         this.user = user;
         this.channel = channel;
+        this.lastReadAt = Instant.now();
     }
 
     public Instant updateLastReadMessageAt() {
