@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
@@ -24,12 +26,12 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus save(ReadStatusCreateRequestDto request) {
 
-        userValidator.getOrThrow(request.getUserId());
-        channelValidator.getOrThrow(request.getChannelId());
-        
-        return this.readStatusRepository.findByUserIdAndChannelId(request.getUserId(), request.getChannelId())
+        User user = userValidator.getOrThrow(request.userId());
+        Channel channel = channelValidator.getOrThrow(request.channelId());
+
+        return this.readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
                 .orElseGet(() -> {
-                    ReadStatus savedReadStatus = request.toEntity();
+                    ReadStatus savedReadStatus = ReadStatus.create(user, channel);
                     this.readStatusRepository.save(savedReadStatus);
                     return savedReadStatus;
                 });
@@ -55,8 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         updateReadStatus.updateLastReadMessageAt();
 
-        ReadStatus readStatus = this.readStatusRepository.update(updateReadStatus);
-        return readStatus;
+        return this.readStatusRepository.update(updateReadStatus);
     }
 
     @Override

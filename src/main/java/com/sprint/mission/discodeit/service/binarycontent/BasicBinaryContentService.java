@@ -21,9 +21,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent save(BinaryContentCreateRequestDto requestDto) {
-        BinaryContent savedContent = this.binaryContentRepository.save(requestDto.toEntity());
-
-        return savedContent;
+        return this.binaryContentRepository.save(requestDto.toEntity());
     }
 
 
@@ -36,15 +34,15 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public List<BinaryContent> findAllByIdIn(List<BinaryContentIdRequestDto> requestDto) {
         List<UUID> ids = requestDto.stream().map(IdRequestDto::getId).toList();
-        return this.binaryContentRepository.findAllByIdIn(ids)
+        return this.binaryContentRepository.findByIdIn(ids)
                 .stream().toList();
     }
 
     @Override
     public void delete(BinaryContentIdRequestDto requestDto) {
-        this.binaryContentRepository.findById(requestDto.getId())
+        BinaryContent deletedEntity = this.binaryContentRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
 
-        this.binaryContentRepository.delete(requestDto.getId());
+        this.binaryContentRepository.delete(deletedEntity);
     }
 }

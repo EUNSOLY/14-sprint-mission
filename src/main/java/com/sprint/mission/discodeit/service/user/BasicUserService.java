@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,17 +49,17 @@ public class BasicUserService implements UserService {
 
         User savedUser = requestDto.toEntity(); // 저장될 User Entity
 
-        UserStatus userStatus = new UserStatus(savedUser.getId()); // User 로그인 일시 핸들러 Entity 생성
+        UserStatus userStatus = UserStatus.create(savedUser); // User 로그인 일시 핸들러 Entity 생성
         userStatusRepository.save(userStatus); // UserStatus 저장
 
         // 프로필 있으면 생성 후 UUID 반환
-        UUID profileId = Optional.ofNullable(profileCreateRequest)
+        BinaryContent profile = Optional.ofNullable(profileCreateRequest)
                 .map((profileRequest) -> {
                     BinaryContent binaryContent = profileRequest.toEntity();
-                    return binaryContentRepository.save(binaryContent).getId();
+                    return binaryContentRepository.save(binaryContent);
                 }).orElse(null);
 
-        savedUser.updateProfile(profileId); // 프로필 ID 업데이트
+        savedUser.updateProfile(profile); // 프로필 ID 업데이트
         userRepository.save(savedUser); // 저장
 
         return savedUser;
@@ -112,18 +111,18 @@ public class BasicUserService implements UserService {
 
         // 새로운 프로필 데이터가 들어오면 기존 프로필 데이터 삭제 -> 신규 프로필 저장 -> User 엔티티 연계
         Optional.ofNullable(profileCreateRequest)
-                .ifPresent(profileRequest -> {
+                .ifPresent(profileCommand -> {
                     // 이미 프로필이 있다면 제거
-                    Optional.ofNullable(currentUser.getProfileId())
-                            .ifPresent(contentId -> {
-                                binaryContentValidator.getOrThrow(contentId);
-                                binaryContentRepository.delete(contentId);
+                    Optional.ofNullable(currentUser.getProfile())
+                            .ifPresent(content -> {
+                                binaryContentValidator.getOrThrow(content.getId());
+                                binaryContentRepository.delete(content.getId());
                             });
 
                     // 프로필 저장
-                    BinaryContent binaryContent = profileRequest.toEntity();
+                    BinaryContent binaryContent = profileCommand.toEntity();
                     binaryContentRepository.save(binaryContent);
-                    currentUser.updateProfile(binaryContent.getId());
+                    currentUser.updateProfile(binaryContent);
                 });
 
         userRepository.update(currentUser.getId(), currentUser);
@@ -136,7 +135,7 @@ public class BasicUserService implements UserService {
 
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
 
-        Optional.ofNullable(deleteUser.getProfileId())
+        Optional.ofNullable(deleteUser.getProfile().getId())
                 .ifPresent(binaryContentRepository::delete);
 
         userRepository.delete(requestDto.getId()); // 유저 삭제
@@ -146,7 +145,7 @@ public class BasicUserService implements UserService {
     public UserStatus updateUserOnlineStatus(UserIdRequestDto requestDto) {
         User user = userValidator.getOrThrow(requestDto.getId());
         UserStatus status = userStatusRepository.findByUserId(user.getId())
-                .orElse(new UserStatus(requestDto.getId()));
+                .orElse(UserStatus.create(user));
         status.updateLastAccessAt();
         userStatusRepository.update(status);
 

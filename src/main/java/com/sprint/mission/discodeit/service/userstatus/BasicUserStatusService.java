@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.service.userstatus;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -21,14 +21,12 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public void save(UserStatusCreateRequestDto request) {
-        this.userRepository.findById(request.getUserId())
+    public void save(User user) {
+        this.userRepository.findById(user.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.USER_NOT_FOUND));
 
-//        this.userStatusRepository.findByUserId(request.getUserId())
-
-
-        this.userStatusRepository.save(request.toEntity());
+        this.userStatusRepository.findByUserId(user.getId());
+        this.userStatusRepository.save(UserStatus.create(user));
 
     }
 

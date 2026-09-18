@@ -8,13 +8,15 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
-import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
+    private final UserValidator userValidator;
 
 
     @Override
@@ -45,7 +48,8 @@ public class BasicChannelService implements ChannelService {
 
         // 사용자별 ReadStatus 생성
         userIds.forEach(userId -> {
-            ReadStatus readStatus = new ReadStatus(userId, savedChannel.getId());
+            User user = userValidator.getOrThrow(userId);
+            ReadStatus readStatus = ReadStatus.create(user, savedChannel);
             readStatusRepository.save(readStatus);
         });
 
@@ -64,7 +68,8 @@ public class BasicChannelService implements ChannelService {
                             .findFirst().orElse(null);
 
                     List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
-                            .map(ReadStatus::getUserId)
+                            .map(ReadStatus::getUser)
+                            .map(User::getId)
                             .toList();
                     return ChannelDto.of(channel, userIds, messageLastTime);
 
@@ -85,7 +90,8 @@ public class BasicChannelService implements ChannelService {
                             .findFirst().orElse(null);
 
                     List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
-                            .map(ReadStatus::getUserId)
+                            .map(ReadStatus::getUser)
+                            .map(User::getId)
                             .toList();
                     return ChannelDto.of(channel, userIds, messageLastTime);
 
@@ -103,7 +109,7 @@ public class BasicChannelService implements ChannelService {
 
                     // 비공개 채널이면 user가 포함된 채널만 통과
                     return readStatusRepository.findByChannelId(channel.getId())
-                            .stream().anyMatch(readStatus -> readStatus.getUserId().equals(requestDto.getId()));
+                            .stream().anyMatch(readStatus -> readStatus.getUser().getId().equals(requestDto.getId()));
                 })
                 .map(channel -> {
                     // 최신 메시지 시간 정보
@@ -113,7 +119,8 @@ public class BasicChannelService implements ChannelService {
                             .findFirst().orElse(null);
 
                     List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
-                            .map(ReadStatus::getUserId)
+                            .map(ReadStatus::getUser)
+                            .map(User::getId)
                             .toList();
                     return ChannelDto.of(channel, userIds, messageLastTime);
                 })

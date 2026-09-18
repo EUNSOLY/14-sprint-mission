@@ -8,11 +8,13 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,6 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
-    private final BinaryContentValidator binaryContentValidator;
 
 
     @Override
@@ -39,22 +40,22 @@ public class BasicMessageService implements MessageService {
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     ) {
 
-        userValidator.getOrThrow(requestDto.getAuthorId());
-        channelValidator.getOrThrow(requestDto.getChannelId());
+        User user = userValidator.getOrThrow(requestDto.authorId());
+        Channel channel = channelValidator.getOrThrow(requestDto.channelId());
 
-        Message savedMessage = requestDto.toEntity();
+        Message savedMessage = Message.create(requestDto.content(), user, channel);
 
-        List<UUID> contentIds = Optional.ofNullable(messageContentCreateRequests)
+        List<BinaryContent> contents = Optional.ofNullable(messageContentCreateRequests)
                 .filter(list -> !list.isEmpty())
                 .map(messageBinaryContents -> {
                     return messageBinaryContents.stream().map(messageBinaryContent -> {
                         BinaryContent binaryContent = messageBinaryContent.toEntity();
-                        return binaryContentRepository.save(binaryContent).getId();
+                        return binaryContentRepository.save(binaryContent);
                     }).toList();
                 })
                 .orElse(Collections.emptyList());
 
-        savedMessage.addAttachmentIds(contentIds);
+        savedMessage.addAttachments(contents);
         messageRepository.save(savedMessage);
         return savedMessage;
     }
@@ -111,9 +112,9 @@ public class BasicMessageService implements MessageService {
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
+        List<UUID> deletedIds = deleteMessage.getAttachments().stream().map(BaseEntity::getId).toList();
 
-
-        deleteMessage.getAttachmentIds().forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
+        deletedIds.forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
         messageRepository.delete(requestDto.getId()); // 메시지 삭제
     }
 }
