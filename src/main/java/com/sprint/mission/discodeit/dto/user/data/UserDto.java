@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.user.data;
 
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class UserDto {
     Instant updatedAt;
     String username;
     String email;
-    UUID profileId;
+    BinaryContent profile;
     Boolean online;
 
     public static UserDto of(User user, boolean online) {
@@ -28,7 +29,7 @@ public class UserDto {
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
+                user.getProfile(),
                 online
         );
     }

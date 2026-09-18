@@ -15,6 +15,6 @@ public class PublicChannelCreateRequestDto {
 
 
     public Channel toEntity() {
-        return new Channel(ChannelType.PUBLIC, this.name, this.description);
+        return Channel.create(ChannelType.PUBLIC, this.name, this.description);
     }
 }
