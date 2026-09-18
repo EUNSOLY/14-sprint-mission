@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
@@ -19,11 +18,11 @@ import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -69,9 +68,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findByUserId(UserIdRequestDto requestDto) {
-        userValidator.getOrThrow(requestDto.getId());
+        User user = userValidator.getOrThrow(requestDto.getId());
 
-        return messageRepository.findByUserId(requestDto.getId())
+        return messageRepository.findByAuthorId(requestDto.getId())
                 .stream().toList();
     }
 
@@ -81,7 +80,7 @@ public class BasicMessageService implements MessageService {
         userValidator.getOrThrow(userRequestDto.getId());
         channelValidator.getOrThrow(channelRequestDto.getId());
 
-        return messageRepository.findByChannelIdAndUserId(userRequestDto.getId(), channelRequestDto.getId())
+        return messageRepository.findByChannelIdAndAuthorId(userRequestDto.getId(), channelRequestDto.getId())
                 .stream().toList();
 
     }
@@ -95,16 +94,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    @Transactional
     public Message update(
             MessageIdRequestDto messageIdRequest,
             MessageUpdateRequestDto request
     ) {
         Message updateMessage = messageRepository.findById(messageIdRequest.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
-
         updateMessage.update(request.getNewContent());
-        messageRepository.update(updateMessage.getId(), updateMessage);
-
         return updateMessage;
     }
 
@@ -112,9 +109,8 @@ public class BasicMessageService implements MessageService {
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
-        List<UUID> deletedIds = deleteMessage.getAttachments().stream().map(BaseEntity::getId).toList();
-
-        deletedIds.forEach(binaryContentRepository::delete); // 수정 파일 Id 값들 전부 데이터 삭제
-        messageRepository.delete(requestDto.getId()); // 메시지 삭제
+        List<BinaryContent> deletedBinaryContent = deleteMessage.getAttachments().stream().toList();
+        binaryContentRepository.deleteAll(deletedBinaryContent); // 수정 파일 Id 값들 전부 데이터 삭제
+        messageRepository.delete(deleteMessage); // 메시지 삭제
     }
 }

@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -128,6 +129,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public Channel update(ChannelIdRequestDto channelId, ChannelUpdateRequestDto requestDto) {
         Channel updateChannel = channelRepository.findById(channelId.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
@@ -137,18 +139,15 @@ public class BasicChannelService implements ChannelService {
         }
 
         updateChannel.update(requestDto.getNewName(), requestDto.getNewDescription());
-        channelRepository.update(updateChannel.getId(), updateChannel);
-
         return updateChannel;
     }
 
     @Override
+    @Transactional
     public void delete(ChannelIdRequestDto requestDto) {
         Channel deleteChannel = channelRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
-
-        readStatusRepository.deleteByChannelId(deleteChannel.getId());
-        messageRepository.deleteByChannelId(deleteChannel.getId());
-        channelRepository.delete(requestDto.getId());
+        
+        channelRepository.delete(deleteChannel);
     }
 }

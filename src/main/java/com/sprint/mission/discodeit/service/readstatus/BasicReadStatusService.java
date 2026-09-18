@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public ReadStatus update(ReadStatusIdRequestDto requestIdDto) {
         ReadStatus updateReadStatus = this.readStatusRepository.findById(requestIdDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
@@ -57,14 +59,14 @@ public class BasicReadStatusService implements ReadStatusService {
 
         updateReadStatus.updateLastReadMessageAt();
 
-        return this.readStatusRepository.update(updateReadStatus);
+        return updateReadStatus;
     }
 
     @Override
     public void delete(ReadStatusIdRequestDto request) {
-        this.readStatusRepository.findById(request.getId())
+        ReadStatus deletedEntity = this.readStatusRepository.findById(request.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
-        this.readStatusRepository.delete(request.getId());
+        this.readStatusRepository.delete(deletedEntity);
     }
 }

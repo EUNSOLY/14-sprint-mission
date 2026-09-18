@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +31,12 @@ public class BasicUserService implements UserService {
     private final BinaryContentValidator binaryContentValidator;
 
     @Override
+    @Transactional
     public User save(
             UserCreateRequest requestDto,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
-        boolean hasDuplicateName = userRepository.existsByName(requestDto.username());
+        boolean hasDuplicateName = userRepository.existsByUsername(requestDto.username());
 
         boolean hasDuplicateEmail = userRepository.existsByEmail(requestDto.email());
 
@@ -49,9 +51,6 @@ public class BasicUserService implements UserService {
 
         User savedUser = requestDto.toEntity(); // 저장될 User Entity
 
-        UserStatus userStatus = UserStatus.create(savedUser); // User 로그인 일시 핸들러 Entity 생성
-        userStatusRepository.save(userStatus); // UserStatus 저장
-
         // 프로필 있으면 생성 후 UUID 반환
         BinaryContent profile = Optional.ofNullable(profileCreateRequest)
                 .map((profileRequest) -> {
@@ -61,6 +60,9 @@ public class BasicUserService implements UserService {
 
         savedUser.updateProfile(profile); // 프로필 ID 업데이트
         userRepository.save(savedUser); // 저장
+
+        UserStatus userStatus = UserStatus.create(savedUser); // User 로그인 일시 핸들러 Entity 생성
+        userStatusRepository.save(userStatus); // UserStatus 저장
 
         return savedUser;
     }
@@ -88,13 +90,14 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(
             UserIdRequestDto userId, UserUpdateRequest userUpdateRequest,
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
         User currentUser = userValidator.getOrThrow(userId.getId());
 
-        boolean hasDuplicateName = userRepository.existsByName(userUpdateRequest.newUsername());
+        boolean hasDuplicateName = userRepository.existsByUsername(userUpdateRequest.newUsername());
 
         boolean hasDuplicateEmail = userRepository.existsByEmail(userUpdateRequest.newEmail());
 
@@ -116,7 +119,7 @@ public class BasicUserService implements UserService {
                     Optional.ofNullable(currentUser.getProfile())
                             .ifPresent(content -> {
                                 binaryContentValidator.getOrThrow(content.getId());
-                                binaryContentRepository.delete(content.getId());
+                                binaryContentRepository.delete(content);
                             });
 
                     // 프로필 저장
@@ -125,30 +128,29 @@ public class BasicUserService implements UserService {
                     currentUser.updateProfile(binaryContent);
                 });
 
-        userRepository.update(currentUser.getId(), currentUser);
         return currentUser;
     }
 
     @Override
+    @Transactional
     public void delete(UserIdRequestDto requestDto) {
         User deleteUser = userValidator.getOrThrow(requestDto.getId());
 
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
 
-        Optional.ofNullable(deleteUser.getProfile().getId())
+        Optional.ofNullable(deleteUser.getProfile())
                 .ifPresent(binaryContentRepository::delete);
 
-        userRepository.delete(requestDto.getId()); // 유저 삭제
+        userRepository.delete(deleteUser); // 유저 삭제
     }
 
     @Override
+    @Transactional
     public UserStatus updateUserOnlineStatus(UserIdRequestDto requestDto) {
         User user = userValidator.getOrThrow(requestDto.getId());
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                 .orElse(UserStatus.create(user));
         status.updateLastAccessAt();
-        userStatusRepository.update(status);
-
         return status;
     }
 }

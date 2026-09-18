@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.entity.channel;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.sprint.mission.discodeit.entity.message.Message;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -16,10 +18,17 @@ import java.io.Serial;
 public class Channel extends BaseUpdatableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @Enumerated(EnumType.STRING)
     private ChannelType type;
+
     private String name;
+    
     private String description;
 
+    // N + 1 발생
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.PERSIST)
+    private final List<Message> messageList = new ArrayList<>();
 
     public static Channel create(ChannelType type, String name, String description) {
         return new Channel(type, name, description);

@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,31 +43,31 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional
     public UserStatus update(UserStatusUpdateRequestDto request) {
         UserStatus updateUserStatus = this.userStatusRepository.findById(request.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
         updateUserStatus.updateLastAccessAt();
-        this.userStatusRepository.update(updateUserStatus);
         return updateUserStatus;
     }
 
     @Override
+    @Transactional
     public UserStatus updateByUserId(UserIdRequestDto requestDto) {
         UserStatus updateUserStatus = this.userStatusRepository.findByUserId(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
         updateUserStatus.updateLastAccessAt();
 
-        this.userStatusRepository.update(updateUserStatus);
         return updateUserStatus;
     }
 
     @Override
     public void delete(UserStatusIdRequestDto requestDto) {
-        this.userStatusRepository.findByUserId(requestDto.getId())
+        UserStatus deletedEntity = this.userStatusRepository.findByUserId(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
 
-        this.userStatusRepository.delete(requestDto.getId());
+        this.userStatusRepository.delete(deletedEntity);
     }
 }
