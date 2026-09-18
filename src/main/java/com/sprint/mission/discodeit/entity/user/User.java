@@ -1,21 +1,41 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.sprint.mission.discodeit.entity.common.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
-import java.util.UUID;
 
 @Getter
-public class User extends BaseEntity {
+@Entity
+@Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String username;
-    private String email;
-    private String password;
-    private UUID profileId;
 
-    public User(String username, String email, String password) {
+    @Column(nullable = false, length = 50)
+    private String username;
+
+    @Column(nullable = false, length = 100)
+    private String email;
+
+    @Column(nullable = false, length = 60)
+    private String password;
+
+    @OneToOne
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    public static User create(String username, String email, String password) {
+        return new User(username, email, password);
+    }
+
+
+    private User(String username, String email, String password) {
         super();
         this.username = username;
         this.email = email;
@@ -23,26 +43,19 @@ public class User extends BaseEntity {
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
-        boolean anyValueUpdated = false;
         if (newUsername != null) {
             this.username = newUsername;
-            anyValueUpdated = true;
         }
         if (newEmail != null) {
             this.email = newEmail;
-            anyValueUpdated = true;
         }
         if (newPassword != null) {
             this.password = newPassword;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            super.updatedAt();
         }
     }
 
-    public void updateProfile(UUID profileId) {
-        this.profileId = profileId;
+    public void updateProfile(BinaryContent profile) {
+        this.profile = profile;
     }
 
     @Override

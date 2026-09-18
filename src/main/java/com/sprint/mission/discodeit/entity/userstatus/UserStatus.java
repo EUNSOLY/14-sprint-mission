@@ -1,27 +1,42 @@
 package com.sprint.mission.discodeit.entity.userstatus;
 
-import com.sprint.mission.discodeit.entity.common.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.user.User;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
+@Entity
 @Getter
-public class UserStatus extends BaseEntity {
-    // 사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델
-    private final UUID userId;
+@Table(name = "user_statuses")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
-        this.userId = userId;
+    public static UserStatus create(User user) {
+        return new UserStatus(user);
+    }
+
+    private UserStatus(User user) {
+        this.user = user;
         this.lastActiveAt = Instant.now();
     }
 
+
     public Instant updateLastAccessAt() {
         this.lastActiveAt = Instant.now();
-        super.updatedAt();
+//        super.updatedAt();
         return this.lastActiveAt;
     }
 

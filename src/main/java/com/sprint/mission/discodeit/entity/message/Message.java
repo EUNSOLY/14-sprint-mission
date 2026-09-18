@@ -1,56 +1,75 @@
 package com.sprint.mission.discodeit.entity.message;
 
-import com.sprint.mission.discodeit.entity.common.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.user.User;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
-public class Message extends BaseEntity {
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Message extends BaseUpdatableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String content;
-    private final UUID authorId;
-    private final UUID channelId;
-    private final List<UUID> attachmentIds;
 
-    public Message(String message, UUID userId, UUID channelId) {
+    private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+
+
+    @OneToMany
+    @JoinTable(
+            name = "message_attachments", // 별도 테이블 매핑
+            joinColumns = @JoinColumn(name = "message_id"), // 1쪽
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+            // N쪽
+    )
+    private List<BinaryContent> attachments = new ArrayList<>();
+
+    public static Message create(String message, User user, Channel channel) {
+        return new Message(message, user, channel);
+    }
+
+    private Message(String message, User user, Channel channel) {
         super();
         this.content = message;
-        this.authorId = userId;
-        this.channelId = channelId;
-        this.attachmentIds = new ArrayList<>();
+        this.author = user;
+        this.channel = channel;
     }
 
     public void update(String message) {
         if (message != null) {
             this.content = message;
-            super.updatedAt();
         }
     }
 
-    public void addAttachmentId(UUID attachmentId) {
-        this.attachmentIds.add(attachmentId);
+    public void addAttachments(List<BinaryContent> attachment) {
+        this.attachments.addAll(attachment);
     }
 
-    public void addAttachmentIds(List<UUID> attachmentIds) {
-        this.attachmentIds.addAll(attachmentIds);
-    }
-
-    public void removeAttachmentIds(List<UUID> attachmentIds) {
-        attachmentIds.forEach(id -> this.attachmentIds.remove(id));
-    }
 
     @Override
     public String toString() {
         return String.format("Message ( \n" +
                         " id=%s, createdAt=%s, updateAt=%s \n" +
-                        " name=%s, userId=%s, channelId=%s \n" + ")",
+                        " name=%s, author=%s, channel=%s \n" + ")",
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
-                this.content, this.authorId, this.channelId
+                this.content, this.author, this.channel
         );
     }
 }

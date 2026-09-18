@@ -1,19 +1,31 @@
 package com.sprint.mission.discodeit.entity.channel;
 
-import com.sprint.mission.discodeit.entity.common.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 
 @Getter
-public class Channel extends BaseEntity {
+@Entity
+@Table(name = "channels")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
     private ChannelType type;
     private String name;
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
+
+    public static Channel create(ChannelType type, String name, String description) {
+        return new Channel(type, name, description);
+    }
+
+    private Channel(ChannelType type, String name, String description) {
         super();
         this.type = type;
         this.name = name;
@@ -22,20 +34,12 @@ public class Channel extends BaseEntity {
 
 
     public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
-
         if (newName != null) {
             this.name = newName;
-            anyValueUpdated = true;
         }
 
         if (newDescription != null) {
             this.description = newDescription;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            super.updatedAt();
         }
     }
 
