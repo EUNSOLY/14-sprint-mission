@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS public.binary_contents CASCADE;
 
 CREATE TABLE public.binary_contents
 (
-    id         uuid         NOT NULL,
-    created_at timestamptz  NOT NULL,
-    file_name  varchar(255) NOT NULL,
-    size       bigint       NOT NULL,
-    bytes      bytea        NOT NULL,
-    content_type varchar(100) NOT NULL ,
+    id           uuid         NOT NULL,
+    created_at   timestamptz  NOT NULL,
+    file_name    varchar(255) NOT NULL,
+    size         bigint       NOT NULL,
+    bytes        bytea        NOT NULL,
+    content_type varchar(100) NOT NULL,
     CONSTRAINT binary_contents_pk PRIMARY KEY (id)
 );
 
