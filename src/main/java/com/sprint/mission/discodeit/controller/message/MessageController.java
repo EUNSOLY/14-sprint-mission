@@ -73,12 +73,13 @@ public class MessageController implements MessageControllerDocs {
     public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
             @RequestParam("channelId") UUID channelId,
             @PageableDefault(sort = "create_at", direction = Sort.Direction.DESC)
-            Pageable pageable
+            Pageable pageable,
+            @RequestParam(name = "cursor", required = false) String cursor
     ) {
-
         PageResponse<MessageDto> responses = messageService.findAllByChannelId(
                 ChannelIdRequestDto.from(channelId),
-                pageable
+                pageable,
+                cursor
         );
 
 

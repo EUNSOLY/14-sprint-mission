@@ -83,6 +83,9 @@ public interface MessageControllerDocs {
             UUID channelId,
 
             @Parameter(description = "페이징 정보")
-            Pageable pageable
+            Pageable pageable,
+
+            @Parameter(description = "페이징 커서 정보")
+            String cursor
     );
 }

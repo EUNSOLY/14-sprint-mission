@@ -3,21 +3,19 @@ package com.sprint.mission.discodeit.service.message;
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.message.data.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
@@ -41,11 +39,12 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentStorage binaryContentStorage;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
-    private final UserMapper userMapper;
+    private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
 
 
     @Override
+    @Transactional
     public MessageDto save(
             MessageCreateRequestDto requestDto,
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
@@ -71,7 +70,7 @@ public class BasicMessageService implements MessageService {
         savedMessage.addAttachments(contents);
         messageRepository.save(savedMessage);
 
-        return this.toMessageDto(savedMessage);
+        return messageMapper.toDto(savedMessage);
     }
 
     @Override
@@ -80,18 +79,22 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
 
-        return this.toMessageDto(message);
+        return messageMapper.toDto(message);
 
     }
 
 
     @Override
-    public PageResponse<MessageDto> findAllByChannelId(ChannelIdRequestDto requestDto, Pageable pageable) {
-
+    @Transactional(readOnly = true)
+    public PageResponse<MessageDto> findAllByChannelId(
+            ChannelIdRequestDto requestDto,
+            Pageable pageable,
+            String cursor
+    ) {
         channelValidator.getOrThrow(requestDto.getId());
 
         Page<Message> messagesPage = messageRepository.findByChannelId(requestDto.getId(), pageable);
-        Page<MessageDto> dtoPage = messagesPage.map(this::toMessageDto);
+        Page<MessageDto> dtoPage = messagesPage.map(messageMapper::toDto);
 
         return pageResponseMapper.fromPage(dtoPage);
     }
@@ -106,20 +109,12 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
         updateMessage.update(request.getNewContent());
 
-        return this.toMessageDto(updateMessage);
+        return messageMapper.toDto(updateMessage);
     }
 
-
-    private MessageDto toMessageDto(Message message) {
-        User user = message.getAuthor();
-        Channel channel = message.getChannel();
-        List<BinaryContent> contents = message.getAttachments();
-        UserDto userDto = userMapper.toDto(user);
-        List<BinaryContentDto> binaryContentDtos = contents.stream().map(BinaryContentDto::of).toList();
-        return MessageDto.to(message, userDto, channel.getId(), binaryContentDtos);
-    }
 
     @Override
+    @Transactional
     public void delete(MessageIdRequestDto requestDto) {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));

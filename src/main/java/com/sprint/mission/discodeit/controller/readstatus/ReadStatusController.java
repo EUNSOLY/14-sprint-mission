@@ -44,8 +44,8 @@ public class ReadStatusController implements ReadStatusControllerDocs {
 
             @RequestBody ReadStatusUpdateRequestDto requestDto
     ) {
-        readStatusService.update(ReadStatusIdRequestDto.from(readStatusId));
-        return ResponseEntity.status(HttpStatus.OK).build();
+        ReadStatusDto readStatusDto = readStatusService.update(ReadStatusIdRequestDto.from(readStatusId));
+        return ResponseEntity.status(HttpStatus.OK).body(readStatusDto);
     }
 
     @Override
