@@ -1,17 +1,22 @@
 package com.sprint.mission.discodeit.controller.message;
 
 
+import com.sprint.mission.discodeit.controller.common.PageResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.message.data.MessageDto;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +36,12 @@ public class MessageController implements MessageControllerDocs {
 
     @Override
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Message> create(
+    public ResponseEntity<MessageDto> create(
             @RequestPart(value = "messageCreateRequest") MessageCreateRequestDto request,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> contentFiles
     ) throws IOException {
         List<BinaryContentCreateRequestDto> binaryRequests = BinaryContentMapper.toList(contentFiles);
-        Message savedMessage = messageService.save(request, binaryRequests);
+        MessageDto savedMessage = messageService.save(request, binaryRequests);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
     }
 
@@ -62,13 +67,20 @@ public class MessageController implements MessageControllerDocs {
 
     }
 
+
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> getMessagesByChannelId(
-            @Parameter(description = "조회할 Channel ID")
-            @RequestParam("channelId") UUID channelId
+    public ResponseEntity<PageResponse<List<MessageDto>>> getMessagesByChannelId(
+            @RequestParam("channelId") UUID channelId,
+            @PageableDefault(sort = "create_at", direction = Sort.Direction.DESC)
+            Pageable pageable
     ) {
-        List<Message> responses = messageService.findAllByChannelId(ChannelIdRequestDto.from(channelId));
+
+        PageResponse<List<MessageDto>> responses = messageService.findAllByChannelId(
+                ChannelIdRequestDto.from(channelId),
+                pageable
+        );
+
 
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }

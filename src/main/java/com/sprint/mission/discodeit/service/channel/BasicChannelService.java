@@ -8,14 +8,17 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
+import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,51 +33,43 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserStatusRepository userStatusRepository;
     private final MessageRepository messageRepository;
     private final UserValidator userValidator;
 
 
     @Override
-    public Channel save(PublicChannelCreateRequestDto request) {
-        Channel savedChannel = request.toEntity();
-        channelRepository.save(savedChannel);
-
-        return savedChannel;
+    public ChannelDto save(PublicChannelCreateRequestDto request) {
+        Channel savedChannel = channelRepository.save(request.toEntity());
+        Instant messageLastTime = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(savedChannel.getId())
+                .map(BaseEntity::getCreatedAt)
+                .orElse(null);
+        return ChannelDto.of(savedChannel, List.of(), messageLastTime);
     }
 
     @Override
-    public Channel save(PrivateChannelCreateRequestDto request) {
-        Channel savedChannel = request.toEntity();
+    @Transactional
+    public ChannelDto save(PrivateChannelCreateRequestDto request) {
+        Channel savedChannel = Channel.create(ChannelType.PRIVATE, "", "");
         List<UUID> userIds = request.getParticipantIds();
+        Channel savedEntity = channelRepository.save(savedChannel);
 
         // 사용자별 ReadStatus 생성
         userIds.forEach(userId -> {
+            System.out.println(userId);
             User user = userValidator.getOrThrow(userId);
-            ReadStatus readStatus = ReadStatus.create(user, savedChannel);
+            ReadStatus readStatus = ReadStatus.create(user, savedEntity);
             readStatusRepository.save(readStatus);
         });
 
-        channelRepository.save(savedChannel);
-        return savedChannel;
+
+        return this.toChannelDto(savedEntity);
     }
 
     @Override
     public ChannelDto find(ChannelIdRequestDto requestDto) {
         return channelRepository.findById(requestDto.getId())
-                .map(channel -> {
-                    // 최신 메시지 시간 정보
-                    Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
-                            .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
-                            .map(BaseEntity::getCreatedAt)
-                            .findFirst().orElse(null);
-
-                    List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
-                            .map(ReadStatus::getUser)
-                            .map(User::getId)
-                            .toList();
-                    return ChannelDto.of(channel, userIds, messageLastTime);
-
-                })
+                .map(this::toChannelDto)
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
 
@@ -83,20 +78,7 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelDto> findAll() {
         return channelRepository.findAll()
                 .stream()
-                .map(channel -> {
-                    // 최신 메시지 시간 정보
-                    Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
-                            .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
-                            .map(BaseEntity::getCreatedAt)
-                            .findFirst().orElse(null);
-
-                    List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
-                            .map(ReadStatus::getUser)
-                            .map(User::getId)
-                            .toList();
-                    return ChannelDto.of(channel, userIds, messageLastTime);
-
-                }).toList();
+                .map(this::toChannelDto).toList();
     }
 
     @Override
@@ -112,25 +94,32 @@ public class BasicChannelService implements ChannelService {
                     return readStatusRepository.findByChannelId(channel.getId())
                             .stream().anyMatch(readStatus -> readStatus.getUser().getId().equals(requestDto.getId()));
                 })
-                .map(channel -> {
-                    // 최신 메시지 시간 정보
-                    Instant messageLastTime = messageRepository.findByChannelId(channel.getId()).stream()
-                            .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
-                            .map(BaseEntity::getCreatedAt)
-                            .findFirst().orElse(null);
+                .map(this::toChannelDto)
+                .toList();
+    }
 
-                    List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId()).stream()
-                            .map(ReadStatus::getUser)
-                            .map(User::getId)
-                            .toList();
-                    return ChannelDto.of(channel, userIds, messageLastTime);
+    private ChannelDto toChannelDto(Channel channel) {
+        Instant messageLastTime = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
+                .map(BaseEntity::getCreatedAt)
+                .orElse(null);
+
+        List<UserDto> users = readStatusRepository.findByChannelId(channel.getId()).stream()
+                .map(ReadStatus::getUser)
+                .map(user -> {
+                    boolean userStatus = userStatusRepository.findByUserId(user.getId())
+                            .map(UserStatus::isOnline)
+                            .orElse(false);
+
+                    return UserDto.of(user, userStatus);
                 })
                 .toList();
+
+        return ChannelDto.of(channel, users, messageLastTime);
     }
 
     @Override
     @Transactional
-    public Channel update(ChannelIdRequestDto channelId, ChannelUpdateRequestDto requestDto) {
+    public ChannelDto update(ChannelIdRequestDto channelId, ChannelUpdateRequestDto requestDto) {
         Channel updateChannel = channelRepository.findById(channelId.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
@@ -139,7 +128,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         updateChannel.update(requestDto.getNewName(), requestDto.getNewDescription());
-        return updateChannel;
+        return this.toChannelDto(updateChannel);
     }
 
     @Override
@@ -147,7 +136,7 @@ public class BasicChannelService implements ChannelService {
     public void delete(ChannelIdRequestDto requestDto) {
         Channel deleteChannel = channelRepository.findById(requestDto.getId())
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
-        
+
         channelRepository.delete(deleteChannel);
     }
 }

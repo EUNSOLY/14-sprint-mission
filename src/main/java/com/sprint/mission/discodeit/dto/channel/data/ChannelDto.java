@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel.data;
 
+import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import lombok.AccessLevel;
@@ -19,16 +20,16 @@ public class ChannelDto {
     ChannelType type;
     String name;
     String description;
-    List<UUID> participantIds;
+    List<UserDto> participants;
     Instant lastMessageAt;
 
-    public static ChannelDto of(Channel channel, List<UUID> participantIds, Instant lastMessageAt) {
+    public static ChannelDto of(Channel channel, List<UserDto> participants, Instant lastMessageAt) {
         return new ChannelDto(
                 channel.getId(),
                 channel.getType(),
                 channel.getName(),
                 channel.getDescription(),
-                participantIds,
+                participants,
                 lastMessageAt
         );
     }

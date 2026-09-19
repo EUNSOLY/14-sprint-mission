@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.readstatus;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.data.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ public interface ReadStatusControllerDocs {
             description = "ChanChannelMessage 읽음 상태가 성공적으로 생성됨",
             content = @Content(schema = @Schema(implementation = ReadStatus.class))
     )
-    ResponseEntity<ReadStatus> createMessageReadStatus(ReadStatusCreateRequestDto request);
+    ResponseEntity<ReadStatusDto> createMessageReadStatus(ReadStatusCreateRequestDto request);
 
     @Operation(summary = "Message 읽음 상태 수정")
     @ApiResponse(
@@ -45,7 +46,7 @@ public interface ReadStatusControllerDocs {
             description = "Message 읽음 상태가 성공적으로 수정됨",
             content = @Content(schema = @Schema(implementation = ReadStatus.class))
     )
-    ResponseEntity<ReadStatus> updateMessageReadStatus(
+    ResponseEntity<ReadStatusDto> updateMessageReadStatus(
             @Parameter(description = "수정할 읽음 상태 ID")
             UUID readStatusId,
             ReadStatusUpdateRequestDto requestDto
@@ -57,7 +58,7 @@ public interface ReadStatusControllerDocs {
             description = "Message 읽음 상태 목록 조회 성공",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class)))
     )
-    ResponseEntity<List<ReadStatus>> findAllByUserId(
+    ResponseEntity<List<ReadStatusDto>> findAllByUserId(
             @Parameter(description = "조회할 User ID")
             UUID userId
     );

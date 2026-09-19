@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.binarycotent;
 
+import com.sprint.mission.discodeit.dto.binarycontent.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +28,7 @@ public interface BinaryContentControllerDocs {
             description = "첨부 파일 조회 성공",
             content = @Content(schema = @Schema(implementation = BinaryContent.class))
     )
-    ResponseEntity<BinaryContent> getFile(
+    ResponseEntity<BinaryContentDto> getFile(
             @Parameter(description = "조회할 첨부 파일 ID")
             UUID binaryContentId
     );
@@ -39,8 +40,21 @@ public interface BinaryContentControllerDocs {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
             )
     )
-    ResponseEntity<List<BinaryContent>> getFiles(
+    ResponseEntity<List<BinaryContentDto>> getFiles(
             @Parameter(description = "조회할 첨부 파일 ID 목록")
             List<UUID> binaryContentIds
+    );
+
+
+    @Operation(summary = "파일 다운로드")
+    @ApiResponse(
+            responseCode = "200",
+            description = "파일 다운로드 성공",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
+            )
+    )
+    ResponseEntity<byte[]> fileDownload(
+            @Parameter(description = "다운로드할 파일 ID")
+            UUID binaryContentId
     );
 }

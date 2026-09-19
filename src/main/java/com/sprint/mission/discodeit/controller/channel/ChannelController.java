@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,30 +25,30 @@ public class ChannelController implements ChannelControllerDocs {
 
     @Override
     @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ResponseEntity<Channel> createPublicChannel(
+    public ResponseEntity<ChannelDto> createPublicChannel(
             @RequestBody PublicChannelCreateRequestDto request
     ) {
-        Channel response = channelService.save(request);
+        ChannelDto response = channelService.save(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED).body(response);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.POST, value = "/private")
-    public ResponseEntity<Channel> createPrivateChannel(
+    public ResponseEntity<ChannelDto> createPrivateChannel(
             @RequestBody PrivateChannelCreateRequestDto request
     ) {
-        Channel response = channelService.save(request);
+        ChannelDto response = channelService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
-    public ResponseEntity<Channel> updatePublicChannel(
+    public ResponseEntity<ChannelDto> updatePublicChannel(
             @PathVariable(value = "id") UUID channelId,
             @RequestBody ChannelUpdateRequestDto request
     ) {
-        Channel channel = channelService.update(ChannelIdRequestDto.from(channelId), request);
+        ChannelDto channel = channelService.update(ChannelIdRequestDto.from(channelId), request);
         return ResponseEntity.status(HttpStatus.OK).body(channel);
     }
 
@@ -72,10 +71,5 @@ public class ChannelController implements ChannelControllerDocs {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-//    @RequestMapping(method = RequestMethod.GET)
-//    public ResponseEntity<ApiCustomResponse<List<ChannelResponseDto>>> getChannels() {
-//        List<ChannelResponseDto> channelResponse = channelService.findAll();
-//
-//        return ApiCustomResponse.toSuccess(CustomStatusCode.OK, channelResponse);
-//    }
+
 }

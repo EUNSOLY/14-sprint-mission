@@ -1,30 +1,27 @@
 package com.sprint.mission.discodeit.service.message;
 
+import com.sprint.mission.discodeit.controller.common.PageResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.dto.message.data.MessageDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface MessageService {
-    Message save(
+    MessageDto save(
             MessageCreateRequestDto requestDto,
             List<BinaryContentCreateRequestDto> messageContentCreateRequests
     );
 
-    Message find(MessageIdRequestDto requestDto);
+    MessageDto find(MessageIdRequestDto requestDto);
 
-    List<Message> findByUserId(UserIdRequestDto requestDto);
+    PageResponse<List<MessageDto>> findAllByChannelId(ChannelIdRequestDto requestDto, Pageable pageable);
 
-    List<Message> findByChannelIdAndUserId(UserIdRequestDto userRequestDto, ChannelIdRequestDto channelRequestDto);
-
-    List<Message> findAllByChannelId(ChannelIdRequestDto requestDto);
-
-    Message update(
+    MessageDto update(
             MessageIdRequestDto messageIdRequest,
             MessageUpdateRequestDto request
     );

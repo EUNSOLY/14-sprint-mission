@@ -97,7 +97,7 @@ public class UserController implements UserControllerDocs {
                 .status(HttpStatus.OK)
                 .body(user);
     }
-    
+
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> findAll(

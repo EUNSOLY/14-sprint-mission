@@ -26,7 +26,7 @@ public interface ChannelControllerDocs {
             description = "Public Channel이 성공적으로 생성됨",
             content = @Content(schema = @Schema(implementation = Channel.class))
     )
-    ResponseEntity<Channel> createPublicChannel(PublicChannelCreateRequestDto request);
+    ResponseEntity<ChannelDto> createPublicChannel(PublicChannelCreateRequestDto request);
 
     @Operation(summary = "Private Channel 생성")
     @ApiResponse(
@@ -34,7 +34,7 @@ public interface ChannelControllerDocs {
             description = "Private Channel이 성공적으로 생성됨",
             content = @Content(schema = @Schema(implementation = Channel.class))
     )
-    ResponseEntity<Channel> createPrivateChannel(PrivateChannelCreateRequestDto request);
+    ResponseEntity<ChannelDto> createPrivateChannel(PrivateChannelCreateRequestDto request);
 
     @Operation(summary = "Channel 정보 수정")
     @ApiResponse(
@@ -52,7 +52,7 @@ public interface ChannelControllerDocs {
             description = "Channel 정보가 성공적으로 수정됨",
             content = @Content(schema = @Schema(implementation = Channel.class))
     )
-    ResponseEntity<Channel> updatePublicChannel(
+    ResponseEntity<ChannelDto> updatePublicChannel(
             @Parameter(description = "수정할 Channel ID") UUID channelId,
             ChannelUpdateRequestDto request
     );
