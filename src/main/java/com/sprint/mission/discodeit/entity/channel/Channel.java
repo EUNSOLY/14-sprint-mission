@@ -23,10 +23,9 @@ public class Channel extends BaseUpdatableEntity {
     private ChannelType type;
 
     private String name;
-    
+
     private String description;
 
-    // N + 1 발생
     @OneToMany(mappedBy = "channel", cascade = CascadeType.PERSIST)
     private final List<Message> messageList = new ArrayList<>();
 

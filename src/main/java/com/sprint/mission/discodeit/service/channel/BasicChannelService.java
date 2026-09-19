@@ -14,11 +14,10 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,9 +32,9 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
-    private final UserStatusRepository userStatusRepository;
     private final MessageRepository messageRepository;
     private final UserValidator userValidator;
+    private final UserMapper userMapper;
 
 
     @Override
@@ -105,13 +104,7 @@ public class BasicChannelService implements ChannelService {
 
         List<UserDto> users = readStatusRepository.findByChannelId(channel.getId()).stream()
                 .map(ReadStatus::getUser)
-                .map(user -> {
-                    boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                            .map(UserStatus::isOnline)
-                            .orElse(false);
-
-                    return UserDto.of(user, userStatus);
-                })
+                .map(userMapper::toDto)
                 .toList();
 
         return ChannelDto.of(channel, users, messageLastTime);

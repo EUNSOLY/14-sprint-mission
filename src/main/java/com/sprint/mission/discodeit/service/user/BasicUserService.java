@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -29,6 +30,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserValidator userValidator;
     private final BinaryContentValidator binaryContentValidator;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -70,22 +72,15 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto find(UserIdRequestDto requestDto) {
         User currentUser = userValidator.getOrThrow(requestDto.getId());
-        boolean userStatus = userStatusRepository.findByUserId(currentUser.getId())
-                .map(UserStatus::isOnline)
-                .orElse(false);
-        return UserDto.of(currentUser, userStatus);
+
+        return userMapper.toDto(currentUser);
     }
 
     @Override
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> {
-                    boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                            .map(UserStatus::isOnline)
-                            .orElse(false);
-                    return UserDto.of(user, userStatus);
-                })
+                .map(userMapper::toDto)
                 .toList();
     }
 

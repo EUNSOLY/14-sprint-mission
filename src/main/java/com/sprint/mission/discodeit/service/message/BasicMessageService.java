@@ -15,10 +15,9 @@ import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
-    private final UserStatusRepository userStatusRepository;
+    private final UserMapper userMapper;
 
 
     @Override
@@ -115,10 +114,7 @@ public class BasicMessageService implements MessageService {
         User user = message.getAuthor();
         Channel channel = message.getChannel();
         List<BinaryContent> contents = message.getAttachments();
-        boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
-                .orElse(false);
-        UserDto userDto = UserDto.of(user, userStatus);
+        UserDto userDto = userMapper.toDto(user);
         List<BinaryContentDto> binaryContentDtos = contents.stream().map(BinaryContentDto::of).toList();
         return MessageDto.to(message, userDto, channel.getId(), binaryContentDtos);
     }

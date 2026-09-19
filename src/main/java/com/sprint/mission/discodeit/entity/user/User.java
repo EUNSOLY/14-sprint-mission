@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.user;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,6 +30,10 @@ public class User extends BaseUpdatableEntity {
     @OneToOne
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
+
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private UserStatus userStatus;
 
     public static User create(String username, String email, String password) {
         return new User(username, email, password);

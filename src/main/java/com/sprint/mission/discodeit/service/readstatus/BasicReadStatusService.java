@@ -2,27 +2,20 @@ package com.sprint.mission.discodeit.service.readstatus;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
-import com.sprint.mission.discodeit.dto.channel.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.user.data.UserDto;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -31,8 +24,6 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
-    private final UserStatusRepository userStatusRepository;
-    private final MessageRepository messageRepository;
 
     @Override
     public ReadStatusDto save(ReadStatusCreateRequestDto request) {
@@ -88,27 +79,6 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     private ReadStatusDto toReadStatusDto(ReadStatus readStatus, User user, Channel channel) {
-        Instant messageLastTime = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
-                .map(BaseEntity::getCreatedAt)
-                .orElse(null);
-
-        List<UserDto> users = readStatusRepository.findByChannelId(channel.getId()).stream()
-                .map(ReadStatus::getUser)
-                .map(readUser -> {
-                    boolean userStatus = userStatusRepository.findByUserId(readUser.getId())
-                            .map(UserStatus::isOnline)
-                            .orElse(false);
-
-                    return UserDto.of(readUser, userStatus);
-                })
-                .toList();
-
-        boolean userStatus = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
-                .orElse(false);
-
-        UserDto userDto = UserDto.of(user, userStatus);
-        ChannelDto channelDto = ChannelDto.of(channel, users, messageLastTime);
         return ReadStatusDto.to(readStatus, user.getId(), channel.getId());
     }
 

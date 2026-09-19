@@ -19,8 +19,7 @@ public class UserDto {
     BinaryContentDto profile;
     Boolean online;
 
-    public static UserDto of(User user, boolean online) {
-        BinaryContentDto binaryContentDto = user.getProfile() != null ? BinaryContentDto.of(user.getProfile()) : null;
+    public static UserDto of(User user, BinaryContentDto binaryContentDto, boolean online) {
         return new UserDto(
                 user.getId(),
                 user.getUsername(),
