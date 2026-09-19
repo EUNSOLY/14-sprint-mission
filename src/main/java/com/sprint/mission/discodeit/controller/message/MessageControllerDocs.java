@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller.message;
 
-import com.sprint.mission.discodeit.controller.common.PageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.message.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.message.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -78,7 +78,7 @@ public interface MessageControllerDocs {
             description = "Message 목록 조회 성공",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
     )
-    ResponseEntity<PageResponse<List<MessageDto>>> getMessagesByChannelId(
+    ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
             @Parameter(description = "조회할 Channel ID")
             UUID channelId,
 
