@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.user;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,7 +57,7 @@ public interface UserControllerDocs {
             description = "User 정보가 성공적으로 수정됨",
             content = @Content(schema = @Schema(implementation = User.class))
     )
-    ResponseEntity<User> update(
+    ResponseEntity<UserDto> update(
             @Parameter(description = "수정할 User ID")
             UUID userId,
 
@@ -116,7 +117,7 @@ public interface UserControllerDocs {
             description = "User 온라인 상태가 성공적으로 업데이트됨",
             content = @Content(schema = @Schema(implementation = UserStatus.class))
     )
-    ResponseEntity<UserStatus> updateOnlineStatus(
+    ResponseEntity<UserStatusDto> updateOnlineStatus(
             @Parameter(description = "상태를 변경할 User ID")
             UUID userId
     );

@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.user.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +30,7 @@ import java.util.UUID;
 @Tag(name = "User", description = "User API")
 public class UserController implements UserControllerDocs {
     private final UserService userService;
+
 
     @Override
     @RequestMapping(
@@ -57,7 +58,7 @@ public class UserController implements UserControllerDocs {
             value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<User> update(
+    public ResponseEntity<UserDto> update(
             @Parameter(description = "수정할 User ID")
             @PathVariable("id") UUID userId,
 
@@ -68,7 +69,7 @@ public class UserController implements UserControllerDocs {
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         BinaryContentCreateRequestDto binaryRequest = BinaryContentMapper.to(profile);
-        User updatedUser = userService.update(UserIdRequestDto.from(userId), userUpdateRequest, binaryRequest);
+        UserDto updatedUser = userService.update(UserIdRequestDto.from(userId), userUpdateRequest, binaryRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -110,11 +111,11 @@ public class UserController implements UserControllerDocs {
 
     @Override
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/userStatus")
-    public ResponseEntity<UserStatus> updateOnlineStatus(
+    public ResponseEntity<UserStatusDto> updateOnlineStatus(
             @Parameter(description = "상태를 변경할 User ID")
             @PathVariable(value = "id") UUID userId
     ) {
-        UserStatus userStatus = userService.updateUserOnlineStatus(UserIdRequestDto.from(userId));
+        UserStatusDto userStatus = userService.updateUserOnlineStatus(UserIdRequestDto.from(userId));
         return ResponseEntity.status(HttpStatus.OK).body(userStatus);
     }
 }

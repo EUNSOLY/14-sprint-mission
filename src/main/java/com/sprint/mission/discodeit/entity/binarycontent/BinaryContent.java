@@ -13,28 +13,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
     private String fileName;
-    private byte[] bytes;
     private String contentType;
     private Long size;
 
     private BinaryContent(
             String fileName,
-            byte[] bytes,
             String contentType,
             Long size
     ) {
         this.fileName = fileName;
-        this.bytes = bytes;
         this.contentType = contentType;
         this.size = size;
     }
 
     public static BinaryContent create(
             String fileName,
-            byte[] bytes,
             String contentType,
             Long size
     ) {
-        return new BinaryContent(fileName, bytes, contentType, size);
+        return new BinaryContent(fileName, contentType, size);
     }
 }

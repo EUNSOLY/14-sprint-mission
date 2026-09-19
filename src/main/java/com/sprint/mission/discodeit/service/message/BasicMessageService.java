@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.message.data.MessageDto;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
@@ -20,6 +21,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,7 @@ import java.util.Optional;
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
     private final UserMapper userMapper;
@@ -56,7 +59,9 @@ public class BasicMessageService implements MessageService {
                 .map(messageBinaryContents -> {
                     return messageBinaryContents.stream().map(messageBinaryContent -> {
                         BinaryContent binaryContent = messageBinaryContent.toEntity();
-                        return binaryContentRepository.save(binaryContent);
+                        BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+                        binaryContentStorage.put(savedContent.getId(), messageBinaryContent.bytes());
+                        return savedContent;
                     }).toList();
                 })
                 .orElse(Collections.emptyList());
@@ -125,6 +130,8 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
         List<BinaryContent> deletedBinaryContent = deleteMessage.getAttachments().stream().toList();
         binaryContentRepository.deleteAll(deletedBinaryContent); // 수정 파일 Id 값들 전부 데이터 삭제
+        deletedBinaryContent.stream().map(BaseEntity::getId)
+                .forEach(binaryContentStorage::delete);
         messageRepository.delete(deleteMessage); // 메시지 삭제
     }
 }

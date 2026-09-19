@@ -53,7 +53,7 @@ public interface BinaryContentControllerDocs {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
             )
     )
-    ResponseEntity<byte[]> fileDownload(
+    ResponseEntity<?> fileDownload(
             @Parameter(description = "다운로드할 파일 ID")
             UUID binaryContentId
     );

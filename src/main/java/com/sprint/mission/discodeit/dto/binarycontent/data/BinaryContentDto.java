@@ -16,7 +16,6 @@ public class BinaryContentDto {
     private final String fileName;
     private final String contentType;
     private final Long size;
-    private final byte[] bytes;
 
 
     public static BinaryContentDto of(BinaryContent binaryContent) {
@@ -24,8 +23,7 @@ public class BinaryContentDto {
                 binaryContent.getId(),
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
-                binaryContent.getSize(),
-                binaryContent.getBytes()
+                binaryContent.getSize()
         );
     }
 }

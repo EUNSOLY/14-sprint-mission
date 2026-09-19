@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.auth;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,5 +29,5 @@ public interface AuthControllerDocs {
             description = "비밀번호가 일치하지 않음",
             content = @Content(examples = @ExampleObject("Wrong password"))
     )
-    ResponseEntity<User> login(LoginRequest request);
+    ResponseEntity<UserDto> login(LoginRequest request);
 }

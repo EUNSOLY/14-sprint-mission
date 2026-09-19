@@ -8,6 +8,6 @@ public record BinaryContentCreateRequestDto(
         byte[] bytes
 ) {
     public BinaryContent toEntity() {
-        return BinaryContent.create(this.fileName, this.bytes, this.contentType, (long) this.bytes.length);
+        return BinaryContent.create(this.fileName, this.contentType, (long) this.bytes.length);
     }
 }

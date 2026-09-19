@@ -49,14 +49,10 @@ public class BinaryContentController implements BinaryContentControllerDocs {
 
     @Override
     @RequestMapping(method = RequestMethod.GET, value = "/{binaryContentId}/download")
-    public ResponseEntity<byte[]> fileDownload(
+    public ResponseEntity<?> fileDownload(
             @PathVariable UUID binaryContentId
     ) {
-        BinaryContent binaryContent = binaryContentService.find(BinaryContentIdRequestDto.from(binaryContentId));
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(binaryContent.getBytes());
+
+        return binaryContentService.findFile(binaryContentId);
     }
-
-
 }
