@@ -66,11 +66,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
-        InputStream contentStream = this.get(binaryContentDto.getId());
+        InputStream contentStream = this.get(binaryContentDto.id());
         InputStreamResource inputStreamResource = new InputStreamResource(contentStream);
         return ResponseEntity.status(HttpStatus.OK)
-                .contentLength(binaryContentDto.getSize())
-                .contentType(MediaType.valueOf(binaryContentDto.getContentType()))
+                .contentLength(binaryContentDto.size())
+                .contentType(MediaType.valueOf(binaryContentDto.contentType()))
                 .body(inputStreamResource);
     }
 

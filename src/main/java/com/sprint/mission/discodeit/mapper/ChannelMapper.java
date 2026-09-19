@@ -7,27 +7,36 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor()
-public class ChannelMapper {
-    private final MessageRepository messageRepository;
-    private final ReadStatusRepository readStatusRepository;
-    private final UserMapper userMapper;
+@Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE)
+public abstract class ChannelMapper {
+    @Autowired
+    protected MessageRepository messageRepository;
+    @Autowired
+    protected ReadStatusRepository readStatusRepository;
+    @Autowired
+    protected UserMapper userMapper;
 
-    public ChannelDto toDto(Channel channel) {
-        Instant messageLastTime = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
+    @Mapping(target = "participants", expression = "java(getParticipants(channel))")
+    @Mapping(target = "lastMessageAt", expression = "java(getLastMessageAt(channel))")
+    public abstract ChannelDto toDto(Channel channel);
+
+    protected Instant getLastMessageAt(Channel channel) {
+        return messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
                 .map(BaseEntity::getCreatedAt)
                 .orElse(null);
+    }
 
+    protected List<UserDto> getParticipants(Channel channel) {
         List<ReadStatus> readStatusList = readStatusRepository.findByChannelId(channel.getId());
-        List<UserDto> userDtos = readStatusList.stream().map(readStatus -> userMapper.toDto(readStatus.getUser())).toList();
-
-        return ChannelDto.of(channel, userDtos, messageLastTime);
+        return readStatusList.stream().map(readStatus -> userMapper.toDto(readStatus.getUser())).toList();
     }
 }
+

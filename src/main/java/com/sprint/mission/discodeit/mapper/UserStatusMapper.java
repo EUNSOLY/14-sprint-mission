@@ -2,15 +2,15 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Component
-@RequiredArgsConstructor
-public class UserStatusMapper {
+@Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE)
+public interface UserStatusMapper {
 
-    public UserStatusDto toDto(UserStatus userStatus) {
-        return UserStatusDto.to(userStatus);
-    }
+
+    @Mapping(target = "userId", source = "user.id")
+    UserStatusDto toDto(UserStatus userStatus);
 
 }
