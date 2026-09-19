@@ -12,8 +12,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReadStatusDto {
     private final UUID id;
-    private final UUID user;
-    private final UUID channel;
+    private final UUID userId;
+    private final UUID channelId;
     private final Instant lastReadAt;
 
 

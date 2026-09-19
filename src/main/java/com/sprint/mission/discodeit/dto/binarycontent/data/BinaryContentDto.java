@@ -12,10 +12,11 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BinaryContentDto {
-    private UUID id;
-    private String fileName;
-    private String contentType;
-    private Long size;
+    private final UUID id;
+    private final String fileName;
+    private final String contentType;
+    private final Long size;
+    private final byte[] bytes;
 
 
     public static BinaryContentDto of(BinaryContent binaryContent) {
@@ -23,7 +24,8 @@ public class BinaryContentDto {
                 binaryContent.getId(),
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
-                binaryContent.getSize()
+                binaryContent.getSize(),
+                binaryContent.getBytes()
         );
     }
 }

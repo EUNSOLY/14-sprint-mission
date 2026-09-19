@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -15,8 +14,6 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserDto {
     UUID id;
-    Instant createdAt;
-    Instant updatedAt;
     String username;
     String email;
     BinaryContentDto profile;
@@ -26,8 +23,6 @@ public class UserDto {
         BinaryContentDto binaryContentDto = user.getProfile() != null ? BinaryContentDto.of(user.getProfile()) : null;
         return new UserDto(
                 user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
                 binaryContentDto,
