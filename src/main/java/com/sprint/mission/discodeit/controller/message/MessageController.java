@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.controller.message;
 
 
-import com.sprint.mission.discodeit.controller.common.PageResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.message.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.message.MessageService;
@@ -70,13 +70,13 @@ public class MessageController implements MessageControllerDocs {
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<List<MessageDto>>> getMessagesByChannelId(
+    public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
             @RequestParam("channelId") UUID channelId,
             @PageableDefault(sort = "create_at", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
 
-        PageResponse<List<MessageDto>> responses = messageService.findAllByChannelId(
+        PageResponse<MessageDto> responses = messageService.findAllByChannelId(
                 ChannelIdRequestDto.from(channelId),
                 pageable
         );

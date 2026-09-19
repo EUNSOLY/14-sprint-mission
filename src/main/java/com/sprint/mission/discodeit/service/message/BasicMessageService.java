@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.message;
 
 import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
 import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
-import com.sprint.mission.discodeit.controller.common.PageResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
@@ -10,12 +9,14 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.message.data.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -41,6 +42,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelValidator channelValidator;
     private final UserValidator userValidator;
     private final UserMapper userMapper;
+    private final PageResponseMapper pageResponseMapper;
 
 
     @Override
@@ -84,21 +86,14 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public PageResponse<List<MessageDto>> findAllByChannelId(ChannelIdRequestDto requestDto, Pageable pageable) {
+    public PageResponse<MessageDto> findAllByChannelId(ChannelIdRequestDto requestDto, Pageable pageable) {
 
         channelValidator.getOrThrow(requestDto.getId());
 
         Page<Message> messagesPage = messageRepository.findByChannelId(requestDto.getId(), pageable);
-        List<MessageDto> message = messagesPage.getContent().stream()
-                .map(this::toMessageDto).toList();
+        Page<MessageDto> dtoPage = messagesPage.map(this::toMessageDto);
 
-        return PageResponse.to(
-                message,
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                messagesPage.hasNext(),
-                messagesPage.getTotalElements()
-        );
+        return pageResponseMapper.fromPage(dtoPage);
     }
 
     @Override
