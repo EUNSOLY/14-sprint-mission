@@ -7,14 +7,14 @@ import org.springframework.data.domain.Slice;
 
 @Getter
 
-public class PageResponseMapper<T> {
+public class PageResponseMapper {
 
-    public PageResponse<T> fromSlice(Slice<T> slice) {
+    public <T> PageResponse<T> fromSlice(Slice<T> slice) {
         return PageResponse.to(slice.getContent(), slice.getNumber(), slice.getSize(), slice.hasNext(), null);
     }
 
 
-    public PageResponse<T> fromPage(Page<T> page) {
+    public <T> PageResponse<T> fromPage(Page<T> page) {
         return PageResponse.to(page.getContent(), page.getNumber(), page.getSize(), page.hasNext(), page.getTotalElements());
     }
 
