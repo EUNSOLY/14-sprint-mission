@@ -3,7 +3,7 @@ spring:
     name: 14-sprint-mission
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    generate-ddl: true
+    generate-ddl: false
     hibernate:
       ddl-auto: none
       naming:
@@ -19,6 +19,7 @@ spring:
   sql:
     init:
       mode: NEVER
+      #      mode: ALWAYS
       schema-locations:
         - 'classpath:schema.sql'
   datasource:
@@ -29,8 +30,9 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG              # 실행되는 SQL 쿼리 로그
-    org.hibernate.orm.jdbc.bind: TRACE    # 바인딩 파라미터 값 로그 (Hibernate 6+)
+    org.hibernate.SQL: DEBUG                        # 실행되는 SQL 쿼리 로그
+    org.hibernate.orm.jdbc.bind: TRACE              # 바인딩 파라미터 값 로그 (Hibernate 6+)
+    org.springframework.jdbc.datasource.init: DEBUG # schema.sql 같은 SQL 스크립트 실행 로그
 server:
   port: 8080
 
@@ -38,6 +40,12 @@ discodeit:
   repository:
     type: jcf # jcf | file
     file-directory: .discodeit
+  storage:
+    type: "local"
+    local:
+      root-path: ".discodeit-files/upload"
+      #      root-path: "/Users/eunsol/CodeitDevelop/upload/"
+
 
 file:
   path: .uploader
