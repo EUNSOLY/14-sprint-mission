@@ -8,12 +8,12 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
-import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -35,6 +35,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final UserValidator userValidator;
     private final UserMapper userMapper;
+    private final ChannelMapper channelMapper;
 
 
     @Override
@@ -62,13 +63,13 @@ public class BasicChannelService implements ChannelService {
         });
 
 
-        return this.toChannelDto(savedEntity);
+        return channelMapper.toDto(savedEntity);
     }
 
     @Override
     public ChannelDto find(ChannelIdRequestDto requestDto) {
         return channelRepository.findById(requestDto.getId())
-                .map(this::toChannelDto)
+                .map(channelMapper::toDto)
                 .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
 
 
@@ -77,10 +78,11 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelDto> findAll() {
         return channelRepository.findAll()
                 .stream()
-                .map(this::toChannelDto).toList();
+                .map(channelMapper::toDto).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChannelDto> findAllByUserId(UserIdRequestDto requestDto) {
         return channelRepository.findAll().stream()
                 .filter(channel -> {
@@ -93,21 +95,8 @@ public class BasicChannelService implements ChannelService {
                     return readStatusRepository.findByChannelId(channel.getId())
                             .stream().anyMatch(readStatus -> readStatus.getUser().getId().equals(requestDto.getId()));
                 })
-                .map(this::toChannelDto)
+                .map(channelMapper::toDto)
                 .toList();
-    }
-
-    private ChannelDto toChannelDto(Channel channel) {
-        Instant messageLastTime = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
-                .map(BaseEntity::getCreatedAt)
-                .orElse(null);
-
-        List<UserDto> users = readStatusRepository.findByChannelId(channel.getId()).stream()
-                .map(ReadStatus::getUser)
-                .map(userMapper::toDto)
-                .toList();
-
-        return ChannelDto.of(channel, users, messageLastTime);
     }
 
     @Override
@@ -121,7 +110,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         updateChannel.update(requestDto.getNewName(), requestDto.getNewDescription());
-        return this.toChannelDto(updateChannel);
+        return channelMapper.toDto(updateChannel);
     }
 
     @Override

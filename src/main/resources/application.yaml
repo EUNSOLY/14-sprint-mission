@@ -2,6 +2,7 @@ spring:
   application:
     name: 14-sprint-mission
   jpa:
+    open-in-view: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: false
     hibernate:
