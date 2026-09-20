@@ -22,11 +22,12 @@ import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -92,11 +93,21 @@ public class BasicMessageService implements MessageService {
             String cursor
     ) {
         channelValidator.getOrThrow(requestDto.getId());
+        Slice<Message> messagesSlice;
 
-        Page<Message> messagesPage = messageRepository.findByChannelId(requestDto.getId(), pageable);
-        Page<MessageDto> dtoPage = messagesPage.map(messageMapper::toDto);
+        if (cursor == null || cursor.isBlank()) {
+            messagesSlice = messageRepository.findFirstPage(requestDto.getId(), pageable);
+        } else {
+            messagesSlice = messageRepository.findByChannelId(requestDto.getId(), Instant.parse(cursor), pageable);
+        }
+        String nextCursor = null;
+        if (messagesSlice.hasNext() && messagesSlice.hasContent()) {
+            List<Message> contents = messagesSlice.getContent();
+            nextCursor = contents.get(contents.size() - 1).getCreatedAt().toString();
+        }
+        Slice<MessageDto> dtoSlice = messagesSlice.map(messageMapper::toDto);
 
-        return pageResponseMapper.fromPage(dtoPage);
+        return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
     }
 
     @Override

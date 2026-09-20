@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class PageResponseMapper {
+    public <T> PageResponse<T> fromSlice(Slice<T> slice, String cursor) {
+        return PageResponse.to(slice.getContent(), cursor, slice.getSize(), slice.hasNext(), null);
+    }
+
     public <T> PageResponse<T> fromSlice(Slice<T> slice) {
         return PageResponse.to(slice.getContent(), slice.getNumber(), slice.getSize(), slice.hasNext(), null);
     }
