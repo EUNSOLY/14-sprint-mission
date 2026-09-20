@@ -32,7 +32,7 @@ public class User extends BaseUpdatableEntity {
     private BinaryContent profile;
 
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user")
     private UserStatus userStatus;
 
     public static User create(String username, String email, String password) {
