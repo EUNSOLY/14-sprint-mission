@@ -24,6 +24,18 @@ spring:
       mode: NEVER
       schema-locations:
         - 'classpath:schema.sql'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+          - loggers
+
+
 logging:
   level:
     root: info
