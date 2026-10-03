@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -50,10 +52,12 @@ public class BasicUserService implements UserService {
 
         // 이름 중복 검증
         if (hasDuplicateName) {
+            log.warn("사용자 생성 실패 : 중복 이름");
             throw new GlobalCustomException(CustomStatusCode.DUPLICATE_NAME);
         }
         // 이메일 중복 검증
         if (hasDuplicateEmail) {
+            log.warn("사용자 생성 실패 : 중복 이메일");
             throw new GlobalCustomException(CustomStatusCode.DUPLICATE_EMAIL);
         }
 
@@ -62,17 +66,19 @@ public class BasicUserService implements UserService {
         // 프로필 있으면 생성 후 UUID 반환
         BinaryContent profile = Optional.ofNullable(profileCreateRequest)
                 .map((profileRequest) -> {
+                    log.info("프로필 생성");
                     BinaryContent binaryContent = profileRequest.toEntity();
-
                     BinaryContent savedContent = binaryContentRepository.save(binaryContent);
                     binaryContentStorage.put(savedContent.getId(), profileRequest.bytes());
                     return savedContent;
                 }).orElse(null);
 
         savedUser.updateProfile(profile); // 프로필 ID 업데이트
+        log.info("사용자 생성");
         userRepository.save(savedUser); // 저장
 
         UserStatus userStatus = UserStatus.create(savedUser); // User 로그인 일시 핸들러 Entity 생성
+        log.info("사용자 상태 생성");
         userStatusRepository.save(userStatus); // UserStatus 저장
 
         return savedUser;
@@ -107,10 +113,12 @@ public class BasicUserService implements UserService {
 
         // 이름 중복 검증
         if (hasDuplicateName) {
+            log.warn("사용자 수정 실패 : 중복 이름");
             throw new GlobalCustomException(CustomStatusCode.DUPLICATE_NAME);
         }
         // 이메일 중복 검증
         if (hasDuplicateEmail) {
+            log.warn("사용자 수정 실패 : 중복 이메일");
             throw new GlobalCustomException(CustomStatusCode.DUPLICATE_EMAIL);
         }
 
@@ -120,6 +128,7 @@ public class BasicUserService implements UserService {
         Optional.ofNullable(profileCreateRequest)
                 .ifPresent(profileCommand -> {
                     // 이미 프로필이 있다면 제거
+                    log.info("사용자 수정 - 기존 프로필 이미지 제거");
                     Optional.ofNullable(currentUser.getProfile())
                             .ifPresent(content -> {
                                 binaryContentValidator.getOrThrow(content.getId());
@@ -128,6 +137,7 @@ public class BasicUserService implements UserService {
                             });
 
                     // 프로필 저장
+                    log.info("사용자 수정 - 신규 프로필 이미지 생성");
                     BinaryContent binaryContent = profileCommand.toEntity();
                     binaryContentRepository.save(binaryContent);
                     binaryContentStorage.put(binaryContent.getId(), profileCommand.bytes());
@@ -143,15 +153,18 @@ public class BasicUserService implements UserService {
     public void delete(UserIdRequestDto requestDto) {
         User deleteUser = userValidator.getOrThrow(requestDto.getId());
 
+        log.info("사용자 상태 삭제");
         userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
 
         Optional.ofNullable(deleteUser.getProfile())
                 .ifPresent(binaryContent -> {
+                    log.info("사용자 프로필 삭제");
                     UUID deletedId = binaryContent.getId();
                     binaryContentStorage.delete(deletedId);
                     binaryContentRepository.delete(binaryContent);
                 });
 
+        log.info("사용자 삭제");
         userRepository.delete(deleteUser); // 유저 삭제
     }
 

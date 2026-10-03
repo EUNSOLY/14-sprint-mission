@@ -11,7 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -42,8 +46,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try (FileOutputStream savedFile = new FileOutputStream(path.toString())) {
             savedFile.write(value);
         } catch (IOException e) {
+            log.error("파일 저장 중 발생 예외", e);
             throw new RuntimeException("파일 저장 중 오류 발생", e);
         }
+        log.info("파일 업로드 완료 FileId : {}, size : {}", key, value.length);
         return key;
     }
 
@@ -60,6 +66,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             return new FileInputStream(path.toFile());
         } catch (IOException e) {
+            log.error("파일을 불러오는 도중 발생 예외", e);
             throw new RuntimeException("파일을 불러오는 도중 예외가 발생했습니다.", e);
         }
     }
@@ -68,6 +75,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
         InputStream contentStream = this.get(binaryContentDto.id());
         InputStreamResource inputStreamResource = new InputStreamResource(contentStream);
+        log.info("파일 다운로드 FileId : {}", binaryContentDto.id());
         return ResponseEntity.status(HttpStatus.OK)
                 .contentLength(binaryContentDto.size())
                 .contentType(MediaType.valueOf(binaryContentDto.contentType()))
@@ -78,8 +86,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     private Path resolvePath(UUID fileId) {
         Path baseDirPath = Path.of(uploadDirPath);
         Path filePath = baseDirPath.resolve(fileId.toString());
-
-        log.info("테스트합니다: {}", filePath);
         return filePath;
     }
 }
