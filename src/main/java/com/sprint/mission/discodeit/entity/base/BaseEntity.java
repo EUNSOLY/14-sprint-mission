@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.entity.base;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,11 +32,11 @@ public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @CreationTimestamp
-    @Column(updatable = false, nullable = false) // 업데이트 불가로 선언
+    @Column(columnDefinition = "timestamp with time zone", updatable = false, nullable = false)
     private Instant createdAt;
 }

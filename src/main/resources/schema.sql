@@ -1,3 +1,6 @@
+-- 나는 한번에 생성 + 제약조건을 진행했음 그래서 테이블 생성 순서가 중요
+-- 코드잇 제공 코드는 테이블 생성 -> 수정을 통한 제약조건 적용하여 Table 생성 순서가 중요하지않음
+
 DROP TABLE IF EXISTS public.binary_contents CASCADE;
 DROP TABLE IF EXISTS public.message_attachments CASCADE;
 DROP TABLE IF EXISTS public.messages CASCADE;

@@ -1,9 +1,16 @@
 package com.sprint.mission.discodeit.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,21 +25,21 @@ public class User extends BaseUpdatableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String username;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String email;
 
     @Column(nullable = false, length = 60)
     private String password;
 
-    @OneToOne
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BinaryContent profile;
 
-
-    @OneToOne(mappedBy = "user")
+    @JsonBackReference // 객체 간 양방향 참조 시 발생하는 무한 재귀(순환 참조) 문제를 해결
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus userStatus;
 
     public static User create(String username, String email, String password) {

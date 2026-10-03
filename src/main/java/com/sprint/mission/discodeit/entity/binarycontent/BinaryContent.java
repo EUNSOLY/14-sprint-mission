@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.binarycontent;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -12,8 +13,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "binary_contents")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
+
+    @Column(nullable = false)
     private String fileName;
+    @Column(length = 100, nullable = false)
     private String contentType;
+    @Column(nullable = false)
     private Long size;
 
     private BinaryContent(

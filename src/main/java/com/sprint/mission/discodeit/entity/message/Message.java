@@ -4,7 +4,14 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.user.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,22 +28,22 @@ public class Message extends BaseUpdatableEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Column(columnDefinition = "text")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id", columnDefinition = "uuid")
     private User author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", nullable = false, columnDefinition = "uuid")
     private Channel channel;
-
 
     @OneToMany
     @JoinTable(
             name = "message_attachments", // 별도 테이블 매핑
-            joinColumns = @JoinColumn(name = "message_id"), // 1쪽
-            inverseJoinColumns = @JoinColumn(name = "attachment_id")// N쪽
+            joinColumns = @JoinColumn(name = "message_id", nullable = false, columnDefinition = "uuid"), // 1쪽
+            inverseJoinColumns = @JoinColumn(name = "attachment_id", nullable = false, columnDefinition = "uuid")// N쪽
     )
     private List<BinaryContent> attachments = new ArrayList<>();
 
