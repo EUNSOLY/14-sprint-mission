@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.channel;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
@@ -13,6 +11,8 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateNotAllowedException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -72,7 +73,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto find(ChannelIdRequestDto requestDto) {
         return channelRepository.findById(requestDto.getId())
                 .map(channelMapper::toDto)
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("조회 채널 - ID", requestDto.getId())));
 
 
     }
@@ -105,11 +106,11 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto update(ChannelIdRequestDto channelId, ChannelUpdateRequestDto requestDto) {
         Channel updateChannel = channelRepository.findById(channelId.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("채널 ID", channelId.getId())));
 
         if (updateChannel.getType().equals(ChannelType.PRIVATE)) {
             log.warn("비공개 채널은 수정이 불가능합니다. 수정 불가 채널 : {}", channelId);
-            throw new GlobalCustomException(CustomStatusCode.PRIVATE_CHANNEL_CANNOT_UPDATE);
+            throw new PrivateChannelUpdateNotAllowedException(Map.of("채널 ID", channelId));
         }
 
         updateChannel.update(requestDto.getNewName(), requestDto.getNewDescription());
@@ -123,7 +124,7 @@ public class BasicChannelService implements ChannelService {
         Channel deleteChannel = channelRepository.findById(requestDto.getId())
                 .orElseThrow(() -> {
                     log.warn("삭제할 채널 없음 삭제 채널 {}", requestDto.getId());
-                    return new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND);
+                    return new ChannelNotFoundException(Map.of("채널 ID", requestDto.getId()));
                 });
 
         log.info("채널 삭제 완료");

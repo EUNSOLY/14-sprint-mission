@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.readstatus;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusIdRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.data.ReadStatusDto;
@@ -9,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.readstatus.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelValidator;
 import com.sprint.mission.discodeit.service.user.UserValidator;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusDto find(ReadStatusIdRequestDto requestDto) {
         ReadStatus readStatus = this.readStatusRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("읽음 상태 ID", requestDto.getId())));
 
         User user = readStatus.getUser();
         Channel channel = readStatus.getChannel();
@@ -69,7 +69,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusDto update(ReadStatusIdRequestDto requestIdDto) {
         ReadStatus updateReadStatus = this.readStatusRepository.findById(requestIdDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("읽음 상태 ID", requestIdDto.getId())));
 
         updateReadStatus.updateLastReadMessageAt();
 
@@ -85,7 +85,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void delete(ReadStatusIdRequestDto request) {
         ReadStatus deletedEntity = this.readStatusRepository.findById(request.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.DATA_NOT_FOUND));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("읽음 상태 ID", request.getId())));
 
         this.readStatusRepository.delete(deletedEntity);
     }

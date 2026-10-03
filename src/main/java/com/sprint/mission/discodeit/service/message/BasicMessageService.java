@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.message;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelIdRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
@@ -14,6 +12,7 @@ import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -31,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -81,7 +81,7 @@ public class BasicMessageService implements MessageService {
     public MessageDto find(MessageIdRequestDto requestDto) {
 
         Message message = messageRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new MessageNotFoundException(Map.of("메세지 ID", requestDto.getId())));
 
         return messageMapper.toDto(message);
 
@@ -122,7 +122,7 @@ public class BasicMessageService implements MessageService {
         Message updateMessage = messageRepository.findById(messageIdRequest.getId())
                 .orElseThrow(() -> {
                     log.warn("업데이트할 메세지가 존재하지 않음 id :{}", messageIdRequest.getId());
-                    return new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND);
+                    return new MessageNotFoundException(Map.of("메세지 ID", messageIdRequest.getId()));
                 });
         updateMessage.update(request.getNewContent());
 
@@ -137,7 +137,7 @@ public class BasicMessageService implements MessageService {
         Message deleteMessage = messageRepository.findById(requestDto.getId())
                 .orElseThrow(() -> {
                     log.warn("삭제할 메세지가 존재하지 않음 id :{}", requestDto.getId());
-                    return new GlobalCustomException(CustomStatusCode.MESSAGE_NOT_FOUND);
+                    return new MessageNotFoundException(Map.of("메세지 ID", requestDto.getId()));
                 });
         List<BinaryContent> deletedBinaryContent = deleteMessage.getAttachments().stream().toList();
         binaryContentRepository.deleteAll(deletedBinaryContent); // 수정 파일 Id 값들 전부 데이터 삭제

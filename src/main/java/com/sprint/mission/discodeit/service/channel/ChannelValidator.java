@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service.channel;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -20,7 +20,7 @@ public class ChannelValidator {
         return channelRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("채널이 존재하지 않습니다. id : {}", id);
-                    return new GlobalCustomException(CustomStatusCode.CHANNEL_NOT_FOUND);
+                    return new ChannelNotFoundException(Map.of("요청 채널 ID", id));
                 });
 
     }

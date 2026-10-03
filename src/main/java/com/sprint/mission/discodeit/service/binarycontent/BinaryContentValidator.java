@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.binarycontent;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -16,6 +16,6 @@ public class BinaryContentValidator {
 
     public BinaryContent getOrThrow(UUID id) {
         return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("파일 ID", id)));
     }
 }

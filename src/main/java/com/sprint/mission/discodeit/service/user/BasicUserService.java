@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.user;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
@@ -11,6 +9,8 @@ import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserDuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.UserDuplicateNameException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,12 +54,12 @@ public class BasicUserService implements UserService {
         // 이름 중복 검증
         if (hasDuplicateName) {
             log.warn("사용자 생성 실패 : 중복 이름");
-            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_NAME);
+            throw new UserDuplicateNameException(Map.of("요청 이름", requestDto.username()));
         }
         // 이메일 중복 검증
         if (hasDuplicateEmail) {
             log.warn("사용자 생성 실패 : 중복 이메일");
-            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_EMAIL);
+            throw new UserDuplicateEmailException(Map.of("요청 이메일", requestDto.username()));
         }
 
         User savedUser = requestDto.toEntity(); // 저장될 User Entity
@@ -114,12 +115,12 @@ public class BasicUserService implements UserService {
         // 이름 중복 검증
         if (hasDuplicateName) {
             log.warn("사용자 수정 실패 : 중복 이름");
-            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_NAME);
+            throw new UserDuplicateNameException(Map.of("요쳥 이름", userUpdateRequest.newUsername()));
         }
         // 이메일 중복 검증
         if (hasDuplicateEmail) {
             log.warn("사용자 수정 실패 : 중복 이메일");
-            throw new GlobalCustomException(CustomStatusCode.DUPLICATE_EMAIL);
+            throw new UserDuplicateEmailException(Map.of("요청 이메일", userUpdateRequest.newEmail()));
         }
 
         currentUser.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword());
@@ -175,8 +176,7 @@ public class BasicUserService implements UserService {
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                 .orElse(UserStatus.create(user));
         status.updateLastAccessAt();
-
-
+        
         return userStatusMapper.toDto(status);
     }
 }

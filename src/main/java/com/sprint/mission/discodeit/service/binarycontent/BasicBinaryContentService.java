@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.service.binarycontent;
 
-import com.sprint.mission.discodeit.common.dto.CustomStatusCode;
-import com.sprint.mission.discodeit.common.exception.GlobalCustomException;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentIdRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.common.IdRequestDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -35,7 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent find(BinaryContentIdRequestDto requestDto) {
         return this.binaryContentRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("파일 ID", requestDto.getId())));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(BinaryContentIdRequestDto requestDto) {
         BinaryContent deletedEntity = this.binaryContentRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new GlobalCustomException(CustomStatusCode.CONTENT_FILE_NOT_FOUND));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("파일 ID", requestDto.getId())));
 
         this.binaryContentRepository.delete(deletedEntity);
     }
