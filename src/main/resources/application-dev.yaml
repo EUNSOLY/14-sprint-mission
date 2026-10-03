@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  datasource:
+    url: jdbc:h2:mem:discodeit
+    driver-class-name: org.h2.Driver
+    username: discodeit_user
+    password: discodeit1234
+  h2:
+    console:
+      enabled: true # H2 콘솔 웹 페이지 사용 여부
+      path: /h2-console # 컨설 접속 경로 (기본값)
+logging:
+  level:
+    com.sprint.mission.discodeit: debug

@@ -1,0 +1,14 @@
+server:
+  port: 8082
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:54322/discodeit?useSSL=false
+    username: discodeit_user
+    password: discodeit1234

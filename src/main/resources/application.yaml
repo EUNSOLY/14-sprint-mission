@@ -1,42 +1,35 @@
 spring:
   application:
     name: 14-sprint-mission
+  profiles:
+    default: dev
   jpa:
     open-in-view: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
-        globally_quoted_identifiers: true
-        format_sql: true          # SQL 줄바꿈 포맷팅
-        highlight_sql: true       # SQL 색깔 강조
-        use_sql_comments: true    # 주석 표시
+        globally_quoted_identifiers: true                          # 테이블·컬럼명을 전부 큰따옴표로 감쌈 (예약어 충돌 방지)
+        globally_quoted_identifiers_skip_column_definitions: true  # columnDefinition(타입 지정)은 따옴표에서 제외
+        format_sql: true                                           # SQL 줄바꿈 포맷팅
+        highlight_sql: true                                        # SQL 색깔 강조
+        use_sql_comments: true                                     # SQL에 생성 출처 주석 추가 (예: /* insert for User */)
+    defer-datasource-initialization: true                          # Hibernate DDL 실행 후에 schema.sql/data.sql 실행
   sql:
     init:
       mode: NEVER
-      #      mode: ALWAYS
       schema-locations:
         - 'classpath:schema.sql'
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:54322/discodeit?useSSL=false
-    username: discodeit_user
-    password: discodeit1234
-
 logging:
   level:
-    org.hibernate.SQL: DEBUG                        # 실행되는 SQL 쿼리 로그
-    org.hibernate.orm.jdbc.bind: TRACE              # 바인딩 파라미터 값 로그 (Hibernate 6+)
-    org.springframework.jdbc.datasource.init: DEBUG # schema.sql 같은 SQL 스크립트 실행 로그
-server:
-  port: 8080
-
+    root: info
+    org.hibernate.SQL: DEBUG                                        # 실행되는 SQL 쿼리 로그
+    org.hibernate.orm.jdbc.bind: DEBUG                              # 바인딩 파라미터 값 로그 (Hibernate 6+)
+    org.springframework.jdbc.datasource.init: DEBUG                 # schema.sql 같은 SQL 스크립트 실행 로그
 discodeit:
   repository:
     type: jcf # jcf | file
