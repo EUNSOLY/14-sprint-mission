@@ -1,14 +1,11 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@RequiredArgsConstructor
-public class PrivateChannelCreateRequestDto {
-    private final List<UUID> participantIds;
-
+public record PrivateChannelCreateRequestDto(
+        List<@NotNull(message = "잘못된 ID로 요청되었습니다.") UUID> participantIds
+) {
 }

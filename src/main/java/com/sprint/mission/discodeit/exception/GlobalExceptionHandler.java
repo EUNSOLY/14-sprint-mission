@@ -10,10 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -113,9 +119,38 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handle(MethodArgumentNotValidException e) {
+        log.warn("MethodArgumentNotValidException : {}", e.getMessage());
+        List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+        Map<String, Object> details = fieldErrors.stream()
+                .collect(Collectors.toMap(
+                                FieldError::getField,
+                                value -> Optional.ofNullable(value.getDefaultMessage()).orElse("입력값을 확인하세요"),
+//                        value -> String.format("%s / 현재 입력값 : %s",
+//                                value.getDefaultMessage(),
+//                                Optional.ofNullable(value.getRejectedValue()).orElse("없음")
+//                        ),
+                                (a, b) -> a) // 같은 필드에 에러가 여러 개면 첫 번째 값 유지
+                );
+
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.builder()
+                        .timestamp(Instant.now())
+                        .message("입력값 검증에 실패했습니다.")
+                        .details(details)
+                        .code(e.getClass().getSimpleName())
+                        .exceptionType(e.getClass().getSimpleName())
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .build());
+    }
+
+    // 알수 없는 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {
-        log.warn("Exception : {}", e.getMessage());
+        log.error("Exception : {}", e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

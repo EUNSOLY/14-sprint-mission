@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.user.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,7 @@ public class UserController implements UserControllerDocs {
     )
     public ResponseEntity<User> create(
             @Parameter(description = "User 생성 정보")
-            @RequestPart(value = "userCreateRequest") UserCreateRequest request,
+            @RequestPart(value = "userCreateRequest") @Valid UserCreateRequest request,
 
             @Parameter(description = "User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -68,7 +69,7 @@ public class UserController implements UserControllerDocs {
             @PathVariable("id") UUID userId,
 
             @Parameter(description = "User 수정 정보")
-            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
 
             @Parameter(description = "수정할 User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile

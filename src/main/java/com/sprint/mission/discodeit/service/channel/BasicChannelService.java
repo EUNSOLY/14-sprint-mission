@@ -53,7 +53,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto save(PrivateChannelCreateRequestDto request) {
         Channel savedChannel = Channel.create(ChannelType.PRIVATE, "", "");
-        List<UUID> userIds = request.getParticipantIds();
+        List<UUID> userIds = request.participantIds();
         Channel savedEntity = channelRepository.save(savedChannel);
 
         // 사용자별 ReadStatus 생성
@@ -113,7 +113,7 @@ public class BasicChannelService implements ChannelService {
             throw new PrivateChannelUpdateNotAllowedException(Map.of("채널 ID", channelId));
         }
 
-        updateChannel.update(requestDto.getNewName(), requestDto.getNewDescription());
+        updateChannel.update(requestDto.newName(), requestDto.newDescription());
         log.info("채널 수정 완료");
         return channelMapper.toDto(updateChannel);
     }
