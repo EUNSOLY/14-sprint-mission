@@ -1,8 +1,12 @@
 spring:
   application:
-    name: 14-sprint-mission
+    name: discodeit
   profiles:
     default: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
   jpa:
     open-in-view: false
     generate-ddl: false
@@ -24,8 +28,32 @@ spring:
       mode: NEVER
       schema-locations:
         - 'classpath:schema.sql'
+info:
+  app:
+    name: ${spring.application.name}
+    version: 1.7.0
+    java:
+      version: 17
+    spring-boot:
+      version: 3.4.0
+    config:
+      dataSource: ${spring.datasource}
+      jpa: ${spring.jpa.hibernate.ddl-auto}
+      storage:
+        type: ${discodeit.storage.type}
+        path: ${discodeit.storage.local.root-path}
+      multipart:
+        max-file-size: ${spring.servlet.multipart.max-file-size}
+        max-request-size: ${spring.servlet.multipart.max-request-size}
 
 management:
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
   endpoints:
     web:
       exposure:
@@ -42,6 +70,7 @@ logging:
     org.hibernate.SQL: DEBUG                                        # 실행되는 SQL 쿼리 로그
     org.hibernate.orm.jdbc.bind: DEBUG                              # 바인딩 파라미터 값 로그 (Hibernate 6+)
     org.springframework.jdbc.datasource.init: DEBUG                 # schema.sql 같은 SQL 스크립트 실행 로그
+
 discodeit:
   repository:
     type: jcf # jcf | file
