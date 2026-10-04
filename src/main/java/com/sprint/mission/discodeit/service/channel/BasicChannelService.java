@@ -54,6 +54,8 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto save(PrivateChannelCreateRequestDto request) {
         Channel savedChannel = Channel.create(ChannelType.PRIVATE, "", "");
         List<UUID> userIds = request.participantIds();
+        userIds.forEach(userValidator::getOrThrow);
+
         Channel savedEntity = channelRepository.save(savedChannel);
 
         // 사용자별 ReadStatus 생성
@@ -89,6 +91,9 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelDto> findAllByUserId(UserIdRequestDto requestDto) {
         return channelRepository.findAll().stream()
                 .filter(channel -> {
+
+                    userValidator.getOrThrow(requestDto.getId());
+
                     // 공개 채널은 통과
                     if (channel.getType().equals(ChannelType.PUBLIC)) {
                         return true;
