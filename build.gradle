@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 
@@ -46,7 +47,7 @@ dependencies {
 
     // admin
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.3'
-    
+
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -56,4 +57,49 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport' // 테스트 후에 JaCoCo 리포트 생성
+}
+
+// Jacoco 관련 설정
+jacoco {
+    toolVersion = "0.8.11"  // 버전에 맞는 jacoco 설정
+}
+
+// 리포트 생성
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    // 서비스만 보기위해서 필터링
+//    classDirectories.setFrom(files(classDirectories.files.collect {
+//        fileTree(dir: it, include: [
+//                'com/sprint/mission/discodeit/service/user/**',
+//                'com/sprint/mission/discodeit/service/channel/**',
+//                'com/sprint/mission/discodeit/service/message/**'
+//        ])
+//    }))
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, include: ['com/sprint/mission/discodeit/service/**'])
+    }))
+}
+
+// violationRules에 따라서 커버리지를 만족하는지 검증
+jacocoTestCoverageVerification {
+    // 검사 대상을 service 패키지로만 한정
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, include: ['com/sprint/mission/discodeit/service/**'])
+    }))
+
+    violationRules {
+        rule {
+            element = 'BUNDLE'          // 클래스별이 아니라 대상 전체 합계로 계산
+            limit {
+                counter = 'LINE'        // 코드 줄 기준
+                value = 'COVEREDRATIO'  // 실행된 비율
+                minimum = 0.60          // 60% 이상
+            }
+        }
+    }
 }
