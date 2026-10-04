@@ -6,7 +6,7 @@
     <!-- 로그 경로 설정 -->
     <property name="LOG_DIR" value="./logs"/>
     <property name="LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan([%logger{36}]) - %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan([%logger{36}]) %green([ %X{requestId:--} | %X{requestMethod:--} | %X{requestUrl:--} ]) - %msg%n"/>
 
     <!-- 1. 콘솔 Appender 설정  -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
