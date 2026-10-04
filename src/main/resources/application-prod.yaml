@@ -2,6 +2,12 @@ server:
   port: 8082
 
 spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
   config:
     activate:
       on-profile: prod
