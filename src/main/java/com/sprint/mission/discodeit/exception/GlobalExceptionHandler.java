@@ -125,18 +125,14 @@ public class GlobalExceptionHandler {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         Map<String, Object> details = fieldErrors.stream()
                 .collect(Collectors.toMap(
-                                FieldError::getField,
-                                value -> Optional.ofNullable(value.getDefaultMessage()).orElse("입력값을 확인하세요"),
-//                        value -> String.format("%s / 현재 입력값 : %s",
-//                                value.getDefaultMessage(),
-//                                Optional.ofNullable(value.getRejectedValue()).orElse("없음")
-//                        ),
-                                (a, b) -> a) // 같은 필드에 에러가 여러 개면 첫 번째 값 유지
+                        FieldError::getField,
+                        value -> Optional.ofNullable(value.getDefaultMessage()).orElse("입력값을 확인하세요"),
+                        (a, b) -> a) // 같은 필드에 에러가 여러 개면 첫 번째 값 유지
                 );
 
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.builder()
                         .timestamp(Instant.now())
                         .message("입력값 검증에 실패했습니다.")
@@ -150,13 +146,13 @@ public class GlobalExceptionHandler {
     // 알수 없는 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {
-        log.error("Exception : {}", e.getMessage());
+        log.error("Unexpected exception", e);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.builder()
                         .timestamp(Instant.now())
-                        .message(e.getMessage())
+                        .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
                         .code(e.getClass().getSimpleName())
                         .exceptionType(e.getClass().getSimpleName())
                         .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
