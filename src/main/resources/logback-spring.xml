@@ -8,6 +8,9 @@
     <property name="LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan([%logger{36}]) %green([ %X{requestId:--} | %X{requestMethod:--} | %X{requestUrl:--} ]) - %msg%n"/>
 
+    <property name="FILE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{36}] [ %X{requestId:--} | %X{requestMethod:--} | %X{requestUrl:--} ] - %msg%n"/>
+
     <!-- 1. 콘솔 Appender 설정  -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -27,7 +30,7 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 

@@ -35,7 +35,6 @@ public class MDCLoggingInterceptor implements HandlerInterceptor {
         MDC.put(REQUEST_ID, requestId);
         MDC.put(REQUEST_METHOD, request.getMethod());
         MDC.put(REQUEST_URL, request.getRequestURI());
-
         response.setHeader(REQUEST_ID_HEADER, requestId);
 
         return true;
