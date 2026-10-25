@@ -68,7 +68,6 @@ management:
           - metrics
           - loggers
 
-
 logging:
   level:
     root: info
@@ -81,11 +80,15 @@ discodeit:
     type: jcf # jcf | file
     file-directory: .discodeit
   storage:
-    type: "local"
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
     local:
-      root-path: ".discodeit-files/upload"
-      #      root-path: "/Users/eunsol/CodeitDevelop/upload/"
-
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY:}
+      secret-key: ${AWS_S3_SECRET_KEY:}
+      region: ${AWS_S3_REGION:}
+      bucket: ${AWS_S3_BUCKET:}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 file:
   path: .uploader

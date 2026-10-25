@@ -58,7 +58,9 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 's3테스트'
+    }
     finalizedBy 'jacocoTestReport' // 테스트 후에 JaCoCo 리포트 생성
 }
 
