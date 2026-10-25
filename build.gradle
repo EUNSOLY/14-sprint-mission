@@ -52,6 +52,8 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // aws
+    implementation 'software.amazon.awssdk:s3:2.31.7'
 
 }
 
