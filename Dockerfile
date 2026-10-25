@@ -22,5 +22,4 @@ ENV JVM_OPTS=$JVM_OPTS
 EXPOSE 80
 
 # 컨테이너 실행 시
-ENTRYPOINT ["java $JVM_OPTS", "-jar","build/libs/$PROJECT_NAME-$PROJECT_VERSION.jar"]
-
+ENTRYPOINT ["sh", "-c", "exec java $JVM_OPTS -jar build/libs/$PROJECT_NAME-$PROJECT_VERSION.jar"]
