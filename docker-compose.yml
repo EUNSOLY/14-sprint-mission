@@ -23,6 +23,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # 2. MY APP
   app:
     build: .
     container_name: my_application
