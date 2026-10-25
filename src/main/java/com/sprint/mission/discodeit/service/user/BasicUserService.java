@@ -86,6 +86,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto find(UserIdRequestDto requestDto) {
         User currentUser = userValidator.getOrThrow(requestDto.getId());
 
@@ -93,6 +94,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()

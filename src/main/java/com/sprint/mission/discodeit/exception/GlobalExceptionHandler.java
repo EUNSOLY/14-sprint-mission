@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
     // 알수 없는 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {
-        log.error("Unexpected exception", e);
+        log.error("[심각]: {}", e.getClass().getSimpleName(), e);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
