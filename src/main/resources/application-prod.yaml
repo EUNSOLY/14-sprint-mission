@@ -15,6 +15,6 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:54322/discodeit?useSSL=false
+    url: jdbc:postgresql://host.docker.internal:54322/discodeit?useSSL=false
     username: discodeit_user
     password: discodeit1234
