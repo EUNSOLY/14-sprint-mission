@@ -15,7 +15,7 @@ jobs:
     # 실행 단계 (Steps)
     steps:
       # 1. 내 코드 내려 받기 (Checkout)
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       # 2. Java 설치하기
       - name: Set up JDK 17
