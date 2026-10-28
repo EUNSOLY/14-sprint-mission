@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/github/EUNSOLY/14-sprint-mission/branch/sprint-8/graph/badge.svg?token=ZO9ODM4TU0)](https://codecov.io/github/EUNSOLY/14-sprint-mission)
+
 # 14-sprint-mission-4
 
 ## 🎯 학습 목표
