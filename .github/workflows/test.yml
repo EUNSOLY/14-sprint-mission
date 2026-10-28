@@ -1,0 +1,33 @@
+name: CI - TEST
+
+on:
+  push:
+    branches: [ "sprint-8" ]
+  pull_request:
+    branches: [ "sprint-8" ]
+
+
+jobs:
+  build:
+    # 실행 환경 (리눅스 우분투 최신 버전 빌려줘!)
+    runs-on: ubuntu-latest
+
+    # 실행 단계 (Steps)
+    steps:
+      # 1. 내 코드 내려 받기 (Checkout)
+      - uses: actions/checkout@v3
+
+      # 2. Java 설치하기
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      # 3. Gradle 권한 부여(가끔 권한 문제 생겨서 설정)
+      - name: Gradle 권한 부여
+        run: chmod +x gradlew
+
+      # 4. 빌드 및 테스트 실행
+      - name: Build with Gradle
+        run: ./gradlew clean build
