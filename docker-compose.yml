@@ -25,11 +25,13 @@ services:
 
   # 2. MY APP
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-multi
     container_name: my_application
     restart: always
     ports:
-      - "8081:8080"
+      - "8081:80"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
       - DB_HOST=db
@@ -38,13 +40,14 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
       - STORAGE_TYPE=${STORAGE_TYPE:-local}
+      - STORAGE_LOCAL_ROOT_PATH=/app/.discodeit/storage
       - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
       - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
       - AWS_S3_REGION=${AWS_S3_REGION}
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - AWS_S3_PRESIGNED_URL_EXPIRATION=${AWS_S3_PRESIGNED_URL_EXPIRATION:-600}
     volumes:
-      - binary_data:/app/.discodeit-files
+      - binary_data:/app/.discodeit/storage
     depends_on:
       db:
         condition: service_healthy

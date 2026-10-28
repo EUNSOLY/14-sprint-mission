@@ -10,6 +10,6 @@ admin
 build
 docs
 logs
-.discodeit-files
+.discodeit/storage
 .env
 discodeit.env
