@@ -15,7 +15,12 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false  # org.hibernate.SQL 로거와 중복 출력되므로 끔
+    properties:
+      hibernate:
+        format_sql: true         # SQL 줄바꿈 포맷팅
+        highlight_sql: true      # SQL 색깔 강조
+        use_sql_comments: true   # SQL에 생성 출처 주석 추가 (예: /* insert for User */)
   datasource:
     url: jdbc:h2:mem:discodeit
     driver-class-name: org.h2.Driver
@@ -28,3 +33,5 @@ spring:
 logging:
   level:
     com.sprint.mission.discodeit: debug
+    org.hibernate.SQL: debug                # 실행되는 SQL 쿼리 로그
+    org.hibernate.orm.jdbc.bind: trace      # 바인딩 파라미터 값 로그 (Hibernate 6+, trace에서만 값 출력)
