@@ -1,0 +1,116 @@
+name: Spring Boot CD - AWS
+
+on:
+  push:
+    branches: [ "release" ]
+
+
+jobs:
+  # ========== Job 1: 이미지 빌드 + ECR 업로드 ==========
+  build:
+    runs-on: ubuntu-latest
+
+    # 변수 설정
+    env:
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      ECR_REPOSITORY_URI: ${{secrets.ECR_REPOSITORY_URI}}
+      ECS_CLUSTER: ${{secrets.ECS_CLUSTER}}
+      ECS_SERVICE: ${{secrets.ECS_SERVICE}}
+      ECS_TASK_DEFINITION: ${{secrets.ECS_TASK_DEFINITION}}
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+        # AWS Config
+      - name: AWS 자격 증명
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{env.AWS_REGION}}
+
+      - name: AWS ECR Public 로그인
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/j1k2i0g8
+
+        # 프로젝트에 주입할 환경변수를 S3 버킷에서 가져와서 프로젝트 주입
+        # 가져와서 이름 변경
+      - name: S3 환경변수 가져오기
+        run: |
+          aws s3 cp s3://discodeit-binary-content-storage-es/discodeit.env .
+          mv ./discodeit.env ./.env
+
+      - name: ECR 이미지 업로드
+        id: build-image
+        env:
+          IMAGE_TAG: ${{github.sha}}
+        run: |
+          echo "🐳 도커 이미지 빌드 시작"
+          docker build -f Dockerfile-multi \
+            -t $ECR_REPOSITORY_URI:$IMAGE_TAG \
+            -t $ECR_REPOSITORY_URI:latest .
+          echo "✅ 도커 이미지 빌드 완료"
+
+          echo "🚀 ECR 이미지 업로드 시작"
+          docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
+          docker push $ECR_REPOSITORY_URI:latest
+          echo "🎉 ECR 이미지 업로드 완료"
+
+  # ========== Job 2: ECS 서비스 업데이트 ==========
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔑 AWS CLI 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+
+      - name: 📝 태스크 정의 업데이트
+        id: task-def
+        run: |
+          # 1) 현재 태스크 정의 가져오기
+          aws ecs describe-task-definition \
+          --task-definition $ECS_TASK_DEFINITION \
+          --query taskDefinition > task-def.json
+          
+          # 2) 이미지만 새 커밋 해시로 교체 + 등록 때 안 받는 필드 제거
+          jq --arg IMAGE "$ECR_REPOSITORY_URI:${{ github.sha }}" \
+          '.containerDefinitions[0].image = $IMAGE
+          | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
+                .compatibilities, .registeredAt, .registeredBy)' \
+          task-def.json > new-task-def.json
+          
+          # 3) 새 개정으로 등록하고 ARN 저장
+          NEW_ARN=$(aws ecs register-task-definition \
+          --cli-input-json file://new-task-def.json \
+          --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "arn=$NEW_ARN" >> $GITHUB_OUTPUT
+          echo "✅ 새 태스크 정의: $NEW_ARN"
+
+      - name: 🛑 기존 서비스 중단
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 0
+          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
+          echo "✅ 기존 태스크 중단 완료"
+
+      - name: 🚀 새 태스크 정의로 서비스 업데이트
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition ${{ steps.task-def.outputs.arn }} \
+            --desired-count 1
+          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
+          echo "🎉 배포 완료"

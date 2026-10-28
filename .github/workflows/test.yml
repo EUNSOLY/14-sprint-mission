@@ -40,3 +40,4 @@ jobs:
           files: build/reports/jacoco/test/jacocoTestReport.xml # 업로드할 리포트 파일 경로
           flags: unittests # 리포트에 붙이는 이름표
           fail_ci_if_error: false # 업로드 실패하면 CI 실패처리 (false 기본값)
+

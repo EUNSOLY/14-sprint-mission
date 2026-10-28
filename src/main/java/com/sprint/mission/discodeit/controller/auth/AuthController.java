@@ -23,6 +23,7 @@ public class AuthController implements AuthControllerDocs {
     public ResponseEntity<UserDto> login(
             @RequestBody LoginRequest request
     ) {
+        log.info("로그인");
         UserDto loginUser = authService.login(request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(loginUser);
