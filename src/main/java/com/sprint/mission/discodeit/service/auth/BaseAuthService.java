@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -17,12 +18,13 @@ public class BaseAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    @Transactional
     public UserDto login(LoginRequest loginRequest) {
         String username = loginRequest.username();
         String password = loginRequest.password();
 
         boolean hasDuplicateName = userRepository.existsByUsername(username);
-        
+
         if (!hasDuplicateName) {
             throw new UserNotFoundException(Map.of("로그인 요청 이름", username));
         }
