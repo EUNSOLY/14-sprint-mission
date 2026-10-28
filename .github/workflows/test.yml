@@ -2,10 +2,7 @@ name: Spring Boot CI (TEST)
 
 on:
   push:
-    branches: [ "sprint-8" ]
   pull_request:
-    branches: [ "sprint-8" ]
-
 
 jobs:
   build:
