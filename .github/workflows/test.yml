@@ -1,4 +1,4 @@
-name: CI - TEST
+name: Spring Boot CI (TEST)
 
 on:
   push:
@@ -31,3 +31,12 @@ jobs:
       # 4. 빌드 및 테스트 실행
       - name: Build with Gradle
         run: ./gradlew clean build
+
+      # Codecov 업로드
+      - name: Codecov_테스트커버리지 리포트 업로드
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/jacoco/test/jacocoTestReport.xml # 업로드할 리포트 파일 경로
+          flags: unittests # 리포트에 붙이는 이름표
+          fail_ci_if_error: false # 업로드 실패하면 CI 실패처리 (false 기본값)
