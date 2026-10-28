@@ -2,7 +2,10 @@ name: Spring Boot CI (TEST)
 
 on:
   push:
+    branches-ignore: [ "release" ]
   pull_request:
+    branches-ignore: [ "release" ]
+  workflow_call:
 
 jobs:
   build:
