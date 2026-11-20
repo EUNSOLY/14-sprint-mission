@@ -24,7 +24,7 @@ FROM amazoncorretto:17-alpine
 WORKDIR /app
 
 ARG PROJECT_NAME=discodeit
-ARG PROJECT_VERSION=1.2-M8
+ARG PROJECT_VERSION=2.0-M9
 ENV JVM_OPTS=""
 
 # 빌드 단계에서 jar 하나만 가져옴
