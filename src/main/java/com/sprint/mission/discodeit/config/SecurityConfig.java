@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 
@@ -16,6 +18,8 @@ import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CsrfTokenRequestHandler spaCsrfTokenRequestHandler;
+    private final AuthenticationSuccessHandler loginSuccessHandler;
+    private final AuthenticationFailureHandler loginFailureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -23,6 +27,13 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(spaCsrfTokenRequestHandler)
+        );
+
+//        http.formLogin(Customizer.withDefaults());
+        http.formLogin(login -> login
+                .loginProcessingUrl("/api/auth/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
         );
 
         return http.build();
