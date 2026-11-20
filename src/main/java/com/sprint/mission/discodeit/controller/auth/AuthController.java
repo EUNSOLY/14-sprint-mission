@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller.auth;
 
-import com.sprint.mission.discodeit.common.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.service.auth.DiscodietUserDetails;
+import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,12 +11,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthControllerDocs {
+    private final UserService userService;
 
     @Override
     @GetMapping("/api/auth/csrf-token")
@@ -28,10 +33,21 @@ public class AuthController implements AuthControllerDocs {
 
     @GetMapping("/api/auth/me")
     public ResponseEntity<UserDto> getMe(
-            @AuthenticationPrincipal DiscodeitUserDetails userDetails
+            @AuthenticationPrincipal DiscodietUserDetails userDetails
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userDetails.getUserDto());
     }
+
+    @PutMapping("/api/auth/role")
+    public ResponseEntity<UserDto> updateUserRole(
+            @RequestBody UserRoleUpdateRequest request
+    ) {
+        UserDto userDto = userService.updateUserRole(request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userDto);
+    }
+
 }

@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -42,6 +44,10 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus userStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Role role;
+
     public static User create(String username, String email, String password) {
         return new User(username, email, password);
     }
@@ -52,6 +58,7 @@ public class User extends BaseUpdatableEntity {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = Role.USER;
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
@@ -79,5 +86,11 @@ public class User extends BaseUpdatableEntity {
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
                 this.username, this.email, this.password // 비밀번호는 노출안되도록 제거 할 필요있음
         );
+    }
+
+    public void updateRole(Role role) {
+        if (role != null) {
+            this.role = role;
+        }
     }
 }

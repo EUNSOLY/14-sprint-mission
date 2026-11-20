@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.common.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.common.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
+import com.sprint.mission.discodeit.service.auth.DiscodietUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +25,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             Authentication authentication
     ) throws IOException, ServletException {
         // 1. principal 에서 user 꺼내오기
-        DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
+        DiscodietUserDetails principal = (DiscodietUserDetails) authentication.getPrincipal();
         UserDto userDto = principal.getUserDto();
 
         // 2. 응답

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.auth;
 
-import com.sprint.mission.discodeit.common.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -28,6 +27,6 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
 
         UserDto userDto = userMapper.toDto(entity);
 
-        return new DiscodeitUserDetails(userDto, entity.getPassword());
+        return new DiscodietUserDetails(userDto, entity.getPassword());
     }
 }
