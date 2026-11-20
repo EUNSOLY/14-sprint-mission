@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
     private final UserStatusMapper userStatusMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -48,7 +50,6 @@ public class BasicUserService implements UserService {
             BinaryContentCreateRequestDto profileCreateRequest
     ) {
         boolean hasDuplicateName = userRepository.existsByUsername(requestDto.username());
-
         boolean hasDuplicateEmail = userRepository.existsByEmail(requestDto.email());
 
         // 이름 중복 검증
@@ -62,7 +63,8 @@ public class BasicUserService implements UserService {
             throw new UserDuplicateEmailException(Map.of("요청 이메일", requestDto.username()));
         }
 
-        User savedUser = requestDto.toEntity(); // 저장될 User Entity
+        String encoded = passwordEncoder.encode(requestDto.password());
+        User savedUser = requestDto.toEntity(encoded); // 저장될 User Entity
 
         // 프로필 있으면 생성 후 UUID 반환
         BinaryContent profile = Optional.ofNullable(profileCreateRequest)
@@ -178,7 +180,7 @@ public class BasicUserService implements UserService {
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                 .orElse(UserStatus.create(user));
         status.updateLastAccessAt();
-        
+
         return userStatusMapper.toDto(status);
     }
 }
