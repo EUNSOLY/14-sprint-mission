@@ -35,3 +35,4 @@ logging:
     com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug                # 실행되는 SQL 쿼리 로그
     org.hibernate.orm.jdbc.bind: trace      # 바인딩 파라미터 값 로그 (Hibernate 6+, trace에서만 값 출력)
+    org.springframework.security: trace
