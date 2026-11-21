@@ -20,7 +20,8 @@ public record UserCreateRequest(
         String password
 ) {
 
-    public User toEntity() {
-        return User.create(this.username, this.email, this.password);
+
+    public User toEntity(String encodedPassword) {
+        return User.create(this.username, this.email, encodedPassword);
     }
 }

@@ -6,14 +6,13 @@ import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateNameException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.auth.AuthService;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
 import com.sprint.mission.discodeit.service.user.BasicUserService;
 import com.sprint.mission.discodeit.service.user.UserValidator;
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Map;
@@ -52,13 +52,16 @@ class UserServiceTest {
     private BinaryContentRepository binaryContentRepository;
 
     @Mock
-    private UserStatusRepository userStatusRepository;
-
-    @Mock
     private BinaryContentStorage binaryContentStorage;
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private AuthService authService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private BasicUserService userService;
@@ -82,7 +85,6 @@ class UserServiceTest {
         assertThat(result.getEmail()).isEqualTo("sol@test.com"); // 반환된 User의 email이 요청값과 같은지
         assertThat(result.getProfile()).isNull();                         // 프로필을 넘기지 않았으므로 profile은 null이어야 함
         verify(userRepository).save(any(User.class));                     // userRepository.save()가 User 타입 인자로 1번 호출됐는지
-        verify(userStatusRepository).save(any(UserStatus.class));         // 사용자 생성 시 UserStatus도 함께 저장됐는지 (1번 호출)
         verify(binaryContentRepository, never()).save(any());             // 프로필이 없으므로 binaryContentRepository.save()는 한 번도 호출되지 않아야 함
     }
 
@@ -119,7 +121,6 @@ class UserServiceTest {
         assertThrows(UserDuplicateNameException.class, () -> userService.save(request, null));
 
         verify(userRepository, never()).save(any(User.class));
-        verify(userStatusRepository, never()).save(any(UserStatus.class));
     }
 
     @Test
@@ -133,7 +134,6 @@ class UserServiceTest {
         assertThrows(UserDuplicateEmailException.class, () -> userService.save(request, null));
 
         verify(userRepository, never()).save(any(User.class));
-        verify(userStatusRepository, never()).save(any(UserStatus.class));
     }
 
     // ==================== update ====================
@@ -158,7 +158,7 @@ class UserServiceTest {
         assertThat(user.getEmail()).isEqualTo("sol2@test.com");
         assertThat(user.getProfile()).isNull();
 
-        verify(userMapper).toDto(user);
+        verify(userMapper).toDto(user, false);
 
     }
 
@@ -230,7 +230,6 @@ class UserServiceTest {
 
         userService.delete(UserIdRequestDto.from(userId));
 
-        verify(userStatusRepository).deleteByUserId(userId);
         verify(binaryContentStorage, never()).delete(any());
         verify(userRepository).delete(user);
     }
@@ -249,7 +248,6 @@ class UserServiceTest {
 
         userService.delete(UserIdRequestDto.from(userId));
 
-        verify(userStatusRepository).deleteByUserId(userId);
         verify(binaryContentStorage).delete(any());
         verify(userRepository).delete(user);
     }

@@ -48,6 +48,9 @@ bin/
 .discodeit/storage
 logs
 
+.env
+.env.**
+
 
 .env
 discodeit.env

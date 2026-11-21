@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -37,10 +37,10 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id", columnDefinition = "uuid")
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BinaryContent profile;
-
-    @JsonBackReference // 객체 간 양방향 참조 시 발생하는 무한 재귀(순환 참조) 문제를 해결
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus userStatus;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Role role;
 
     public static User create(String username, String email, String password) {
         return new User(username, email, password);
@@ -52,6 +52,7 @@ public class User extends BaseUpdatableEntity {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = Role.USER;
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
@@ -79,5 +80,11 @@ public class User extends BaseUpdatableEntity {
                 super.getId(), super.getCreatedAt(), super.getUpdatedAt(),
                 this.username, this.email, this.password // 비밀번호는 노출안되도록 제거 할 필요있음
         );
+    }
+
+    public void updateRole(Role role) {
+        if (role != null) {
+            this.role = role;
+        }
     }
 }

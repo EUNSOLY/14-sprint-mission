@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.controller.user;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
-import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.MediaType;
@@ -105,20 +107,4 @@ public interface UserControllerDocs {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class)))
     )
     ResponseEntity<List<UserDto>> findAll();
-
-    @Operation(summary = "User 온라인 상태 업데이트")
-    @ApiResponse(
-            responseCode = "404",
-            description = "해당 User의 UserStatus를 찾을 수 없음",
-            content = @Content(schema = @Schema(implementation = String.class, examples = "UserStatus with userId {userId} not found"))
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "User 온라인 상태가 성공적으로 업데이트됨",
-            content = @Content(schema = @Schema(implementation = UserStatus.class))
-    )
-    ResponseEntity<UserStatusDto> updateOnlineStatus(
-            @Parameter(description = "상태를 변경할 User ID")
-            UUID userId
-    );
 }

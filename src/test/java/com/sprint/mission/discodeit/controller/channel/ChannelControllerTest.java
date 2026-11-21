@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.channel.ChannelService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(ChannelController.class)
+@AutoConfigureMockMvc(addFilters = false) // Security 필터(CSRF/인증) 제외 - 컨트롤러 동작만 검증
 class ChannelControllerTest {
     @Autowired
     private MockMvc mockMvc;

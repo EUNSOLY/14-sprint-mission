@@ -5,12 +5,13 @@ import com.sprint.mission.discodeit.entity.user.User;
 
 import java.util.UUID;
 
-public record UserDto(UUID id, String username, String email, BinaryContentDto profile, Boolean online) {
+public record UserDto(UUID id, String username, String email, String role, BinaryContentDto profile, Boolean online) {
     public static UserDto of(User user, BinaryContentDto binaryContentDto, boolean online) {
         return new UserDto(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getRole().name(),
                 binaryContentDto,
                 online
         );

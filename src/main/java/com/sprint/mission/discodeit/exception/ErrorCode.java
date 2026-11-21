@@ -10,13 +10,15 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum ErrorCode {
+    // auth
+    AUTH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
+    AUTH_FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다."),
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "이미 존재하는 사용자 이름입니다."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이름 또는 패스워드가 일치하지 않습니다."),
-    USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 상태가 존재하지 않습니다."),
-    INVALID_USER_STATUS_TYPE(HttpStatus.BAD_REQUEST, "일치하는 사용자 상태 타입이 없습니다."),
 
     // Channel
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널이 존재하지 않습니다."),
