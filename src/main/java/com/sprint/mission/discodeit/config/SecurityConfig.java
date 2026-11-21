@@ -12,6 +12,8 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,6 +24,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableMethodSecurity
@@ -35,7 +38,7 @@ public class SecurityConfig {
     private final AccessDeniedHandler discodeitAccessDeniedHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
 
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -66,22 +69,42 @@ public class SecurityConfig {
                 .anyRequest().authenticated()                                                                 // 외 모든 요청은 인증 필수
         );
 
-        // 권한이 없는 경우 403 응답을 반환
+        // 인증 X : 401 / 권한이 없는 경우 403 응답을 반환
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .accessDeniedHandler(discodeitAccessDeniedHandler)
         );
 
+        // 세션 관리(동일 계정 동시 로그인 방지)
+        http.sessionManagement(management -> management
+                .sessionConcurrency(concurrency -> concurrency
+                        .maximumSessions(1)                 // 계정당 세션 최대 1개
+                        .maxSessionsPreventsLogin(true)     // true: 새 로그인 차단, false(기본값): 기존 세션 만료
+                        .sessionRegistry(sessionRegistry)   // 유저별 세션을 기록할 저장소
+                )
+        );
+        
         return http.build();
     }
 
+
+    // 유저별로 어떤 세션들이 있는지 기록하는 저장소 (권한 변경 시 해당 유저 세션을 찾아 만료시키는 용도)
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    // HttpSession이 없어지면(로그아웃, 타임아웃) SessionRegistry에서도 해당 세션 정보를 지우기 위해 등록
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
 
     // 비밀번호
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     // 권한 계층 구조 정의
     @Bean
