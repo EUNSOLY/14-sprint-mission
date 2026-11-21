@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +30,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
+@Slf4j
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity(debug = true)
@@ -37,8 +42,16 @@ public class SecurityConfig {
     private final LogoutSuccessHandler httpStatusReturningLogoutSuccessHandler;
     private final AccessDeniedHandler discodeitAccessDeniedHandler;
 
+    @Value("${discodeit.security.remember-me.secret-key}")
+    private String rememberMeKey;
+
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            SessionRegistry sessionRegistry,
+            UserDetailsService userDetailsService
+    ) throws Exception {
 
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -79,11 +92,21 @@ public class SecurityConfig {
         http.sessionManagement(management -> management
                 .sessionConcurrency(concurrency -> concurrency
                         .maximumSessions(1)                 // 계정당 세션 최대 1개
-                        .maxSessionsPreventsLogin(true)     // true: 새 로그인 차단, false(기본값): 기존 세션 만료
+                        .maxSessionsPreventsLogin(false)    // 새 로그인 허용 + 기존 세션 만료 (true: 새 로그인 차단, false(기본값): 기존 세션 만료)
                         .sessionRegistry(sessionRegistry)   // 유저별 세션을 기록할 저장소
+                        .expiredSessionStrategy(event ->           // 만료된 세션으로 요청이 오면 401 응답
+                                event.getResponse().setStatus(HttpServletResponse.SC_UNAUTHORIZED))
                 )
         );
-        
+
+        // 로그인 상태 유지 (세션이 없어도 remember-me 쿠키로 자동 로그인)
+        http.rememberMe(remember -> remember
+                .key(rememberMeKey)                      // 토큰 생성/검증에 쓰는 비밀 키
+                .rememberMeParameter("remember-me")      // 로그인 요청에서 체크 여부를 받을 파라미터 이름
+                .tokenValiditySeconds(86400 * 14)        // 유지 기간 14일 (초 단위)
+                .userDetailsService(userDetailsService)  // 자동 로그인할 때 유저 정보를 조회할 서비스
+        );
+
         return http.build();
     }
 

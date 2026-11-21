@@ -86,6 +86,8 @@ discodeit:
     admin-username: ${ADMIN_USERNAME}
     admin-email: ${ADMIN_EMAIL}
     admin-pwd: ${ADMIN_PWD}
+    remember-me:
+      secret-key: ${REMEMBER_ME_SECRET_KEY}
 
 
 file:
