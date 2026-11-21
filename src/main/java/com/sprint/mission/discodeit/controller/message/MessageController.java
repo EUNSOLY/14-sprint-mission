@@ -21,6 +21,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,7 @@ public class MessageController implements MessageControllerDocs {
 
     @Override
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}")
+    @PreAuthorize("@messagePermission.isAuthor(#messageId, principal.userDto.id())")
     public ResponseEntity<Message> updateMessage(
             @PathVariable(value = "id") UUID messageId,
             @RequestBody MessageUpdateRequestDto request
@@ -62,11 +64,11 @@ public class MessageController implements MessageControllerDocs {
         log.info("메세지 수정 : {}", messageId);
         messageService.update(MessageIdRequestDto.from(messageId), request);
         return ResponseEntity.status(HttpStatus.OK).body(null);
-
     }
 
     @Override
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    @PreAuthorize("@messagePermission.isAuthor(#messageId, principal.userDto.id())")
     public ResponseEntity<Void> deleteMessage(
             @Parameter(description = "삭제할 Message ID")
             @PathVariable(value = "id") UUID messageId
