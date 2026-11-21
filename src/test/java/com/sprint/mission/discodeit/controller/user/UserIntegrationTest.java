@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +31,6 @@ public class UserIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
-    @Autowired
-    private UserStatusRepository userStatusRepository;
 
     @Test
     @DisplayName("사용자 생성")
@@ -57,7 +54,7 @@ public class UserIntegrationTest {
     @Test
     @DisplayName("사용자 삭제")
     void delete_user_success() {
-        // given: 삭제할 사용자를 실제로 생성 (서비스가 UserStatus도 함께 만듦)
+        // given: 삭제할 사용자를 실제로 생성
         User saved = userService.save(new UserCreateRequest("sol", "sol@test.com", "1234"), null);
         UUID userId = saved.getId();
         entityManager.flush();
@@ -70,7 +67,6 @@ public class UserIntegrationTest {
 
         // then : DB 체크
         assertThat(userRepository.findById(userId)).isEmpty();
-        assertThat(userStatusRepository.findByUserId(userId)).isEmpty();
     }
 
 }

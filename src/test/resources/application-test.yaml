@@ -22,3 +22,8 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+discodeit:
+  security:
+    admin-username: admin
+    admin-email: admin@test.com
+    admin-pwd: admin1234
