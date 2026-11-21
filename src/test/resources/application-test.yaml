@@ -27,3 +27,5 @@ discodeit:
     admin-username: admin
     admin-email: admin@test.com
     admin-pwd: admin1234
+    remember-me:
+      secret-key: ${REMEMBER_ME_SECRET_KEY:test-remember-me-secret-key}
