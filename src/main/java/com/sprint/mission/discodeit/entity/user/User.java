@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,11 +37,7 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id", columnDefinition = "uuid")
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BinaryContent profile;
-
-    @JsonBackReference // 객체 간 양방향 참조 시 발생하는 무한 재귀(순환 참조) 문제를 해결
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus userStatus;
-
+    
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Role role;

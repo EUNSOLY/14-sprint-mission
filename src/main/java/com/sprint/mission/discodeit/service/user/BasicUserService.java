@@ -6,17 +6,14 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
-import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.userstatus.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.UserDuplicateNameException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.auth.AuthService;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentValidator;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +32,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserValidator userValidator;
     private final BinaryContentValidator binaryContentValidator;
     private final UserMapper userMapper;
-    private final UserStatusMapper userStatusMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     @Override
     @Transactional
@@ -81,9 +77,6 @@ public class BasicUserService implements UserService {
         log.info("사용자 생성");
         userRepository.save(savedUser); // 저장
 
-        UserStatus userStatus = UserStatus.create(savedUser); // User 로그인 일시 핸들러 Entity 생성
-        log.info("사용자 상태 생성");
-        userStatusRepository.save(userStatus); // UserStatus 저장
 
         return savedUser;
     }
@@ -93,7 +86,7 @@ public class BasicUserService implements UserService {
     public UserDto find(UserIdRequestDto requestDto) {
         User currentUser = userValidator.getOrThrow(requestDto.getId());
 
-        return userMapper.toDto(currentUser);
+        return userMapper.toDto(currentUser, authService.isOnline(requestDto.getId()));
     }
 
     @Override
@@ -101,7 +94,7 @@ public class BasicUserService implements UserService {
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(userMapper::toDto)
+                .map(user -> userMapper.toDto(user, authService.isOnline(user.getId())))
                 .toList();
     }
 
@@ -151,16 +144,13 @@ public class BasicUserService implements UserService {
                     currentUser.updateProfile(binaryContent);
                 });
 
-        return userMapper.toDto(currentUser);
+        return userMapper.toDto(currentUser, authService.isOnline(currentUser.getId()));
     }
 
     @Override
     @Transactional
     public void delete(UserIdRequestDto requestDto) {
         User deleteUser = userValidator.getOrThrow(requestDto.getId());
-
-        log.info("사용자 상태 삭제");
-        userStatusRepository.deleteByUserId(requestDto.getId()); // 로그인 상태 삭제
 
         Optional.ofNullable(deleteUser.getProfile())
                 .ifPresent(binaryContent -> {
@@ -176,23 +166,12 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public UserStatusDto updateUserOnlineStatus(UserIdRequestDto requestDto) {
-        User user = userValidator.getOrThrow(requestDto.getId());
-        UserStatus status = userStatusRepository.findByUserId(user.getId())
-                .orElse(UserStatus.create(user));
-        status.updateLastAccessAt();
-
-        return userStatusMapper.toDto(status);
-    }
-
-    @Override
-    @Transactional
     public UserDto updateUserRole(UserRoleUpdateRequest request) {
 
         User entity = userValidator.getOrThrow(request.userId());
 
         entity.updateRole(request.newRole());
 
-        return userMapper.toDto(entity);
+        return userMapper.toDto(entity, authService.isOnline(entity.getId()));
     }
 }

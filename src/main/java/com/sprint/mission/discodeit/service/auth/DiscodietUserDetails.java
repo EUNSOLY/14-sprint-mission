@@ -19,6 +19,7 @@ public class DiscodietUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + userDto.role()));
+
     }
 
     @Override
@@ -29,5 +30,18 @@ public class DiscodietUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return userDto.username();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DiscodietUserDetails user) {
+            return this.userDto.username().equals(user.getUsername());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.userDto.username().hashCode();
     }
 }

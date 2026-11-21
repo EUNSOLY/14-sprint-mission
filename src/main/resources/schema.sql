@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS public.message_attachments CASCADE;
 DROP TABLE IF EXISTS public.messages CASCADE;
 DROP TABLE IF EXISTS public.read_statuses CASCADE;
 DROP TABLE IF EXISTS public.channels CASCADE;
-DROP TABLE IF EXISTS public.user_statuses CASCADE;
 DROP TABLE IF EXISTS public.users CASCADE;
 
 
@@ -34,17 +33,6 @@ CREATE TABLE public.users
     role varchar(20) NOT NULL
     CONSTRAINT users_pk PRIMARY KEY (id),
     CONSTRAINT profile_pk FOREIGN KEY (profile_id) REFERENCES binary_contents (id) ON DELETE SET NULL
-);
-
-CREATE TABLE public.user_statuses
-(
-    id             uuid        NOT NULL,
-    created_at     timestamptz NOT NULL,
-    updated_at     timestamptz,
-    last_active_at timestamptz NOT NULL,
-    user_id        uuid UNIQUE NOT NULL,
-    CONSTRAINT user_statuses_pk PRIMARY KEY (id),
-    CONSTRAINT users_pk FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE public.channels

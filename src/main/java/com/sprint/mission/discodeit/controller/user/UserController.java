@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
-import com.sprint.mission.discodeit.dto.userstatus.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.service.binarycontent.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.user.UserService;
@@ -115,15 +114,5 @@ public class UserController implements UserControllerDocs {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(users);
-    }
-
-    @Override
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/userStatus")
-    public ResponseEntity<UserStatusDto> updateOnlineStatus(
-            @Parameter(description = "상태를 변경할 User ID")
-            @PathVariable(value = "id") UUID userId
-    ) {
-        UserStatusDto userStatus = userService.updateUserOnlineStatus(UserIdRequestDto.from(userId));
-        return ResponseEntity.status(HttpStatus.OK).body(userStatus);
     }
 }

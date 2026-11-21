@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.exception.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.message.MessageException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusException;
 import com.sprint.mission.discodeit.exception.user.UserException;
-import com.sprint.mission.discodeit.exception.userstatus.UserStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -66,22 +65,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.builder()
                         .timestamp(e.getTimestamp())
                         .code(e.getErrorCode().name())
-                        .details(e.getDetails())
-                        .exceptionType(e.getClass().getSimpleName())
-                        .status(e.getErrorCode().getStatus().value())
-                        .build());
-    }
-
-    @ExceptionHandler(UserStatusException.class)
-    public ResponseEntity<ErrorResponse> handle(UserStatusException e) {
-        log.warn("UserStatusException : {}", e.getErrorCode().getMessage());
-
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ErrorResponse.builder()
-                        .timestamp(e.getTimestamp())
-                        .code(e.getErrorCode().name())
-                        .message(e.getMessage())
                         .details(e.getDetails())
                         .exceptionType(e.getClass().getSimpleName())
                         .status(e.getErrorCode().getStatus().value())
@@ -158,7 +141,7 @@ public class GlobalExceptionHandler {
                         .status(HttpStatus.FORBIDDEN.value())
                         .build());
     }
-
+    
     // 알수 없는 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {

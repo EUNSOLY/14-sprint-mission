@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.auth;
 
 import com.sprint.mission.discodeit.dto.auth.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserIdRequestDto;
 import com.sprint.mission.discodeit.dto.user.data.UserDto;
 import com.sprint.mission.discodeit.service.auth.DiscodietUserDetails;
 import com.sprint.mission.discodeit.service.user.UserService;
@@ -36,11 +37,13 @@ public class AuthController implements AuthControllerDocs {
     public ResponseEntity<UserDto> getMe(
             @AuthenticationPrincipal DiscodietUserDetails userDetails
     ) {
+        UserDto userDto = userService.find(UserIdRequestDto.from(userDetails.getUserDto().id()));
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(userDetails.getUserDto());
+                .body(userDto);
     }
-    
+
     @PutMapping("/api/auth/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> updateUserRole(
